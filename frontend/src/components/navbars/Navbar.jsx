@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Transition } from '@headlessui/react'
 import 'hover.css/css/hover-min.css';
 
-function Navbar() {
+function Navbar({onClick, text}) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div>
@@ -24,7 +24,7 @@ function Navbar() {
                 </div>
               </div>
               <div>
-                  <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right'>Logout</span>
+                  <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={onClick}>{text}</span>
                 </div>
             </div>
             <div className="-mr-2 flex md:hidden">

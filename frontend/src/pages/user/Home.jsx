@@ -14,7 +14,7 @@ import pentest from '../../asset/pentest.jpg'
 function Home() {
   return (
     <div className='w-screen h-screen overflow-x-hidden'>
-     <Navbar />
+     <Navbar text="Login" />
     <div className='w-full h-full'>
         <hr class="border-t-1 border-white shadow-md shadow-white" />
         <div style={{ borderRadius: "0 0 6rem 0" }} className='w-full h-homeBanner-sm md:h-homeBanner bg-custom-bg-color flex flex-col md:flex-row'>
