@@ -1,51 +1,71 @@
 import React, { useState } from 'react'
 import { Input, Button } from "@material-tailwind/react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import toast,{Toaster} from 'react-hot-toast';
+import {Toaster} from 'react-hot-toast';
 import {useNavigate} from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 
 import Navbar from '../../components/navbars/navbar'
 import LoginImage from '../../asset/login.svg'
+import axios from '../../helper/axios'
+import { setCredentials } from  '../../features/authSlice'
+import ToastHelper from '../../helper/ToastHelper';
+
+const toastHelper = new ToastHelper();
 
 function Login() {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [passwordType, setPasswordType] = useState(true);
-  const [prevToastId, setPrevToastId] = useState(null);
 
   const [values, setValues] = useState({
     email: "",
     password: ""
   })
 
-  const showToast = (message)=>{
-    
-    if(prevToastId){
-      toast.dismiss(prevToastId)
-    }
 
-    const newToastId = toast.error(message,{
-      duration: 3000,
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-        width: '300px',
-      },
-    })
-
-    setPrevToastId(newToastId)
-
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    return emailRegex.test(email);
   }
 
   const handleSubmit = ()=>{
     const {email, password} = values
 
     if(email === "" || password === ""){
-      showToast("fill the form")
+      toastHelper.showToast("fill the form")
+      return
+    }
+
+    if (!isValidEmail(email)){
+      toastHelper.showToast("email not in correct form")
       return
     }
 
     console.log(values);
+
+    axios.post('/login',values,{
+      withCredentials: true,
+      credentials: 'include'
+    })
+    .then((res)=>{
+      console.log(res.data.role);
+      console.log(res.data.accessToken);
+      console.log(res.data.fullname);
+      const userCredentials = {
+        user: res.data.fullname,
+        accessToken: res.data.accessToken,
+        role: res.data.role
+      }
+      dispatch(setCredentials(userCredentials))
+      res.data.role === 3000 ? navigate('/teacher') : navigate('/')
+    })
+    .catch((err)=>{
+      toastHelper.showToast(err?.response?.data?.message)
+      // showToast(err?.message)
+      console.log(err);
+    })
   }
 
 

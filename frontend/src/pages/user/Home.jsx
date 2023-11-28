@@ -10,6 +10,7 @@ import Sql from '../../asset/sql.jpg'
 import osint from '../../asset/osint.jpg'
 import malware from '../../asset/malware.jpg'
 import pentest from '../../asset/pentest.jpg'
+import Footer from '../../components/footer/Footer'
 
 function Home() {
   return (
@@ -74,6 +75,7 @@ function Home() {
                 <CourseComponent />
             </div>
         </div>
+    <Footer />
     </div>
     </div>
   )

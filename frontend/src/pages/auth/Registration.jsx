@@ -2,11 +2,15 @@ import React, { useState } from 'react'
 import { Input, Button } from "@material-tailwind/react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Switch } from '@headlessui/react'
-import toast,{Toaster} from 'react-hot-toast';
+import {Toaster} from 'react-hot-toast';
 import {useNavigate} from 'react-router-dom'
 
 import Navbar from '../../components/navbars/navbar'
 import LoginImage from '../../asset/login.svg'
+import axios from '../../helper/axios'
+import ToastHelper from '../../helper/ToastHelper';
+
+const toastHelper = new ToastHelper();
 
 
 function Registration() {
@@ -14,7 +18,6 @@ function Registration() {
     const [passwordType, setPasswordType] = useState(true);
     const [rePasswordType, setRePasswordType] = useState(true);
     const [enabled, setEnabled] = useState(false)
-    const [prevToastId, setPrevToastId] = useState(null);
 
     const [values, setValues] = useState({
       fullname: "",
@@ -24,40 +27,43 @@ function Registration() {
       isTeacher: false
     })
 
-    const showToast = (message)=>{
+
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
-      if(prevToastId){
-        toast.dismiss(prevToastId)
-      }
-  
-      const newToastId = toast.error(message,{
-        duration: 3000,
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-          width: '300px',
-        },
-      })
-  
-      setPrevToastId(newToastId)
-  
+      return emailRegex.test(email);
     }
 
     const handleSubmit = ()=>{
       
       const {fullname,email,password,confirmpassword} = values
       if(fullname.trim() === "" || email.trim() === "" || password.trim() === "" || confirmpassword.trim() === ""){
-        showToast("fill the form")
+        toastHelper.showToast("fill the form")
+        return
+      }
+
+      if (!isValidEmail(email)){
+        toastHelper.showToast("email not in correct form")
         return
       }
 
       if(password !== confirmpassword){
-        showToast("password doesnot match")
+        toastHelper.showToast("password doesnot match")
         return
       }
 
-      console.log({...values,isTeacher: enabled});
+
+      const postData = {...values, isTeacher: enabled}
+
+      axios.post('/signup',postData)
+      .then((res)=>{
+        navigate('/login')
+        console.log("success");
+      })
+      .catch((err)=>{
+        toastHelper.showToast(err.response.data.message)
+        console.log(err.message);
+      })
 
     }
 
@@ -65,9 +71,6 @@ function Registration() {
     const handleChanges = (e)=>{
       setValues({...values, [e.target.name]: e.target.value.trim()})
     }
-
-
-
 
 
   return (

@@ -11,17 +11,26 @@ export default withMT({
       backgroundColor: {
         'custom-bg-color': '#111927',
         'custom-btnColor': '#9FEF00',
-        'custom-cyan' : '#04D2C8'
+        'custom-cyan' : '#04D2C8',
+        'profile-card-color': '#4d44b5',
+        'dashboard-bg' : '#1F1F1F'
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
       },
       height: {
         'homeBanner': '80vh', 
-        'homeBanner-sm': '60vh' 
+        'homeBanner-sm': '60vh',
+        'screen+50': '150vh'
       },
       fontSize: {
-        'verySmall': '0.625rem'
+        'verySmall': '0.625rem',
+        'verySmall-1': '0.725rem',
+        'veryLarge': '2.5rem'
+      },
+      colors: {
+        'profile-color' : '#4d44b5',
+        'dashboard' : '#9FEF00'
       }
     },
   },

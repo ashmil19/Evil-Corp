@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Transition } from '@headlessui/react'
 import 'hover.css/css/hover-min.css';
 import { useSelector, useDispatch } from 'react-redux';
@@ -7,24 +7,23 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logOut } from '../../features/authSlice';
 import { axiosPrivate } from '../../helper/axios';
 
-function Navbar({onClick, text}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const authState = useSelector((state)=> state.auth)
-  const dispatch = useDispatch() 
-  const navigate = useNavigate()
 
-  const handleLogout = () =>{
-    axiosPrivate.get("/logout")
-    .then((response)=>{
-      console.log("success");
-      dispatch(logOut())
-      navigate('/login')
-    })
-  }
+const AdminNavbar = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const authState = useSelector((state)=> state.auth)
+    const dispatch = useDispatch() 
+    const navigate = useNavigate()
 
-  const allowedRoles = [1000,2000,3000] 
+    const handleLogout = () =>{
+        axiosPrivate.get("/logout")
+        .then((response)=>{
+          console.log("success");
+          dispatch(logOut())
+          navigate('/login')
+        })
+    }
+    
 
-  console.log(authState);
   return (
     <div>
       <nav className="w-screen bg-custom-bg-color">
@@ -36,18 +35,16 @@ function Navbar({onClick, text}) {
               </div>
               <div className="hidden md:flex md:justify-between">
                 <div className=" flex items-center justify-between space-x-7">
-                  <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Home</p>
-                  <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Course</p>
-                  <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>About Us</p>
-                  <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Blog</p>
-                  <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Profile</p>
+                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'><Link to="/admin">Dashboard</Link></p>
+                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Students</p>
+                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Teachers</p>
+                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Teacher Request</p>
+                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>All Courses</p>
+                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Transactions</p>
                 </div>
               </div>
-              <div>
-                  {authState?.role?.find(role => allowedRoles?.includes(role))
-                  ? <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={handleLogout}>Logout</span>
-                  : <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={onClick == undefined ? ()=> navigate('/login') : onClick}>{text}</span>
-                }
+              <div>  
+                <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={handleLogout}>Logout</span>
               </div>
             </div>
             <div className="-mr-2 flex md:hidden">
@@ -111,10 +108,11 @@ function Navbar({onClick, text}) {
               <div ref={ref} className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               
                 <div className=" flex flex-col gap-3 mb-3">
-                  <p className='text-white text-medium cursor-pointer py-1'>Home</p>
-                  <p className='text-white text-medium cursor-pointer py-1'>Course</p>
-                  <p className='text-white text-medium cursor-pointer py-1'>About Us</p>
-                  <p className='text-white text-medium cursor-pointer py-1'>Blog</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Dashboard</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Running Class</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Upload Class</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Chat</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Payment</p>
                   <p className='text-white text-medium cursor-pointer py-1'>Profile</p>
                 </div>
               
@@ -131,4 +129,4 @@ function Navbar({onClick, text}) {
   )
 }
 
-export default Navbar
+export default AdminNavbar
