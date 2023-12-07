@@ -1,13 +1,33 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import {FaMailBulk, FaPhone } from 'react-icons/fa';
+import { useSelector } from 'react-redux'
+
+import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 
 import TeacherNavbar from '../../components/navbars/TeacherNavbar'
 import ThreeDotMenu from '../../components/common/ThreeDotMenu';
 import ProfileIcon from '../../components/common/ProfileIcon';
+import profileImg from '../../asset/person.svg'
+import { Button } from '@material-tailwind/react';
 
 const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0e6b47b83af64e0c9.jpg';
 
 const TeacherProfile = () => {
+  const [image, setImage] = useState(null)
+  const [teacherData, setTeacherData] = useState({})
+  const axiosPrivate = useAxiosPrivate()
+  const authState = useSelector((state)=> state.auth)
+
+  useEffect(() => {
+    
+    axiosPrivate.get(`/teacher/profile?userId=${authState.userId}`)
+    .then((res)=>{
+      setTeacherData(res?.data?.teacher)
+      console.log(res?.data?.teacher);
+    })
+    
+  }, []);
+
   return (
     <div className='w-screen h-screen+50 md:h-screen overflow-x-hidden'>
       <TeacherNavbar />
@@ -16,21 +36,22 @@ const TeacherProfile = () => {
           <div className='h-1/2 flex flex-col relative'>
             <div className='bg-profile-card-color h-1/3 rounded-tl-md rounded-tr-md'></div>
             <div className='bg-white h-2/3 rounded-bl-md rounded-br-md'>
-              <div className='h-1/4 flex justify-end pr-5'>
+              <div className='h-1/4 flex justify-end pr-5 gap-4'>
+                {/* <Button className='h-10'>hel</Button> */}
                 <ThreeDotMenu />
               </div>
-              <div className='h-1/4 pl-5 text-2xl font-semibold flex items-center'>Maria Historia</div>
+              <div className='h-1/4 pl-5 text-2xl font-semibold flex items-center'>{teacherData ? teacherData.fullname : ""}</div>
               <div className='h-2/4 flex flex-col md:flex-row pl-5'>
                 <div className='w-1/2 h-full flex items-center'>
-                  <ProfileIcon Icon={<FaMailBulk/>} title='email' subtitle='kingkaiser@gmail.com' />
+                  <ProfileIcon Icon={<FaMailBulk/>} title='email' subtitle={teacherData ? teacherData.email : ""} />
                 </div>
-                <div className='w-1/2 h-full flex items-center'>
+                {/* <div className='w-1/2 h-full flex items-center'>
                   <ProfileIcon Icon={<FaPhone/>} title='phone' subtitle='909876883' />
-                </div>
+                </div> */}
               </div>
             </div>
             <div className='bg-white w-24 md:w-28 h-24 md:h-28 rounded-full absolute top-14 md:top-8 left-4 flex items-center justify-center'>
-              <div style={{backgroundImage: `url(${profilePic})`}} className='bg-black bg-cover bg-center w-20 md:w-24 h-20 md:h-24 rounded-full '></div>
+              <div style={{backgroundImage: `url(${image ? URL.createObjectURL(image) : profileImg})`}} className='bg-grey-800 bg-cover bg-center w-20 md:w-24 h-20 md:h-24 rounded-full '></div>
             </div>
           </div>
           <div className='bg-white h-1/2 rounded-md'>

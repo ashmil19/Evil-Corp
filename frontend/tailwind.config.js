@@ -13,12 +13,15 @@ export default withMT({
         'custom-btnColor': '#9FEF00',
         'custom-cyan' : '#04D2C8',
         'profile-card-color': '#4d44b5',
-        'dashboard-bg' : '#1F1F1F'
+        'dashboard-bg' : '#1F1F1F',
+        'teacher-card-bg' : '#272738',
+        'teacher-btn' : '#FB7D5B'
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
       },
       height: {
+        'course': '130vh',
         'homeBanner': '80vh', 
         'homeBanner-sm': '60vh',
         'screen+50': '150vh'
@@ -30,7 +33,8 @@ export default withMT({
       },
       colors: {
         'profile-color' : '#4d44b5',
-        'dashboard' : '#9FEF00'
+        'dashboard' : '#9FEF00',
+        'Student-management' : '#111927'
       }
     },
   },

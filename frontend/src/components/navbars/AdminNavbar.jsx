@@ -36,8 +36,8 @@ const AdminNavbar = () => {
               <div className="hidden md:flex md:justify-between">
                 <div className=" flex items-center justify-between space-x-7">
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'><Link to="/admin">Dashboard</Link></p>
-                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Students</p>
-                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Teachers</p>
+                  <Link to="/admin/students"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Students</p></Link>
+                  <Link to="/admin/teachers"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Teachers</p></Link>
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Teacher Request</p>
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>All Courses</p>
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Transactions</p>

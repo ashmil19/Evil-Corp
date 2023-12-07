@@ -50,11 +50,9 @@ function Login() {
       credentials: 'include'
     })
     .then((res)=>{
-      console.log(res.data.role);
-      console.log(res.data.accessToken);
-      console.log(res.data.fullname);
       const userCredentials = {
         user: res.data.fullname,
+        userId: res.data.userId,
         accessToken: res.data.accessToken,
         role: res.data.role
       }

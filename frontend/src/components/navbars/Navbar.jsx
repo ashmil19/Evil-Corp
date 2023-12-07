@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Transition } from '@headlessui/react'
 import 'hover.css/css/hover-min.css';
 import { useSelector, useDispatch } from 'react-redux';
@@ -36,11 +36,11 @@ function Navbar({onClick, text}) {
               </div>
               <div className="hidden md:flex md:justify-between">
                 <div className=" flex items-center justify-between space-x-7">
-                  <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Home</p>
+                  <Link to='/user'><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Home</p></Link>
                   <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Course</p>
                   <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>About Us</p>
                   <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Blog</p>
-                  <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Profile</p>
+                  <Link to="/user/profile"><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Profile</p></Link>
                 </div>
               </div>
               <div>
