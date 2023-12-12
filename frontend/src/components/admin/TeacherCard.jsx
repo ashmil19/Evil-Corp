@@ -18,7 +18,7 @@ const TeacherCard = () => {
         </div>
         <div className='w-full h-1/3 flex justify-evenly items-center'>
                 <Button className='bg-profile-color'>Profile</Button>
-                <Button className='bg-teacher-btn'>Profile</Button>
+                <Button className='bg-teacher-btn'>Chat</Button>
         </div>
     </div>
   )

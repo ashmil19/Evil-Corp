@@ -18,15 +18,49 @@ const TeacherProfile = () => {
   const axiosPrivate = useAxiosPrivate()
   const authState = useSelector((state)=> state.auth)
 
-  useEffect(() => {
-    
+
+  const handleEditClick = () => {
+    document.getElementById('imageInput').click()
+  } 
+
+  const handleUploadImage = (e) =>{
+    setImage(e.target.files[0])
+
+    const postData = {
+      id: teacherData._id,
+      image: e.target.files[0],
+    }
+
+    axiosPrivate.post("/teacher/uploadImage", postData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    .then((res) => {
+      setImage(null)
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  }
+
+  const getBackgroundImage = () => {
+    if (image) {
+      return URL.createObjectURL(image);
+    } else if (teacherData?.profileImage?.url) {
+      return teacherData.profileImage.url;
+    }else {
+      return profileImg;
+    }
+  };
+
+  useEffect(() => { 
     axiosPrivate.get(`/teacher/profile?userId=${authState.userId}`)
     .then((res)=>{
       setTeacherData(res?.data?.teacher)
       console.log(res?.data?.teacher);
     })
     
-  }, []);
+  }, [image]);
 
   return (
     <div className='w-screen h-screen+50 md:h-screen overflow-x-hidden'>
@@ -51,7 +85,15 @@ const TeacherProfile = () => {
               </div>
             </div>
             <div className='bg-white w-24 md:w-28 h-24 md:h-28 rounded-full absolute top-14 md:top-8 left-4 flex items-center justify-center'>
-              <div style={{backgroundImage: `url(${image ? URL.createObjectURL(image) : profileImg})`}} className='bg-grey-800 bg-cover bg-center w-20 md:w-24 h-20 md:h-24 rounded-full '></div>
+              <div style={{backgroundImage: `url(${getBackgroundImage()})`}} onClick={handleEditClick} className='bg-gray-600 hover:opacity-60 bg-cover bg-center w-20 md:w-24 h-20 md:h-24 rounded-full '>
+                <input
+                  type="file"
+                  id="imageInput"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleUploadImage}
+                />
+              </div>
             </div>
           </div>
           <div className='bg-white h-1/2 rounded-md'>

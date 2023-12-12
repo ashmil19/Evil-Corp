@@ -24,7 +24,6 @@ function Navbar({onClick, text}) {
 
   const allowedRoles = [1000,2000,3000] 
 
-  console.log(authState);
   return (
     <div>
       <nav className="w-screen bg-custom-bg-color">
@@ -37,7 +36,7 @@ function Navbar({onClick, text}) {
               <div className="hidden md:flex md:justify-between">
                 <div className=" flex items-center justify-between space-x-7">
                   <Link to='/user'><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Home</p></Link>
-                  <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Course</p>
+                  <Link to="/user/course"><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Course</p></Link>
                   <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>About Us</p>
                   <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Blog</p>
                   <Link to="/user/profile"><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Profile</p></Link>

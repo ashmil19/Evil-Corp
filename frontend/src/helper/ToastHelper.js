@@ -18,7 +18,9 @@ class ToastHelper{
             borderRadius: '10px',
             background: '#333',
             color: '#fff',
-            width: '300px',
+            width: '500px',
+            fontSize: '0.85rem',
+            textAlign: 'center'
           },
         })
     

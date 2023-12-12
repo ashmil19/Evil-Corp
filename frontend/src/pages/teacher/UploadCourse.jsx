@@ -1,16 +1,21 @@
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useEffect } from 'react'
+import { useNavigate } from  'react-router-dom'
 import { FaPlus, FaSearch } from 'react-icons/fa'
 import { Dialog, Transition } from '@headlessui/react'
 import { Input, Textarea, Select, Option } from '@material-tailwind/react'
-import {Toaster} from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import Dropzone from 'react-dropzone'
 
 import TeacherNavbar from '../../components/navbars/TeacherNavbar'
 import TeacherCourseCard from '../../components/teacher/TeacherCourseCard'
 import ToastHelper from '../../helper/ToastHelper';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 
 const UploadCourse = () => {
+    const axiosPrivate = useAxiosPrivate()
     const toastHelper = new ToastHelper()
+    const navigate = useNavigate()
+    const [courses, setCourses] = useState(null)
     const [isOpen, setIsOpen] = useState(false)
     const [selectedCategory, setSelectedCategory] = useState('');
     const [coverImage, setCoverImage] = useState(null);
@@ -25,7 +30,7 @@ const UploadCourse = () => {
         setCoverImage(null)
         setIsOpen(false)
     }
-    
+
     function openModal() {
         setIsOpen(true)
     }
@@ -40,26 +45,53 @@ const UploadCourse = () => {
         }
     };
 
-    
-    const handleChanges = (e)=>{
-        setValues({...values, [e.target.name]: e.target.value.trim()})
+
+    const handleChanges = (e) => {
+        setValues({ ...values, [e.target.name]: e.target.value.trim() })
     }
 
 
-    const handleCreateCourse = () =>{
-        if(selectedCategory === "" || values.title === "" || values.description === "" || values.price === "" || !coverImage ){
+    const handleCreateCourse = () => {
+        if (selectedCategory === "" || values.title === "" || values.description === "" || values.price === "" || !coverImage) {
             toastHelper.showToast("Fill the Form")
             return
         }
 
-        if(Number(values.price) < 1){
+        if (Number(values.price) < 1) {
             toastHelper.showToast('Price Must greater Zero')
             return
         }
 
-        console.log({...values,category: selectedCategory,coverImage: coverImage});
+        const postData = { ...values, category: selectedCategory, coverImage: coverImage }
+
+        axiosPrivate.post("/teacher/course", postData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+            .then((res) => {
+                toastHelper.showToast(res.data.message)
+                console.log(res);
+            })
+            .catch((err) => {
+                toastHelper.showToast("some went wrong")
+                console.log(res);
+            })
+
+        closeModal()
+
     }
-      
+
+    useEffect(() => {
+        axiosPrivate.get("/teacher/course")
+        .then((res)=>{
+            console.log(res.data.courses);
+            setCourses(res.data.courses)
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+
+    }, []);
+
 
     return (
         <>
@@ -80,8 +112,8 @@ const UploadCourse = () => {
                         </div>
                     </div>
                     <div className='w-full h-auto flex justify-center px-2 py-2 flex-wrap gap-4'>
-                        {[1, 2].map(() => {
-                            return <TeacherCourseCard />
+                        {courses && courses.map((course) => {
+                            return <TeacherCourseCard image={course.coverImage} onclick={()=>navigate("/teacher/courseDetails")} />
                         })}
                         <div className='h-56 w-64 bg-gray-300 rounded-lg flex justify-center items-center cursor-pointer' onClick={openModal} >
                             <FaPlus className='text-Student-management' size={180} />
@@ -125,16 +157,16 @@ const UploadCourse = () => {
                                         Create Course
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col gap-3">
-                                        <Input label="Title" name='title'  onChange={handleChanges} />
-                                        <Select variant="outlined" label="Category" id="category" name="category" onChange={(e)=> setSelectedCategory(e)}>
+                                        <Input label="Title" name='title' onChange={handleChanges} />
+                                        <Select variant="outlined" label="Category" id="category" name="category" onChange={(e) => setSelectedCategory(e)}>
                                             <Option value='Osint'>Osint</Option>
                                             <Option value='Malware'>Malware</Option>
                                             <Option value='Pentesting'>Pentesting</Option>
                                             <Option value='SQL Injection'>SQL Injection</Option>
                                             <Option value='Other'>Other</Option>
                                         </Select>
-                                        <Textarea label="Description" name='description'  onChange={handleChanges} />
-                                        <Input type='number' label='Price' name='price'  onChange={handleChanges} />
+                                        <Textarea label="Description" name='description' onChange={handleChanges} />
+                                        <Input type='number' label='Price' name='price' onChange={handleChanges} />
                                         {/* <Input type='file' label='Cover Image' name='coverImage' onChange={(e)=> setCoverImage(e.target.files[0])} /> */}
                                         <Dropzone onDrop={handleDrop}>
                                             {({ getRootProps, getInputProps }) => (
@@ -144,7 +176,7 @@ const UploadCourse = () => {
                                                         <div className='flex flex-col h-full justify-center'>
 
                                                             {coverImage ? <div className='h-1/3 flex items-center justify-center'>{coverImage.name}</div>
-                                                            :<p>Drag 'n' drop some files here, or click to select files</p>}
+                                                                : <p>Drag 'n' drop some files here, or click to select files</p>}
                                                             {coverImage && <img className='w-full h-2/3 object-center pb-4' src={URL.createObjectURL(coverImage)}></img>}
 
                                                         </div>

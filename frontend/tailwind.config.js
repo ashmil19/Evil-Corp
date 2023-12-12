@@ -15,7 +15,8 @@ export default withMT({
         'profile-card-color': '#4d44b5',
         'dashboard-bg' : '#1F1F1F',
         'teacher-card-bg' : '#272738',
-        'teacher-btn' : '#FB7D5B'
+        'teacher-btn' : '#FB7D5B',
+        'course-card' : '#c7becc',
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
