@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useEffect } from 'react'
 import { Button } from '@material-tailwind/react'
 import { FaUpload } from 'react-icons/fa'
 import { GoGrabber } from "react-icons/go";
@@ -7,14 +7,20 @@ import Dropzone from 'react-dropzone'
 import { Dialog, Transition } from '@headlessui/react'
 import { Input, Textarea, Select, Option } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
+import { useLocation } from 'react-router-dom';
 
 
 import TeacherNavbar from '../../components/navbars/TeacherNavbar'
 import ToastHelper from '../../helper/ToastHelper'
+import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0e6b47b83af64e0c9.jpg';
 
 
 const CourseDetails = () => {
+  const axiosPrivate = useAxiosPrivate()
+  const location = useLocation();
+  const courseId = location.state && location.state.id;
+
   const toastHelper = new ToastHelper()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -96,6 +102,17 @@ const CourseDetails = () => {
   const handleChanges = (e) => {
     setEditValues({ ...editValues, [e.target.name]: e.target.value.trim() })
   }
+
+  useEffect(() => {
+    axiosPrivate.get(`/teacher/course/${courseId}`)
+    .then((res)=>{
+      console.log(res.data);
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+
+  }, []);
 
   return (
     <>

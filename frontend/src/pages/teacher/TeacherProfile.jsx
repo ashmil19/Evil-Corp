@@ -54,7 +54,8 @@ const TeacherProfile = () => {
   };
 
   useEffect(() => { 
-    axiosPrivate.get(`/teacher/profile?userId=${authState.userId}`)
+    const userId = authState.userId;
+    axiosPrivate.get(`/teacher/profile/${userId}`)
     .then((res)=>{
       setTeacherData(res?.data?.teacher)
       console.log(res?.data?.teacher);

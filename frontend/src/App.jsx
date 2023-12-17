@@ -10,6 +10,7 @@ import Teacher from "./routers/Teacher"
 import Home from "./pages/user/Home"
 import RequireAuth from "./components/features/RequireAuth"
 import CheckAuth from "./components/features/checkAuth"
+import OtpComponent from "./components/auth/OtpComponent"
 
 const ROLES = {
   'User' : 2000,
@@ -29,6 +30,7 @@ function App() {
             <Route element={<CheckAuth />}>
               <Route path="/signup" element={<Registration />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/otp" element={<OtpComponent/>} />
             </Route>
 
 

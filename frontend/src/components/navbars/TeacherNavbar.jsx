@@ -6,22 +6,24 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { logOut } from '../../features/authSlice';
 import { axiosPrivate } from '../../helper/axios';
+import useLogout from '../../hooks/useLogout';
 
 
 function TeacherNavbar() {
+    const logout = useLogout()
     const [isOpen, setIsOpen] = useState(false);
     const authState = useSelector((state)=> state.auth)
     const dispatch = useDispatch() 
     const navigate = useNavigate()
 
-    const handleLogout = () =>{
-        axiosPrivate.get("/logout")
-        .then((response)=>{
-          console.log("success");
-          dispatch(logOut())
-          navigate('/login')
-        })
-      }
+    // const handleLogout = () =>{
+    //     axiosPrivate.get("/teacher/logout")
+    //     .then((response)=>{
+    //       console.log("success");
+    //       dispatch(logOut())
+    //       navigate('/login')
+    //     })
+    //   }
     
 
   return (
@@ -44,7 +46,7 @@ function TeacherNavbar() {
                 </div>
               </div>
               <div>  
-                <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={handleLogout}>Logout</span>
+                <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={logout}>Logout</span>
               </div>
             </div>
             <div className="-mr-2 flex md:hidden">

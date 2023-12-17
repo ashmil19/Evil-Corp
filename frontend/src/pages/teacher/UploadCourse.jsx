@@ -19,6 +19,8 @@ const UploadCourse = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [selectedCategory, setSelectedCategory] = useState('');
     const [coverImage, setCoverImage] = useState(null);
+    const [categories, setCategories] = useState(null);
+    const [message, setMessage] = useState(null)
     const [values, setValues] = useState({
         title: "",
         description: "",
@@ -63,12 +65,14 @@ const UploadCourse = () => {
         }
 
         const postData = { ...values, category: selectedCategory, coverImage: coverImage }
+        console.log(postData);
 
         axiosPrivate.post("/teacher/course", postData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
             .then((res) => {
-                toastHelper.showToast(res.data.message)
+                setMessage(res.data.message)
+                toastHelper.showToast(message)
                 console.log(res);
             })
             .catch((err) => {
@@ -90,7 +94,16 @@ const UploadCourse = () => {
             console.log(err);
         })
 
-    }, []);
+        axiosPrivate.get("/teacher/category")
+        .then((res)=>{
+            console.log(res.data.categories);
+            setCategories(res.data.categories)
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+
+    }, [message]);
 
 
     return (
@@ -113,7 +126,7 @@ const UploadCourse = () => {
                     </div>
                     <div className='w-full h-auto flex justify-center px-2 py-2 flex-wrap gap-4'>
                         {courses && courses.map((course) => {
-                            return <TeacherCourseCard image={course.coverImage} onclick={()=>navigate("/teacher/courseDetails")} />
+                            return <TeacherCourseCard image={course.coverImage} onclick={()=>navigate("/teacher/courseDetails",{state: {id: course._id}})} />
                         })}
                         <div className='h-56 w-64 bg-gray-300 rounded-lg flex justify-center items-center cursor-pointer' onClick={openModal} >
                             <FaPlus className='text-Student-management' size={180} />
@@ -159,11 +172,9 @@ const UploadCourse = () => {
                                     <div className="mt-2 flex flex-col gap-3">
                                         <Input label="Title" name='title' onChange={handleChanges} />
                                         <Select variant="outlined" label="Category" id="category" name="category" onChange={(e) => setSelectedCategory(e)}>
-                                            <Option value='Osint'>Osint</Option>
-                                            <Option value='Malware'>Malware</Option>
-                                            <Option value='Pentesting'>Pentesting</Option>
-                                            <Option value='SQL Injection'>SQL Injection</Option>
-                                            <Option value='Other'>Other</Option>
+                                            {categories && categories.map((category)=>{
+                                                return <Option value={category._id}>{category.name}</Option>
+                                            })}
                                         </Select>
                                         <Textarea label="Description" name='description' onChange={handleChanges} />
                                         <Input type='number' label='Price' name='price' onChange={handleChanges} />

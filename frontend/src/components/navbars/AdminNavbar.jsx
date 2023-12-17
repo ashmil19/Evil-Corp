@@ -6,22 +6,24 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { logOut } from '../../features/authSlice';
 import { axiosPrivate } from '../../helper/axios';
+import useLogout from '../../hooks/useLogout';
 
 
 const AdminNavbar = () => {
+    const logout = useLogout()
     const [isOpen, setIsOpen] = useState(false);
     const authState = useSelector((state)=> state.auth)
     const dispatch = useDispatch() 
     const navigate = useNavigate()
 
-    const handleLogout = () =>{
-        axiosPrivate.get("/logout")
-        .then((response)=>{
-          console.log("success");
-          dispatch(logOut())
-          navigate('/login')
-        })
-    }
+    // const handleLogout = () =>{
+    //     axiosPrivate.get("/admin/logout")
+    //     .then((response)=>{
+    //       console.log("success");
+    //       dispatch(logOut())
+    //       navigate('/login')
+    //     })
+    // }
     
 
   return (
@@ -38,13 +40,13 @@ const AdminNavbar = () => {
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'><Link to="/admin">Dashboard</Link></p>
                   <Link to="/admin/students"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Students</p></Link>
                   <Link to="/admin/teachers"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Teachers</p></Link>
-                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Teacher Request</p>
+                  <Link to="/admin/category"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Category</p></Link>
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>All Courses</p>
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Transactions</p>
                 </div>
               </div>
               <div>  
-                <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={handleLogout}>Logout</span>
+                <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={logout}>Logout</span>
               </div>
             </div>
             <div className="-mr-2 flex md:hidden">
@@ -109,11 +111,11 @@ const AdminNavbar = () => {
               
                 <div className=" flex flex-col gap-3 mb-3">
                   <p className='text-white text-medium cursor-pointer py-1'>Dashboard</p>
-                  <p className='text-white text-medium cursor-pointer py-1'>Running Class</p>
-                  <p className='text-white text-medium cursor-pointer py-1'>Upload Class</p>
-                  <p className='text-white text-medium cursor-pointer py-1'>Chat</p>
-                  <p className='text-white text-medium cursor-pointer py-1'>Payment</p>
-                  <p className='text-white text-medium cursor-pointer py-1'>Profile</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Students</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Teachers</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Category</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>All Courses</p>
+                  <p className='text-white text-medium cursor-pointer py-1'>Transactions</p>
                 </div>
               
                 

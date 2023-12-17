@@ -6,21 +6,23 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { logOut } from '../../features/authSlice';
 import { axiosPrivate } from '../../helper/axios';
+import useLogout from '../../hooks/useLogout';
 
 function Navbar({onClick, text}) {
+  const logout = useLogout()
   const [isOpen, setIsOpen] = useState(false);
   const authState = useSelector((state)=> state.auth)
   const dispatch = useDispatch() 
   const navigate = useNavigate()
 
-  const handleLogout = () =>{
-    axiosPrivate.get("/logout")
-    .then((response)=>{
-      console.log("success");
-      dispatch(logOut())
-      navigate('/login')
-    })
-  }
+  // const handleLogout = () =>{
+  //   axiosPrivate.get("/user/logout")
+  //   .then((response)=>{
+  //     console.log("success");
+  //     dispatch(logOut())
+  //     navigate('/login')
+  //   })
+  // }
 
   const allowedRoles = [1000,2000,3000] 
 
@@ -44,7 +46,7 @@ function Navbar({onClick, text}) {
               </div>
               <div>
                   {authState?.role?.find(role => allowedRoles?.includes(role))
-                  ? <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={handleLogout}>Logout</span>
+                  ? <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={logout}>Logout</span>
                   : <span className='hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right' onClick={onClick == undefined ? ()=> navigate('/login') : onClick}>{text}</span>
                 }
               </div>

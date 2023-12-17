@@ -92,14 +92,14 @@ function Login() {
             <div>
             <Button variant="filled" onClick={handleSubmit}>Log in</Button>
             </div>
-            <div className='w-full md:w-2/3 flex items-center justify-center md:justify-start gap-2'>
+            {/* <div className='w-full md:w-2/3 flex items-center justify-center md:justify-start gap-2'>
               <hr className='w-1/3 md:w-1/3 border-t-2 border-gray-500 my-4'/>
               <span>Or</span>
               <hr className='w-1/3 border-t-2 border-gray-500 my-4'/>
             </div>
             <div className='w-1/2 flex justify-center'>
               google
-            </div>
+            </div> */}
           </div>
         </div>
         <Toaster/>
