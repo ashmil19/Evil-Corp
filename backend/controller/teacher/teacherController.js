@@ -144,6 +144,8 @@ const getAllCategory = async (req, res) => {
 const uploadChapter = async (req, res) => {
   try {
     const { index, title, courseId } = req.body;
+    const chapterVideo = req.files.chapterVideo;
+
     const existedChapter = await courseModel
       .findById(courseId)
       .populate("chapters");
@@ -153,17 +155,29 @@ const uploadChapter = async (req, res) => {
         return;
       }
     }
-    const video = await uploadVideo(req.files.chapterVideo);
-    const newChapter = new chapterModel({
-      index,
-      title,
-      video,
-    });
-    const Chapter = await newChapter.save();
-    await courseModel.findByIdAndUpdate(courseId, {
-      $push: { chapters: Chapter._id },
-    });
-    res.status(200).json({ message: "Chapter uploaded" });
+
+    // const video = await uploadVideo(chapterVideo);
+    // const newChapter = new chapterModel({
+    //   index,
+    //   title,
+    //   video,
+    // });
+    // const Chapter = await newChapter.save();
+    // await courseModel.findByIdAndUpdate(courseId, {
+    //   $push: { chapters: Chapter._id },
+    // });
+
+    await addJobToTestQueue({
+      type: 'VideoUpload',
+      data: {
+        index,
+        title,
+        chapterVideo,
+        courseId
+      }
+    })
+
+    res.status(200).json({ message: "Queued" });
   } catch (error) {
     console.log(error);
   }

@@ -1,46 +1,44 @@
-require('dotenv').config()
-const { Worker } = require('bullmq');
-const {Jobs} = require('./jobs');
+require("dotenv").config();
+const { Worker } = require("bullmq");
+const { Jobs } = require("./jobs");
+const { uploadVideo } = require("./videoUpload");
+const chapterModel = require("../models/chapterModel");
+const courseModel = require("../models/courseModel");
+const mongodb = require("../config/mongo");
+
+mongodb();
 
 const workerHandler = async (job) => {
-    switch(job.data.type){
-        case Jobs.videoUpload: {
-            console.log("Hello world", job.data);
-            return;
-        }
-
-        // case "DoSomeHeavyComputing": {
-        //     console.log("starting job", job.data);
-        //     job.updateProgress(10);
-
-        //     let sum = 0;
-        //     for(let i=0; i<100000; i++){
-        //         sum = sum + i;
-        //         console.log(sum);
-        //     }
-
-        //     job.updateProgress(100);
-        //     console.log("finished job", job.name);
-        //     return;
-        // }
-
-        // case "MayFailOrNot": {
-        //     if(Math.random() > 0.3){
-        //         console.log(`FAILED ;(- ${job.data.data.magicNumber})`);
-        //         throw new Error("something went wrong");
-        //     }
-            
-        //     console.log(`COMPLETED ;(- ${job.data.data.magicNumber})`);
-        //     return "done";
-        // }
+  switch (job.data.type) {
+    case "VideoUpload": {
+      try {
+        console.log({ ...job.data });
+        const { index, title, chapterVideo, courseId } = job.data.data;
+        const video = await uploadVideo(chapterVideo);
+        const newChapter = new chapterModel({
+          index,
+          title,
+          video,
+        });
+        const Chapter = await newChapter.save();
+        await courseModel.findByIdAndUpdate(courseId, {
+          $push: { chapters: Chapter._id },
+        });
+        console.log("succeess");
+        return;
+      } catch (error) {
+        console.log(error);
+      }
     }
+
+  }
 };
 
 const workerOptions = {
-    connection: {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
-    }
+  connection: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  },
 };
 
 const worker = new Worker("testQueue", workerHandler, workerOptions);

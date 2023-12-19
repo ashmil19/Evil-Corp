@@ -142,13 +142,13 @@ const CourseDetails = () => {
     })
       .then((res) => {
         console.log(res);
-        closeChapterModal()
       })
       .catch((err) => {
         toastHelper.showToast(err?.response?.data?.message)
         console.log(err);
       })
-
+      
+      closeChapterModal()
 
   }
 
