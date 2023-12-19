@@ -66,7 +66,7 @@ const OtpComponent = () => {
             />
             <div className='w-full flex justify-center items-center gap-2'>
                 <Button size='sm' onClick={handleOtpVerify}>Verify</Button>
-                <Button size='sm' onClick={handleOtpResend} >Resend OTP</Button>
+                {/* <Button size='sm' onClick={handleOtpResend} >Resend OTP</Button> */}
             </div>
         </div>
         <Toaster />

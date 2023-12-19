@@ -22,6 +22,10 @@ const CategoryManagement = () => {
     const [search, setSearch] = useState("")
     const [message, setMessage] = useState(null)
 
+    const [isImageOpen, setIsImageOpen] = useState(false)
+    const [categoryId, setCategoryId] = useState(null)
+    const [coverImage, setCoverImage] = useState(null);
+
     function closeModal() {
         setIsOpen(false)
         setImage(null)
@@ -31,11 +35,31 @@ const CategoryManagement = () => {
         setIsOpen(true)
     }
 
+    function closeImageModal() {
+        setCoverImage(null)
+        setIsImageOpen(false)
+    }
+
+    function openImageModal(id) {
+        setCategoryId(id)
+        setIsImageOpen(true)
+    }
+
     const handleEditImageDrop = (acceptedFiles) => {
         const file = acceptedFiles[0];
 
         if (file && file.type.startsWith('image/')) {
             setImage(acceptedFiles[0])
+        } else {
+            toastHelper.showToast('Please upload a valid image file.');
+        }
+    };
+
+    const handleEditCoverImageDrop = (acceptedFiles) => {
+        const file = acceptedFiles[0];
+
+        if (file && file.type.startsWith('image/')) {
+            setCoverImage(acceptedFiles[0])
         } else {
             toastHelper.showToast('Please upload a valid image file.');
         }
@@ -55,27 +79,55 @@ const CategoryManagement = () => {
         axiosPrivate.post("/admin/category", postData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
-        .then((res) => {
-            toastHelper.showToast(res.data.message)
-            setMessage(res.data.message)
-            console.log(res);
-        })
-        .catch((err) => {
-            toastHelper.showToast(err?.response?.data?.message)
-            console.log(res);
-        })
+            .then((res) => {
+                toastHelper.showToast(res.data.message)
+                setMessage(res.data.message)
+                console.log(res);
+            })
+            .catch((err) => {
+                toastHelper.showToast(err?.response?.data?.message)
+                console.log(res);
+            })
 
         closeModal()
 
     }
 
-    const hanndleSearch = async ()=>{
+    const handleImageUpload = () => {
+        if (!coverImage) {
+            toastHelper.showToast("select any image")
+            return
+        }
+
+        const postData = {
+            id: categoryId,
+            image: coverImage,
+        }
+
+        console.log(postData);
+
+        axiosPrivate.post("/admin/changeImage", postData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        .then((res) => {
+            setCoverImage(null)
+            console.log(res);
+            setMessage(res.data.message)
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+
+        closeImageModal()
+    }
+
+    const hanndleSearch = async () => {
         const response = await axiosPrivate.get(`/admin/category?search=${search}`)
         setCategories(response?.data?.categories)
     }
 
     useEffect(() => {
-        const fetchCategory = async ()=>{
+        const fetchCategory = async () => {
             const response = await axiosPrivate.get("/admin/category");
             console.log(response.data.categories);
             setCategories(response?.data?.categories)
@@ -92,7 +144,7 @@ const CategoryManagement = () => {
                     <div className='w-full h-20 flex items-center justify-end px-0 md:px-4 gap-4'>
                         <div className='flex '>
                             <input
-                                onChange={(e)=> setSearch(e.target.value)}
+                                onChange={(e) => setSearch(e.target.value)}
                                 type="text"
                                 placeholder="Search..."
                                 className="p-2 rounded-l-md w-full md:w-64 text-white text-verySmall-1 bg-dashboard-bg outline-none"
@@ -135,7 +187,7 @@ const CategoryManagement = () => {
                                                 {category.name}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <Button size='sm'>Edit</Button>
+                                                <Button size='sm' onClick={()=> openImageModal(category._id)}>Edit</Button>
                                             </td>
                                         </tr>
                                     })
@@ -207,6 +259,73 @@ const CategoryManagement = () => {
                                             type="button"
                                             className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                             onClick={handleCreateCategory}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
+
+            <Transition appear show={isImageOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeImageModal}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black/25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    <Dialog.Title
+                                        as="h3"
+                                        className="text-lg font-medium leading-6 text-gray-900"
+                                    >
+                                        Image Upload
+                                    </Dialog.Title>
+                                    <div className="mt-2 flex flex-col gap-3">
+                                        <Dropzone accept={['image/*']} multiple={false} onDrop={handleEditCoverImageDrop}>
+                                            {({ getRootProps, getInputProps }) => (
+                                                <section>
+                                                    <div className='w-full h-40 border-2 border-gray-400 border-dashed flex items-center justify-center cursor-pointer' {...getRootProps()}>
+                                                        <input {...getInputProps()} />
+                                                        <div className='flex flex-col h-full justify-center'>
+
+                                                            {coverImage ? <div className='h-1/3 flex items-center justify-center'>{coverImage.name}</div>
+                                                                : <p>Drag 'n' drop image here, or click to select image</p>}
+                                                            {coverImage && <img className='w-full h-2/3 object-center pb-4' src={URL.createObjectURL(coverImage)}></img>}
+
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            )}
+                                        </Dropzone>
+                                    </div>
+
+                                    <div className="mt-4 flex justify-center">
+                                        <button
+                                            type="button"
+                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                            onClick={handleImageUpload}
                                         >
                                             Submit
                                         </button>

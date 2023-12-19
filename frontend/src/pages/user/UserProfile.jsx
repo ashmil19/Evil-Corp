@@ -8,7 +8,7 @@ import { Toaster } from 'react-hot-toast'
 
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import ToastHelper from '../../helper/ToastHelper'
-import Navbar from '../../components/navbars/navbar'
+import Navbar from '../../components/navbars/Navbar'
 import profileImg from '../../asset/person.svg'
 import { updateUser } from '../../features/authSlice'
 
@@ -19,11 +19,16 @@ import { updateUser } from '../../features/authSlice'
 const UserProfile = () => {
   const dispatch = useDispatch()
   const toastHelper = new ToastHelper()
-  const [isOpen, setIsOpen] = useState(false)
-  const [image, setImage] = useState(null)
-  const [userData, setUserData] = useState({})
   const axiosPrivate = useAxiosPrivate()
   const authState = useSelector((state) => state.auth)
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [isOldPasswordOpen, setIsOldPasswordOpen] = useState(false)
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false)
+  const [image, setImage] = useState(null)
+  const [userData, setUserData] = useState({})
+  const [oldPassword, setOldPassword] = useState(null)
+  const [Password, setPassword] = useState(null)
 
   const [editValues, setEditValues] = useState({
     fullname: authState.user,
@@ -49,6 +54,40 @@ const UserProfile = () => {
       .catch((err) => {
         console.log(err);
       })
+  }
+
+  const checkOldPassword = () =>{
+    const postData = {
+      password: oldPassword,
+      userId: userData._id
+    }
+    axiosPrivate.post("/user/checkPassword",postData)
+    .then((res)=>{
+      console.log("dslfa");
+      openPasswordModal()
+      openOldPasswordModal()
+    })
+    .catch((err)=>{
+      toastHelper.showToast(err?.response?.data?.message);
+    })
+  }
+
+  const changePassword = () =>{
+    const postData = {
+      password: Password,
+      userId: userData._id
+    }
+
+    axiosPrivate.post("/user/changePassword",postData)
+    .then((res)=>{
+      console.log(res);
+    })
+    .catch((err)=>{
+      toastHelper.showToast(err?.response?.data?.message)
+    })
+    
+    closePasswordModal();
+
   }
 
   const getBackgroundImage = () => {
@@ -89,9 +128,25 @@ const UserProfile = () => {
     setIsOpen(false)
   }
 
+  function closeOldPasswordModal() {
+    setIsOldPasswordOpen(false)
+  }
+
+  function closePasswordModal() {
+    setIsPasswordOpen(false)
+  }
+
   function openModal() {
     setEditValues({ ...editValues, fullname: userData.fullname })
     setIsOpen(true)
+  }
+
+  function openOldPasswordModal() {
+    setIsOldPasswordOpen(true)
+  }
+
+  function openPasswordModal() {
+    setIsPasswordOpen(true)
   }
 
   const handleChanges = (e) => {
@@ -161,7 +216,7 @@ const UserProfile = () => {
                 {/* <ChangePasswordModal isOpen={isModalOpen} onRequestClose={closeModal} />  */}
                 {/* <EditDetailsModal isOpen={isEditModalOpen} onRequestClose={editCloseModal} userData={userData}/> */}
                 <div className="pt-12 pb-8 flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
-                  <button className="bg-green-700 hover:bg-green-900 text-white font-bold py-2 px-4 rounded-full"  >Change password</button>
+                  <button className="bg-green-700 hover:bg-green-900 text-white font-bold py-2 px-4 rounded-full" onClick={openOldPasswordModal} >Change password</button>
                   <button className="bg-green-700 hover:bg-green-900 text-white font-bold py-2 px-4 rounded-full" onClick={openModal}  >Edit details</button>
 
                 </div>
@@ -192,6 +247,7 @@ const UserProfile = () => {
         </div>
       </div>
 
+      {/* edit details */}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <Transition.Child
@@ -233,6 +289,112 @@ const UserProfile = () => {
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       onClick={handleEdit}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      {/* old password */}
+      <Transition appear show={isOldPasswordOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closeOldPasswordModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Old Password
+                  </Dialog.Title>
+                  <div className="mt-2 flex flex-col gap-3">
+                    <Input label="Old Password" name='oldPassword' onChange={(e)=> setOldPassword(e.target.value)} />
+                  </div>
+
+                  <div className="mt-4 flex justify-center">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={checkOldPassword}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      {/* change password */}
+      <Transition appear show={isPasswordOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closePasswordModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Change Password
+                  </Dialog.Title>
+                  <div className="mt-2 flex flex-col gap-3">
+                    <Input label="Old Password" name='oldPassword' onChange={(e)=> setPassword(e.target.value)} />
+                  </div>
+
+                  <div className="mt-4 flex justify-center">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={changePassword}
                     >
                       Submit
                     </button>

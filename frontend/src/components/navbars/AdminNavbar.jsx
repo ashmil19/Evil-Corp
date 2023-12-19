@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logOut } from '../../features/authSlice';
 import { axiosPrivate } from '../../helper/axios';
 import useLogout from '../../hooks/useLogout';
+import myLogo from '../../asset/logo.svg';
 
 
 const AdminNavbar = () => {
@@ -33,7 +34,7 @@ const AdminNavbar = () => {
           <div className="w-full flex items-center justify-between h-16">
             <div className="w-full flex items-center justify-between">
               <div className="flex-shrink-0">
-                <p className='text-blue-300 font-bold text-lg'>Logo</p>
+                <div className='w-10 h-10' style={{backgroundImage: `url(${myLogo})`}}></div>
               </div>
               <div className="hidden md:flex md:justify-between">
                 <div className=" flex items-center justify-between space-x-7">

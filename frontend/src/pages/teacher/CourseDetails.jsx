@@ -1,4 +1,5 @@
 import { useState, Fragment, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@material-tailwind/react'
 import { FaUpload } from 'react-icons/fa'
 import { GoGrabber } from "react-icons/go";
@@ -17,26 +18,36 @@ const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0
 
 
 const CourseDetails = () => {
+  const navigate = useNavigate()
   const axiosPrivate = useAxiosPrivate()
   const location = useLocation();
   const courseId = location.state && location.state.id;
 
   const toastHelper = new ToastHelper()
 
+  const [message, setMessage] = useState(null);
+
   const [isOpen, setIsOpen] = useState(false)
   const [isImageOpen, setIsImageOpen] = useState(false)
   const [isChapterOpen, setIsChapterOpen] = useState(false)
 
   const [selectedCategory, setSelectedCategory] = useState('');
-
   const [coverImage, setCoverImage] = useState(null);
-  // const [chapterThumbnail, setChapterThumbnail] = useState(null);
-  const [chapterVideo, setChapterVideo] = useState(null);
 
+  const [chapterVideo, setChapterVideo] = useState(null);
+  const [chapterValues, setChapterValues] = useState({
+    index: "",
+    title: ""
+  })
+
+
+  const [categories, setCategories] = useState(null);
+  const [chapter, setChapter] = useState(null);
+  const [course, setCourse] = useState(null);
   const [editValues, setEditValues] = useState({
-      title: "",
-      description: "",
-      price: "",
+    title: "",
+    description: "",
+    price: "",
   })
 
   function closeModal() {
@@ -44,6 +55,12 @@ const CourseDetails = () => {
   }
 
   function openModal() {
+    setEditValues({
+      title: course.title,
+      description: course.description,
+      price: course.price
+    })
+    setSelectedCategory(course.category._id)
     setIsOpen(true)
   }
 
@@ -57,7 +74,6 @@ const CourseDetails = () => {
   }
 
   function closeChapterModal() {
-    // setChapterThumbnail("")
     setChapterVideo("")
     setIsChapterOpen(false)
   }
@@ -98,21 +114,126 @@ const CourseDetails = () => {
     }
   };
 
+  const getBackgroundImage = () => {
+    if (coverImage) {
+      return URL.createObjectURL(coverImage);
+    } else if (course?.coverImage?.url) {
+      return course.coverImage.url;
+    } else {
+      return profilePic;
+    }
+  };
+
+  const handleUploadChapter = () => {
+    if (chapterValues === null || !chapterVideo) {
+      toastHelper.showToast("Fill the form")
+      return
+    }
+
+    const postData = {
+      ...chapterValues,
+      chapterVideo,
+      courseId
+    }
+
+    console.log(postData);
+    axiosPrivate.post("/teacher/uploadChapter", postData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+      .then((res) => {
+        console.log(res);
+        closeChapterModal()
+      })
+      .catch((err) => {
+        toastHelper.showToast(err?.response?.data?.message)
+        console.log(err);
+      })
+
+
+  }
+
+  const handleEditCourse = () =>{
+    if(editValues.title == "" || editValues.description == "" || editValues.price == ""){
+      toastHelper.showToast("Fill the form")
+      return
+    }
+
+    if(editValues.title == course.title && editValues.description == course.description && editValues.price == course.price && selectedCategory == course.category._id){
+      toastHelper.showToast("values not changed")
+      return
+    }
+    
+    console.log({...editValues,selectedCategory})
+    const putData = {...editValues,category: selectedCategory} 
+
+    axiosPrivate.put(`/teacher/course/${courseId}`,putData)
+    .then((res)=>{
+      setMessage(res.data?.message)
+      toastHelper.showToast(res.data?.message)
+      console.log(res);
+    })
+    .catch((err)=>{
+      toastHelper.showToast(err?.response?.data?.message);
+      console.log(err);
+    })
+
+    closeModal();
+  }
+
+  const handleChangeCourseImage = ()=>{
+    if(!coverImage){
+      toastHelper.showToast("select an image");
+      return;
+    }
+
+    axiosPrivate.put(`/teacher/courseImage/${courseId}`,{image: coverImage},{
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    .then((res) => {
+      setMessage(res.data?.message)
+      setCoverImage(null)
+      console.log(res);
+      toastHelper.showToast(res.data?.message)
+    })
+    .catch((err) => {
+      console.log(err);
+      toastHelper.showToast(err?.response?.data?.message);
+    })
+
+    closeImageModal()
+  }
+
 
   const handleChanges = (e) => {
     setEditValues({ ...editValues, [e.target.name]: e.target.value.trim() })
   }
 
+  const handleChapterValuesChanges = (e) => {
+    setChapterValues({ ...chapterValues, [e.target.name]: e.target.value.trim() })
+  }
+
   useEffect(() => {
     axiosPrivate.get(`/teacher/course/${courseId}`)
-    .then((res)=>{
-      console.log(res.data);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+      .then((res) => {
+        console.log(res.data.course);
+        // setSelectedCategory(res.data.course.category.name)
+        setCourse(res.data.course);
+        setChapter(res.data.course.chapters)
+      })
+      .catch((err) => {
+        console.log(err);
+      })
 
-  }, []);
+    axiosPrivate.get("/teacher/category")
+      .then((res) => {
+        console.log(res.data.categories);
+        setCategories(res.data.categories)
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+
+  }, [message]);
 
   return (
     <>
@@ -122,35 +243,35 @@ const CourseDetails = () => {
           <div className='w-full h-auto flex flex-col md:flex-row  gap-5 '>
             <div className='w-full md:w-1/2 h-auto flex flex-col gap-5 '>
               <div className='w-full h-96 '>
-                <div className='w-full h-5/6 bg-cover bg-center rounded-t-lg' style={{ backgroundImage: `url(${coverImage ? URL.createObjectURL(coverImage) : profilePic})` }}></div>
+                <div className='w-full h-5/6 bg-cover bg-center rounded-t-lg' style={{ backgroundImage: `url(${getBackgroundImage()})` }}></div>
                 <div className='w-full h-1/6 bg-gray-600 rounded-b-lg flex justify-center items-center'>
                   <Button className='rounded-full bg-custom-bg-color' onClick={openImageModal} >Change</Button>
                 </div>
               </div>
               <div className='w-full h-96 bg-teacher-card-bg text-white rounded-lg p-8 flex flex-col justify-evenly gap-2'>
                 <div className=''>
-                  <div className='font-bold text-xl'>Title</div>
-                  <div className='font-normal text-xs opacity-80'>Category</div>
+                  <div className='font-bold text-xl'>{course && course.title}</div>
+                  <div className='font-normal text-xs opacity-80'>{course && course.category.name}</div>
                 </div>
-                <div className='font-medium text-lg'><span className='text-red-500'>&#x20B9;</span> 1000</div>
-                <div className='text-verySmall md:text-sm'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde reiciendis delectus eos dignissimos aliquid totam rerum, autem minima dolor minus ipsam saepe doloribus dolorum consequatur vitae, laboriosam corrupti nemo. At!
-                  Dolorum exercitationem nihil hic sequi numquam repudiandae nostrum nisi, expedita ullam totam voluptate ut ipsa id accusantium maiores aliquam incidunt dicta omnis esse, odio est voluptatibus repellat. Cum, quis harum!
-                </div>
+                <div className='font-medium text-lg'><span className='text-red-500'>&#x20B9;</span> {course && course.price}</div>
+                <div className='text-verySmall md:text-sm overflow-hidden overflow-ellipsis whitespace-nowrap'>{course && course.description}</div>
                 <div className='w-full flex justify-center'>
                   <Button onClick={openModal}>Edit</Button>
                 </div>
               </div>
             </div>
-            <div className='w-full md:w-1/2 h-96 md:h-course rounded-lg bg-teacher-card-bg flex justify-center p-4'>
-                <div className='w-full h-16 px-2 py-5 flex bg-course-card rounded-lg  '>
-                  <div className='flex items-center'>
+            <div className='w-full md:w-1/2 h-96 md:h-course rounded-lg bg-teacher-card-bg flex flex-col justify-start gap-2 p-4'>
+              {chapter && chapter.map((chap) => {
+                return <div className='w-full h-16 px-2 py-5 flex  bg-course-card rounded-lg cursor-pointer'>
+                  <div className='flex items-center w-1/6'>
                     <GoGrabber className='text-black font-extrabold text-3xl mt-1 cursor-grab' />
                   </div>
-                  <span className='cursor-pointer font-semibold text-lg md:text-xl overflow-hidden overflow-ellipsis whitespace-nowrap'>This is Sample title. And this overfloww asdfadflafdladflakdfjsadfasdfasfsasfdlajfldjlsdf afds </span>
-                  <div className='flex items-center pl-2' >
+                  <div className='cursor-pointer font-semibold text-lg md:text-xl overflow-hidden overflow-ellipsis whitespace-pre w-4/6' onClick={() => navigate("/teacher/chapterDetails", { state: { id: chap._id, courseId } })}>{chap.title}</div>
+                  <div className='flex items-center pl-2 w-1/6' >
                     <RiDeleteBin7Fill className='text-black font-extrabold text-xl mt-1 cursor-pointer' />
                   </div>
                 </div>
+              })}
             </div>
           </div>
         </div>
@@ -192,23 +313,21 @@ const CourseDetails = () => {
                     Edit Course
                   </Dialog.Title>
                   <div className="mt-2 flex flex-col gap-3">
-                    <Input label="Title" name='title' onChange={handleChanges} />
-                    <Select variant="outlined" label="Category" id="category" name="category" onChange={(e) => setSelectedCategory(e)}>
-                      <Option value='Osint'>Osint</Option>
-                      <Option value='Malware'>Malware</Option>
-                      <Option value='Pentesting'>Pentesting</Option>
-                      <Option value='SQL Injection'>SQL Injection</Option>
-                      <Option value='Other'>Other</Option>
+                    <Input label="Title" name='title' value={editValues.title} onChange={handleChanges} />
+                    <Select variant="outlined" label="Category" id="category"  name="category" value={selectedCategory} onChange={(e) => setSelectedCategory(e)}>
+                      {categories && categories.map((category) => {
+                        return <Option value={category._id}>{category.name}</Option>
+                      })}
                     </Select>
-                    <Textarea label="Description" name='description' onChange={handleChanges} />
-                    <Input type='number' label='Price' name='price' onChange={handleChanges} />
+                    <Textarea label="Description" name='description' value={editValues.description} onChange={handleChanges} />
+                    <Input type='number' label='Price' name='price' value={editValues.price} onChange={handleChanges} />
                   </div>
 
                   <div className="mt-4 flex justify-center">
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      
+                      onClick={handleEditCourse}
                     >
                       Submit
                     </button>
@@ -276,7 +395,7 @@ const CourseDetails = () => {
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      
+                      onClick={handleChangeCourseImage}
                     >
                       Submit
                     </button>
@@ -287,9 +406,9 @@ const CourseDetails = () => {
           </div>
         </Dialog>
       </Transition>
-      
+
       {/* chapter upload modal */}
-      <Transition appear  as={Fragment} show={isChapterOpen}>
+      <Transition appear as={Fragment} show={isChapterOpen}>
         <Dialog as="div" className="relative z-10" onClose={closeChapterModal}>
           <Transition.Child
             as={Fragment}
@@ -319,11 +438,11 @@ const CourseDetails = () => {
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
-                    Edit Course
+                    Upload Chapter
                   </Dialog.Title>
                   <div className="mt-2 flex flex-col gap-3">
-                    <Input type='number' label='Index' name='index' onChange={handleChanges} />
-                    <Input label="Title" name='title' onChange={handleChanges} />
+                    <Input type='number' label='Index' name='index' onChange={handleChapterValuesChanges} />
+                    <Input label="Title" name='title' onChange={handleChapterValuesChanges} />
                     <Dropzone accept={['video/*']} multiple={false} onDrop={handleChapterVideoDrop}>
                       {({ getRootProps, getInputProps }) => (
                         <section>
@@ -346,7 +465,7 @@ const CourseDetails = () => {
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      
+                      onClick={handleUploadChapter}
                     >
                       Submit
                     </button>

@@ -13,6 +13,7 @@ function Teacher() {
         <Route path='/profile' element={<TeacherProfile/>}/>
         <Route path='/uploadCourse' element={<UploadCourse />}/>
         <Route path='/courseDetails' element={<CourseDetails />}/>
+        <Route path='/chapterDetails' element={<ChapterDetails />}/>
     </Routes>
   )
 }
