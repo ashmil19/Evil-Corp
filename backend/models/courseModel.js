@@ -7,8 +7,9 @@ const courseSchema = new schema({
     required: true,
   },
   category: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: "category"
   },
   description: {
     type: String,

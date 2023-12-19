@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
 
 const userModel = require("../../models/userModel");
-const hash = require('../../utils/toHash')
+const hash = require('../../utils/toHash');
+const otp = require('../../utils/sendOtp')
 
 const createUser = async (req, res) => {
   try {
@@ -26,13 +27,53 @@ const createUser = async (req, res) => {
     })
 
     await newUser.save()
+    const options = {
+      // maxAge: 1000 * 60 * 2,
+      httpOnly: true,
+    };
 
+    const result = await otp.sendOtp({fullname,email});
+    res.cookie('hashOtp', result, {httpOnly: true});
+    res.cookie('id', newUser._id, {httpOnly: true});
     res.status(200).json({message: "Account created successfully"})
-
   } catch (error) {
     console.log(error);
   }
 };
+
+const verifyOtp = async (req, res)=>{
+  try {  
+    console.log(req.cookies);
+    const {hashOtp, id} = req.cookies;
+    const {otp} = req.body
+    const verified = await bcrypt.compare(otp, hashOtp);
+    // console.log(verified);
+    if(!verified){
+      res.status(403).json({message: "OTP is wrong"});
+      return;
+    }
+
+    await userModel.findByIdAndUpdate(id, {$set: {isVerify: true}});
+    res.status(200).json({message: "OTP verification success"});
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const resendOtp = async (req, res)=>{
+  try {
+
+    const userData = await userModel.findById(req.cookies.id)
+    console.log(req.cookies);
+
+    const result = await otp.sendOtp({fullname: userData.fullname, email: userData.email});
+    res.cookie('hashOtp', result, {httpOnly: true});
+    res.status(200).json({message: "Generate otp successfully"})
+
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 
 const handleLogin = async (req, res)=>{
@@ -79,6 +120,71 @@ const handleLogin = async (req, res)=>{
     
   } catch (error) {
     console.log(error)
+  }
+}
+
+const handleGoogleLogin = async (req, res)=>{
+  try {
+    const {email, picture, name } = req.body.payload;
+    const existedUser = await userModel.findOne({email})
+
+
+
+    if (!existedUser) {
+      console.log("lsdfa");
+        const newUser = userModel({
+          fullname: name,
+          email,
+          isGoogle: true,
+        });
+
+        const newUserData = await newUser.save();
+
+        const accessToken = jwt.sign(
+          { userId: newUserData._id },
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: "30s" }
+        );
+
+        const refreshToken = jwt.sign(
+          { userId: newUserData._id },
+          process.env.REFRESH_TOKEN_SECRET,
+          { expiresIn: "1d" }
+        );
+
+        newUserData.refreshToken = refreshToken
+        await newUserData.save();
+
+        res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
+        res.status(200).json({role: newUserData.role, accessToken, fullname: newUserData.fullname, userId: newUserData._id, message: "your account is verified"})
+        return
+    }
+
+    if(!existedUser.isAccess){
+      res.status(400).json({message: "The account is banned"})
+      return
+    }
+
+    const accessToken = jwt.sign(
+      {"userId": existedUser._id},
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: '30s'}
+    )
+    
+    const refreshToken = jwt.sign(
+      {"userId": existedUser._id},
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: '1d'}
+    )
+    
+    existedUser.refreshToken = refreshToken
+    await existedUser.save();
+
+    res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
+    res.status(200).json({role: existedUser.role, accessToken, fullname: existedUser.fullname, userId: existedUser._id, message: "your account is verified"})
+
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -131,9 +237,7 @@ const handleLogout = async (req, res)=>{
       res.clearCookie('jwt', {httpOnly: true})
       return res.sendStatus(204)
     }
-    
-    // Delete refreshToken in db
-    // await userModel.updateOne({refreshToken: refreshToken},{refreshToken: ""});
+
      userData.refreshToken = ""
     await userData.save();
 
@@ -145,9 +249,14 @@ const handleLogout = async (req, res)=>{
   }
 }
 
+
+
 module.exports = {
   createUser,
   handleLogin,
   handleRefreshToken,
-  handleLogout
+  handleLogout,
+  verifyOtp,
+  resendOtp,
+  handleGoogleLogin
 };

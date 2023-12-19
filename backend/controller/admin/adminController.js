@@ -27,5 +27,5 @@ const updateAccess = async (req, res)=>{
 
 module.exports = {
     getStudents,
-    updateAccess
+    updateAccess,
 }

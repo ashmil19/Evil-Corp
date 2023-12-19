@@ -13,7 +13,6 @@ const userSchema = new schema({
   },
   password: {
     type: String,
-    required: true,
   },
   isAccess: {
     type: Boolean,
@@ -49,6 +48,10 @@ const userSchema = new schema({
     type: Number,
     default: 2000,
   },
+  isGoogle: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 module.exports = mongoose.model("user", userSchema);
