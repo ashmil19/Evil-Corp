@@ -14,5 +14,6 @@ router.post("/uploadChapter",teacherController.uploadChapter);
 router.get("/chapter/:id",teacherController.getChapter);
 router.put("/chapter/:id",teacherController.editChapter);
 router.patch("/chapterVideo/:id",teacherController.uploadChapterVideo);
+router.put("/changeIndex/:courseId",teacherController.changeChapterIndex);
 
 module.exports = router;

@@ -63,6 +63,7 @@ const uploadCourse = async (req, res) => {
       description,
       price,
       coverImage,
+      teacher: req.userId
     });
 
     await newCourse.save();
@@ -125,7 +126,9 @@ const getCourse = async (req, res) => {
     const course = await courseModel
       .findOne({ _id: courseId })
       .populate("category")
-      .populate("chapters");
+      .populate({
+        path: "chapters"
+      });
     res.status(200).json({ course });
   } catch (error) {
     console.log(error);
@@ -143,18 +146,9 @@ const getAllCategory = async (req, res) => {
 
 const uploadChapter = async (req, res) => {
   try {
-    const { index, title, courseId } = req.body;
+    const { title, courseId } = req.body;
     const chapterVideo = req.files.chapterVideo;
 
-    const existedChapter = await courseModel
-      .findById(courseId)
-      .populate("chapters");
-    for (let chapter of existedChapter.chapters) {
-      if (chapter.index == index) {
-        res.status(400).json({ message: "Index already existed" });
-        return;
-      }
-    }
 
     // const video = await uploadVideo(chapterVideo);
     // const newChapter = new chapterModel({
@@ -170,7 +164,6 @@ const uploadChapter = async (req, res) => {
     await addJobToTestQueue({
       type: 'VideoUpload',
       data: {
-        index,
         title,
         chapterVideo,
         courseId
@@ -224,6 +217,40 @@ const getChapter = async (req, res) => {
   }
 };
 
+const changeChapterIndex = async (req, res) =>{
+  try {
+    const {courseId} = req.params;
+    const {activeId, overId} = req.body;
+    
+    const course = await courseModel.findById(courseId);
+    
+    
+    if(!course){
+      return res.status(404).json({message: "course not found"})
+    }
+
+    const firstIndex = course.chapters.indexOf(activeId)
+    const secondIndex = course.chapters.indexOf(overId)
+
+
+    if(firstIndex < 0 || secondIndex > course.chapters.length){
+      return res.status(404).json({message: "Chapter not Found"})
+    }
+
+    if(secondIndex < 0 || secondIndex > course.chapters.length){
+      return res.status(404).json({message: "Chapter not Found"})
+    }
+
+    const removedElement = course.chapters.splice(firstIndex, 1)
+    course.chapters.splice(secondIndex, 0, removedElement)
+    await course.save()
+    
+    res.status(200).json({message: "Index Changed"})
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   getTeacher,
   uploadProfileImage,
@@ -236,5 +263,6 @@ module.exports = {
   getChapter,
   changeCourseImage,
   editChapter,
-  uploadChapterVideo
+  uploadChapterVideo,
+  changeChapterIndex
 };

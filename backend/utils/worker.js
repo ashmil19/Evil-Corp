@@ -13,10 +13,9 @@ const workerHandler = async (job) => {
     case "VideoUpload": {
       try {
         console.log({ ...job.data });
-        const { index, title, chapterVideo, courseId } = job.data.data;
+        const { title, chapterVideo, courseId } = job.data.data;
         const video = await uploadVideo(chapterVideo);
         const newChapter = new chapterModel({
-          index,
           title,
           video,
         });

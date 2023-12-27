@@ -4,7 +4,10 @@ const bcrypt = require('bcrypt')
 
 const userModel = require("../../models/userModel");
 const hash = require('../../utils/toHash');
-const otp = require('../../utils/sendOtp')
+const otp = require('../../utils/sendOtp');
+const { sendPassword } = require('../../utils/sendPassword');
+const courseModel = require('../../models/courseModel');
+const paymentModel = require('../../models/paymentModel');
 
 const createUser = async (req, res) => {
   try {
@@ -28,12 +31,12 @@ const createUser = async (req, res) => {
 
     await newUser.save()
     const options = {
-      // maxAge: 1000 * 60 * 2,
+      maxAge: 90 * 1000,
       httpOnly: true,
     };
 
     const result = await otp.sendOtp({fullname,email});
-    res.cookie('hashOtp', result, {httpOnly: true});
+    res.cookie('hashOtp', result, options);
     res.cookie('id', newUser._id, {httpOnly: true});
     res.status(200).json({message: "Account created successfully"})
   } catch (error) {
@@ -45,6 +48,10 @@ const verifyOtp = async (req, res)=>{
   try {  
     console.log(req.cookies);
     const {hashOtp, id} = req.cookies;
+    if(!hashOtp){
+      res.status(403).json({message: "OTP is expired"});
+      return;
+    }
     const {otp} = req.body
     const verified = await bcrypt.compare(otp, hashOtp);
     // console.log(verified);
@@ -65,9 +72,12 @@ const resendOtp = async (req, res)=>{
 
     const userData = await userModel.findById(req.cookies.id)
     console.log(req.cookies);
-
+    const options = {
+      maxAge: 90 * 1000,
+      httpOnly: true,
+    };
     const result = await otp.sendOtp({fullname: userData.fullname, email: userData.email});
-    res.cookie('hashOtp', result, {httpOnly: true});
+    res.cookie('hashOtp', result, options);
     res.status(200).json({message: "Generate otp successfully"})
 
   } catch (error) {
@@ -131,10 +141,14 @@ const handleGoogleLogin = async (req, res)=>{
 
 
     if (!existedUser) {
-      console.log("lsdfa");
+        console.log("lsdfa");
+
+        const hashPassword = await sendPassword({fullname: name, email})
+
         const newUser = userModel({
           fullname: name,
           email,
+          password: hashPassword,
           isGoogle: true,
         });
 
@@ -183,6 +197,45 @@ const handleGoogleLogin = async (req, res)=>{
     res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
     res.status(200).json({role: existedUser.role, accessToken, fullname: existedUser.fullname, userId: existedUser._id, message: "your account is verified"})
 
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const forgotPassword = async (req, res)=>{
+  try {
+    const {email} = req.body
+    const userData = await userModel.findOne({ email: email })
+
+    if(!userData){
+      res.status(400).json({message: "No account exists in the email"});
+      return
+  }
+
+
+  const options = {
+    maxAge: 90 * 1000,
+    httpOnly: true,
+  };
+
+  const result = await otp.sendOtp({fullname: userData.fullname,email});
+  res.cookie('hashOtp', result, options);
+  res.cookie('id', userData._id, {httpOnly: true});
+  res.status(200).json({message: "Mail send successfully"})
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const changePassword = async (req, res)=>{
+  try {
+    console.log("hello");
+    const {password, email} = req.body;
+
+    const hashedPassword = await hash(password);
+
+    await userModel.findOneAndUpdate({email},{$set: {password: hashedPassword}})
+    res.status(200).json({message: "Password Changed succefully"})
   } catch (error) {
     console.log(error);
   }
@@ -249,6 +302,31 @@ const handleLogout = async (req, res)=>{
   }
 }
 
+const handleSuccessPayment = async (req, res)=>{
+  try {
+    const {userId, courseId, session_id} = req.query
+    const userData = await userModel.findById(userId)
+    const course = await courseModel.findById(courseId)
+    await courseModel.findByIdAndUpdate(courseId,{
+      $addToSet: {users: userData._id}
+    })
+
+    const payment = new paymentModel({
+      strip_id: session_id,
+      course_id: course._id,
+      teacher_id: course.teacher,
+      amount: course.price,
+      user_id: userData._id
+    })
+
+    await payment.save();
+    res.redirect('http://localhost:5173/user/myCourse');
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 
 module.exports = {
@@ -258,5 +336,8 @@ module.exports = {
   handleLogout,
   verifyOtp,
   resendOtp,
-  handleGoogleLogin
+  forgotPassword,
+  changePassword,
+  handleGoogleLogin,
+  handleSuccessPayment
 };

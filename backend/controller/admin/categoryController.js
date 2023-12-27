@@ -47,6 +47,25 @@ const changeCategoryImage = async (req, res)=>{
   }
 }
 
+const editCategoryName = async (req, res)=>{
+  try {
+    const {id} = req.params;
+    const {name} = req.body;
+
+    const existedCategory = await categoryModel.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
+
+    if(existedCategory){
+      res.status(409).json({ message: "Category already existed" });
+      return;
+    }
+
+    await categoryModel.findByIdAndUpdate(id, {name});
+    res.status(200).json({message: "category name updated"})
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 const getAllCategory = async (req, res)=>{
     try {
         let search = req.query.search || ""
@@ -66,5 +85,6 @@ const getAllCategory = async (req, res)=>{
 module.exports = {
   createCategory,
   getAllCategory,
-  changeCategoryImage
+  changeCategoryImage,
+  editCategoryName,
 };

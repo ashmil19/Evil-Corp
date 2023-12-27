@@ -7,7 +7,10 @@ router.post("/login", authController.handleLogin);
 router.post("/login/google", authController.handleGoogleLogin);
 router.get("/refresh", authController.handleRefreshToken);
 router.post("/otpVerify", authController.verifyOtp);
-router.post("/otpResend", authController.resendOtp);
+router.get("/otpResend", authController.resendOtp);
+router.post("/forgotPassword", authController.forgotPassword);
+router.post("/changePassword", authController.changePassword);
+router.get("/successPayment", authController.handleSuccessPayment);
 router.get("/logout", authController.handleLogout);
 
 module.exports = router;

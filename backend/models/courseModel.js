@@ -45,6 +45,11 @@ const courseSchema = new schema({
       ref: "chapter",
     },
   ],
+  teacher: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'user',
+    required: true,
+  },
   isPublished: {
     type: Boolean,
     default: false,

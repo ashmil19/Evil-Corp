@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 
 const chapterSchema = new schema({
-  index: {
-    type: Number,
-    required: true,
-  },
   title: {
     type: String,
     required: true,

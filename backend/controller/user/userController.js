@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt")
+const stripe = require('stripe')("sk_test_51OISQWSBQLVhDmRfvicXDGw4m7LT3mOeF3DvnEufBcDN6v0z1STvNhlj4IkBgPHE8lDyByVzsPsv6Y8LAjVub57C00d6Xd8CEy");
 
 const userModel = require("../../models/userModel");
 const courseModel = require("../../models/courseModel");
@@ -90,11 +91,77 @@ const getAllCourses = async (req, res) => {
   }
 };
 
+const getCourse = async (req, res) => {
+  try {
+    console.log(req.params);
+    const courseId = req.params.id;
+    const course = await courseModel
+      .findOne({ _id: courseId })
+      .populate("category")
+      .populate({
+        path: "chapters"
+      });
+    res.status(200).json({ course });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleMakePayment = async (req, res)=>{
+  try {
+    const userId = req.userId;
+    const {courseId} = req.body;
+    
+    const course = await courseModel.findById(courseId);
+    console.log(typeof course.price);
+
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "inr",
+            product_data: {
+              name: course.title,
+              images: [course.coverImage.url],
+            },
+            unit_amount: course.price * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `http://localhost:3000/successPayment?session_id={CHECKOUT_SESSION_ID}&courseId=${course._id}&userId=${userId}`,
+      cancel_url: "http://localhost:5173/course",
+    });
+    
+    res.status(200).json({id: session.id})
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getMyCourse = async (req, res)=>{
+  try {
+    const userId = req.userId;
+    const courses = await courseModel.find({users: userId})
+    res.status(200).json({courses})
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+
 module.exports = {
   getUser,
   uploadProfileImage,
   editUser,
   getAllCourses,
+  getCourse,
   checkPassword,
   changePassword,
+  handleMakePayment,
+  getMyCourse
 };
