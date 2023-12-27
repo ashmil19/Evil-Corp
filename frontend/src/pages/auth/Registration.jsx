@@ -74,6 +74,7 @@ function Registration() {
         console.log("success");
       })
       .catch((err) => {
+        setIsLoading(false)
         toastHelper.showToast(err.response.data.message)
         console.log(err.message);
       })

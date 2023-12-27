@@ -11,6 +11,8 @@ import Home from "./pages/user/Home"
 import RequireAuth from "./components/features/RequireAuth"
 import CheckAuth from "./components/features/checkAuth"
 import OtpComponent from "./components/auth/OtpComponent"
+import ForgotPasswordOtp from "./components/auth/ForgotPasswordOtp"
+import NewPassword from "./pages/auth/NewPassword"
 
 const ROLES = {
   'User' : 2000,
@@ -25,12 +27,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />} >
 
-            <Route path="/" element={<Home />} />
+            {/* <Route path="/" element={<Home />} /> */}
             
             <Route element={<CheckAuth />}>
               <Route path="/signup" element={<Registration />} />
               <Route path="/login" element={<Login />} />
               <Route path="/otp" element={<OtpComponent/>} />
+              <Route path="/forgotpassword" element={<ForgotPasswordOtp/>} />
+              <Route path="/newpassword" element={<NewPassword />} />
             </Route>
 
 

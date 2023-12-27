@@ -9,11 +9,21 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Input, Textarea, Select, Option } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
 import { useLocation } from 'react-router-dom';
+import {
+  DndContext,
+  closestCenter
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable'
 
 
 import TeacherNavbar from '../../components/navbars/TeacherNavbar'
 import ToastHelper from '../../helper/ToastHelper'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
+import SortableItem from '../../components/teacher/SortableItem';
 const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0e6b47b83af64e0c9.jpg';
 
 
@@ -36,13 +46,12 @@ const CourseDetails = () => {
 
   const [chapterVideo, setChapterVideo] = useState(null);
   const [chapterValues, setChapterValues] = useState({
-    index: "",
     title: ""
   })
 
 
   const [categories, setCategories] = useState(null);
-  const [chapter, setChapter] = useState(null);
+  const [chapter, setChapter] = useState([]);
   const [course, setCourse] = useState(null);
   const [editValues, setEditValues] = useState({
     title: "",
@@ -147,60 +156,86 @@ const CourseDetails = () => {
         toastHelper.showToast(err?.response?.data?.message)
         console.log(err);
       })
-      
-      closeChapterModal()
+
+    closeChapterModal()
 
   }
 
-  const handleEditCourse = () =>{
-    if(editValues.title == "" || editValues.description == "" || editValues.price == ""){
+  const handleEditCourse = () => {
+    if (editValues.title == "" || editValues.description == "" || editValues.price == "") {
       toastHelper.showToast("Fill the form")
       return
     }
 
-    if(editValues.title == course.title && editValues.description == course.description && editValues.price == course.price && selectedCategory == course.category._id){
+    if (editValues.title == course.title && editValues.description == course.description && editValues.price == course.price && selectedCategory == course.category._id) {
       toastHelper.showToast("values not changed")
       return
     }
-    
-    console.log({...editValues,selectedCategory})
-    const putData = {...editValues,category: selectedCategory} 
 
-    axiosPrivate.put(`/teacher/course/${courseId}`,putData)
-    .then((res)=>{
-      setMessage(res.data?.message)
-      toastHelper.showToast(res.data?.message)
-      console.log(res);
-    })
-    .catch((err)=>{
-      toastHelper.showToast(err?.response?.data?.message);
-      console.log(err);
-    })
+    console.log({ ...editValues, selectedCategory })
+    const putData = { ...editValues, category: selectedCategory }
+
+    axiosPrivate.put(`/teacher/course/${courseId}`, putData)
+      .then((res) => {
+        setMessage(res.data?.message)
+        toastHelper.showToast(res.data?.message)
+        console.log(res);
+      })
+      .catch((err) => {
+        toastHelper.showToast(err?.response?.data?.message);
+        console.log(err);
+      })
 
     closeModal();
   }
 
-  const handleChangeCourseImage = ()=>{
-    if(!coverImage){
+  const handleChangeCourseImage = () => {
+    if (!coverImage) {
       toastHelper.showToast("select an image");
       return;
     }
 
-    axiosPrivate.put(`/teacher/courseImage/${courseId}`,{image: coverImage},{
+    axiosPrivate.put(`/teacher/courseImage/${courseId}`, { image: coverImage }, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-    .then((res) => {
-      setMessage(res.data?.message)
-      setCoverImage(null)
-      console.log(res);
-      toastHelper.showToast(res.data?.message)
-    })
-    .catch((err) => {
-      console.log(err);
-      toastHelper.showToast(err?.response?.data?.message);
-    })
+      .then((res) => {
+        setMessage(res.data?.message)
+        setCoverImage(null)
+        console.log(res);
+        toastHelper.showToast(res.data?.message)
+      })
+      .catch((err) => {
+        console.log(err);
+        toastHelper.showToast(err?.response?.data?.message);
+      })
 
     closeImageModal()
+  }
+
+  const handleDragEnd = (event) => {
+    const {active, over} = event;
+    const activeId = active.id._id
+    const overId = over.id._id
+    console.log(active);
+    console.log(over);
+
+    if(activeId !== overId){
+      setChapter((value)=>{
+        const activeIndex = value.indexOf(active.id)
+        const overIndex = value.indexOf(over.id)
+
+        const putData = {
+          activeId,
+          overId
+        }
+        axiosPrivate.put(`/teacher/changeIndex/${courseId}`,putData)
+        .catch((err)=>{
+          console.log(err);
+        })
+
+        return arrayMove(value, activeIndex, overIndex);
+      })
+    }
   }
 
 
@@ -237,10 +272,10 @@ const CourseDetails = () => {
 
   return (
     <>
-      <div className='h-auto overflow-x-hidden'>
+      <div className='h-auto overflow-hidden'>
         <TeacherNavbar />
         <div className='w-full h-auto py-5 px-5 md:px-10 bg-dashboard-bg flex flex-col gap-5 '>
-          <div className='w-full h-auto flex flex-col md:flex-row  gap-5 '>
+          <div className='w-full h-auto flex flex-col md:flex-row  gap-5'>
             <div className='w-full md:w-1/2 h-auto flex flex-col gap-5 '>
               <div className='w-full h-96 '>
                 <div className='w-full h-5/6 bg-cover bg-center rounded-t-lg' style={{ backgroundImage: `url(${getBackgroundImage()})` }}></div>
@@ -249,6 +284,7 @@ const CourseDetails = () => {
                 </div>
               </div>
               <div className='w-full h-96 bg-teacher-card-bg text-white rounded-lg p-8 flex flex-col justify-evenly gap-2'>
+
                 <div className=''>
                   <div className='font-bold text-xl'>{course && course.title}</div>
                   <div className='font-normal text-xs opacity-80'>{course && course.category.name}</div>
@@ -260,24 +296,24 @@ const CourseDetails = () => {
                 </div>
               </div>
             </div>
+
+
             <div className='w-full md:w-1/2 h-96 md:h-course rounded-lg bg-teacher-card-bg flex flex-col justify-start gap-2 p-4'>
-              {chapter && chapter.map((chap) => {
-                return <div className='w-full h-16 px-2 py-5 flex  bg-course-card rounded-lg cursor-pointer'>
-                  <div className='flex items-center w-1/6'>
-                    <GoGrabber className='text-black font-extrabold text-3xl mt-1 cursor-grab' />
-                  </div>
-                  <div className='cursor-pointer font-semibold text-lg md:text-xl overflow-hidden overflow-ellipsis whitespace-pre w-4/6' onClick={() => navigate("/teacher/chapterDetails", { state: { id: chap._id, courseId } })}>{chap.title}</div>
-                  <div className='flex items-center pl-2 w-1/6' >
-                    <RiDeleteBin7Fill className='text-black font-extrabold text-xl mt-1 cursor-pointer' />
-                  </div>
-                </div>
-              })}
+              <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={chapter && chapter} strategy={verticalListSortingStrategy}>
+                  {chapter && chapter.map((chap) => <SortableItem key={chap._id} id={chap} chapter={chap} />)}
+                </SortableContext>
+              </DndContext >
             </div>
           </div>
+
+
         </div>
         <div className='bg-white h-8 w-12 rounded-lg flex items-center justify-center text-Student-management fixed bottom-5 right-10 cursor-pointer' onClick={openChapterModal} ><FaUpload /></div>
         <Toaster />
       </div>
+
+
 
       {/* Edit details modal */}
       <Transition appear show={isOpen} as={Fragment}>
@@ -314,7 +350,7 @@ const CourseDetails = () => {
                   </Dialog.Title>
                   <div className="mt-2 flex flex-col gap-3">
                     <Input label="Title" name='title' value={editValues.title} onChange={handleChanges} />
-                    <Select variant="outlined" label="Category" id="category"  name="category" value={selectedCategory} onChange={(e) => setSelectedCategory(e)}>
+                    <Select variant="outlined" label="Category" id="category" name="category" value={selectedCategory} onChange={(e) => setSelectedCategory(e)}>
                       {categories && categories.map((category) => {
                         return <Option value={category._id}>{category.name}</Option>
                       })}
@@ -337,10 +373,10 @@ const CourseDetails = () => {
             </div>
           </div>
         </Dialog>
-      </Transition>
+      </Transition >
 
       {/* Change image modal */}
-      <Transition appear show={isImageOpen} as={Fragment}>
+      < Transition appear show={isImageOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeImageModal}>
           <Transition.Child
             as={Fragment}
@@ -405,10 +441,10 @@ const CourseDetails = () => {
             </div>
           </div>
         </Dialog>
-      </Transition>
+      </ Transition>
 
       {/* chapter upload modal */}
-      <Transition appear as={Fragment} show={isChapterOpen}>
+      <Transition appear as={Fragment} show={isChapterOpen} >
         <Dialog as="div" className="relative z-10" onClose={closeChapterModal}>
           <Transition.Child
             as={Fragment}
@@ -441,7 +477,6 @@ const CourseDetails = () => {
                     Upload Chapter
                   </Dialog.Title>
                   <div className="mt-2 flex flex-col gap-3">
-                    <Input type='number' label='Index' name='index' onChange={handleChapterValuesChanges} />
                     <Input label="Title" name='title' onChange={handleChapterValuesChanges} />
                     <Dropzone accept={['video/*']} multiple={false} onDrop={handleChapterVideoDrop}>
                       {({ getRootProps, getInputProps }) => (
@@ -452,8 +487,6 @@ const CourseDetails = () => {
 
                               {chapterVideo ? <div className='h-1/3 flex items-center justify-center'>{chapterVideo.name}</div>
                                 : <p>Drag 'n' drop some video here, or click to select video</p>}
-                              {/* {chapterVideo && <img className='w-full h-2/3 object-center pb-4' src={URL.createObjectURL(chapterVideo)}></img>} */}
-
                             </div>
                           </div>
                         </section>
@@ -475,7 +508,8 @@ const CourseDetails = () => {
             </div>
           </div>
         </Dialog>
-      </Transition>
+      </Transition >
+
 
     </>
   )

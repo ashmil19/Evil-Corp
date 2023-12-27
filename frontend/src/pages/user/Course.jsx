@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { FaSearch } from 'react-icons/fa'
+import { useNavigate } from  'react-router-dom'
 
 import Navbar from '../../components/navbars/navbar'
 import CourseComponent from '../../components/user/CourseComponent'
@@ -8,6 +9,7 @@ import useAxiosPrivate  from '../../hooks/useAxiosPrivate'
 
 
 const Course = () => {
+  const navigate = useNavigate()
   const axiosPrivate = useAxiosPrivate()
   const [courses, setCourses] = useState(null);
 
@@ -44,7 +46,8 @@ const Course = () => {
         </div>
         <div className='flex gap-4 px-5'>
           {courses && courses.map((course) => {
-            return <CourseComponent course={course} className="h-64 w-full md:w-56 cursor-pointer hvr-grow shadow-lg" />
+            console.log("hh",course._id);
+            return <CourseComponent course={course} className="h-64 w-full md:w-56 cursor-pointer hvr-grow shadow-lg" onclick={()=>navigate("/user/courseDetails",{state: {courseId: course._id}})} />
           })}
         </div>
       </div>

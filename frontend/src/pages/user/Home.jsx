@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 
 import Navbar from '../../components/navbars/navbar'
 import CourseComponent from '../../components/user/CourseComponent'
 import HomeHeading from '../../components/user/HomeHeading'
+import useAxiosPrivate  from '../../hooks/useAxiosPrivate'
 
 import HomeLogo from '../../asset/home.svg'
 import Sql from '../../asset/sql.jpg'
@@ -13,6 +14,20 @@ import pentest from '../../asset/pentest.jpg'
 import Footer from '../../components/footer/Footer'
 
 function Home() {
+    const axiosPrivate = useAxiosPrivate()
+    const [courses, setCourses] = useState(null);
+
+    useEffect(() => {
+        axiosPrivate.get("/user/course")
+        .then((res)=>{
+          console.log(res.data.courses);
+          setCourses(res.data.courses)
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
+    
+      }, []);
   return (
     <div className='w-screen h-screen overflow-x-hidden'>
      <Navbar text="Login" />

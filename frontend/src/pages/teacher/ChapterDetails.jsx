@@ -130,8 +130,10 @@ const ChapterDetails = () => {
     <>
       <div className='w-screen h-screen overflow-hidden'>
         <TeacherNavbar />
-        <div className='w-full h-full px-4 bg-white flex flex-col justify-center items-center gap-5'>
-          <div className='text-center text-3xl md:text-veryLarge font-semibold'>{chapter && chapter.title}</div>
+        <div className='w-full h-full px-4 pt-5 bg-white flex flex-col justify-start items-center gap-5'>
+          <div className='max-h-[150px] px-2'>
+            <div className='capitalize text-center text-3xl md:text-4xl font-semibold flex justify-center break-all'>{chapter && chapter.title}</div>
+          </div>
           <video width="640" height="360" controls>
             {chapter?.video?.url && <source src={chapter.video.url} type="video/mp4" />}
             Your browser does not support the video tag.

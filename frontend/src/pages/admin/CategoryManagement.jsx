@@ -26,6 +26,9 @@ const CategoryManagement = () => {
     const [categoryId, setCategoryId] = useState(null)
     const [coverImage, setCoverImage] = useState(null);
 
+    const [editName, setEditName] = useState(null)
+    const [isEditOpen, setIsEditOpen] = useState(false)
+
     function closeModal() {
         setIsOpen(false)
         setImage(null)
@@ -43,6 +46,15 @@ const CategoryManagement = () => {
     function openImageModal(id) {
         setCategoryId(id)
         setIsImageOpen(true)
+    }
+
+    function closeEditModal() {
+        setIsEditOpen(false)
+    }
+
+    function openEditModal(id) {
+        setCategoryId(id)
+        setIsEditOpen(true)
     }
 
     const handleEditImageDrop = (acceptedFiles) => {
@@ -121,6 +133,29 @@ const CategoryManagement = () => {
         closeImageModal()
     }
 
+    const handleEditName = ()=>{
+        if(editName === ""){
+            toastHelper.showToast("fill the form")
+            return;
+        }
+
+        console.log(editName);
+        console.log(categoryId);
+
+        axiosPrivate.put(`/admin/changeName/${categoryId}`,{name: editName})
+        .then((res)=>{
+            console.log(res);
+            setMessage(res.data.message)
+            closeEditModal()
+            toastHelper.showToast(res?.data?.message)
+        })
+        .catch((err)=>{
+            toastHelper.showToast(err?.response?.data?.message)
+            console.log(err);
+        })
+
+    }
+
     const hanndleSearch = async () => {
         const response = await axiosPrivate.get(`/admin/category?search=${search}`)
         setCategories(response?.data?.categories)
@@ -186,8 +221,11 @@ const CategoryManagement = () => {
                                             <td className="px-6 py-4 font-bold">
                                                 {category.name}
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <Button size='sm' onClick={()=> openImageModal(category._id)}>Edit</Button>
+                                            <td className="px-4 py-4">
+                                                <div className="flex justify-start gap-2">
+                                                    <Button size='sm' onClick={()=> openImageModal(category._id)}>Edit Image</Button>
+                                                    <Button size='sm' onClick={()=> openEditModal(category._id)} >Edit Details</Button>
+                                                </div>
                                             </td>
                                         </tr>
                                     })
@@ -270,6 +308,7 @@ const CategoryManagement = () => {
                 </Dialog>
             </Transition>
 
+            {/* edit image modal */}
             <Transition appear show={isImageOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-10" onClose={closeImageModal}>
                     <Transition.Child
@@ -326,6 +365,59 @@ const CategoryManagement = () => {
                                             type="button"
                                             className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                             onClick={handleImageUpload}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
+
+
+            <Transition appear show={isEditOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeEditModal}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black/25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    <Dialog.Title
+                                        as="h3"
+                                        className="text-lg font-medium leading-6 text-gray-900"
+                                    >
+                                        Edit Details
+                                    </Dialog.Title>
+                                    <div className="mt-2 flex flex-col gap-3">
+                                        <Input label="Category Name" name='category' onChange={(e) => setEditName(e.target.value.trim())} />
+                                    </div>
+
+                                    <div className="mt-4 flex justify-center">
+                                        <button
+                                            type="button"
+                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                            onClick={handleEditName}
                                         >
                                             Submit
                                         </button>

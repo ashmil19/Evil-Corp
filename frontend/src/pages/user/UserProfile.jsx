@@ -8,9 +8,10 @@ import { Toaster } from 'react-hot-toast'
 
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import ToastHelper from '../../helper/ToastHelper'
-import Navbar from '../../components/navbars/Navbar'
+import Navbar from '../../components/navbars/Navbar.jsx'
 import profileImg from '../../asset/person.svg'
 import { updateUser } from '../../features/authSlice'
+import { Link } from 'react-router-dom'
 
 // const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0e6b47b83af64e0c9.jpg';
 // const profilePic = '../../';
@@ -28,7 +29,8 @@ const UserProfile = () => {
   const [image, setImage] = useState(null)
   const [userData, setUserData] = useState({})
   const [oldPassword, setOldPassword] = useState(null)
-  const [Password, setPassword] = useState(null)
+  const [password, setPassword] = useState(null)
+  const [rePassword, setRePassword] = useState(null)
 
   const [editValues, setEditValues] = useState({
     fullname: authState.user,
@@ -73,8 +75,12 @@ const UserProfile = () => {
   }
 
   const changePassword = () =>{
+    if(password !== rePassword){
+      toastHelper.showToast("Password does not match")
+      return;
+    }
     const postData = {
-      password: Password,
+      password: password,
       userId: userData._id
     }
 
@@ -221,7 +227,7 @@ const UserProfile = () => {
 
                 </div>
                 <div className='flex justify-between'>
-                  <p className='font-semibold'>My-Courses</p>
+                  <Link to="/user/myCourse"><p className='font-semibold'>My-Courses</p></Link>
                   <p className='font-semibold'>My-Blogs</p>
                   {/* <span>My-Blogs</span> */}
                 </div>
@@ -387,7 +393,8 @@ const UserProfile = () => {
                     Change Password
                   </Dialog.Title>
                   <div className="mt-2 flex flex-col gap-3">
-                    <Input label="Old Password" name='oldPassword' onChange={(e)=> setPassword(e.target.value)} />
+                    <Input label="New Password" name='newPassword' onChange={(e)=> setPassword(e.target.value)} />
+                    <Input label="Re New Password" name='reNewPassword' onChange={(e)=> setRePassword(e.target.value)} />
                   </div>
 
                   <div className="mt-4 flex justify-center">
