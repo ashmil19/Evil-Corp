@@ -126,7 +126,7 @@ const UploadCourse = () => {
                     </div>
                     <div className='w-full h-auto flex justify-center px-2 py-2 flex-wrap gap-4'>
                         {courses && courses.map((course) => {
-                            return <TeacherCourseCard key={course._id} image={course.coverImage} onclick={()=>navigate("/teacher/courseDetails",{state: {id: course._id}})} />
+                            return <TeacherCourseCard key={course._id} course={course} onclick={()=>navigate("/teacher/courseDetails",{state: {id: course._id}})} />
                         })}
                         <div className='h-56 w-64 bg-gray-300 rounded-lg flex justify-center items-center cursor-pointer' onClick={openModal} >
                             <FaPlus className='text-Student-management' size={180} />

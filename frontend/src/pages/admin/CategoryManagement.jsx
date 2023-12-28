@@ -23,7 +23,8 @@ const CategoryManagement = () => {
     const [message, setMessage] = useState(null)
 
     const [isImageOpen, setIsImageOpen] = useState(false)
-    const [categoryId, setCategoryId] = useState(null)
+    const [categoryId, setCategoryId] = useState(null);
+
     const [coverImage, setCoverImage] = useState(null);
 
     const [editName, setEditName] = useState(null)
@@ -52,8 +53,9 @@ const CategoryManagement = () => {
         setIsEditOpen(false)
     }
 
-    function openEditModal(id) {
+    function openEditModal(id,name) {
         setCategoryId(id)
+        setEditName(name)
         setIsEditOpen(true)
     }
 
@@ -226,7 +228,7 @@ const CategoryManagement = () => {
                                             <td className="px-4 py-4">
                                                 <div className="flex justify-start gap-2">
                                                     <Button size='sm' onClick={()=> openImageModal(category._id)}>Edit Image</Button>
-                                                    <Button size='sm' onClick={()=> openEditModal(category._id)} >Edit Details</Button>
+                                                    <Button size='sm' onClick={()=> openEditModal(category._id, category.name)} >Edit Details</Button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -412,7 +414,7 @@ const CategoryManagement = () => {
                                         Edit Details
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col gap-3">
-                                        <Input label="Category Name" name='category' onChange={(e) => setEditName(e.target.value.trim())} />
+                                        <Input label="Category Name" name='category' value={editName} onChange={(e) => setEditName(e.target.value.trim())} />
                                     </div>
 
                                     <div className="mt-4 flex justify-center">
