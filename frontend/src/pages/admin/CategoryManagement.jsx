@@ -169,6 +169,8 @@ const CategoryManagement = () => {
         }
 
         fetchCategory()
+
+        return ()=> setMessage('')
     }, [message]);
 
     return (

@@ -1,10 +1,12 @@
-const bcrypt = require("bcrypt")
-const stripe = require('stripe')("sk_test_51OISQWSBQLVhDmRfvicXDGw4m7LT3mOeF3DvnEufBcDN6v0z1STvNhlj4IkBgPHE8lDyByVzsPsv6Y8LAjVub57C00d6Xd8CEy");
+const bcrypt = require("bcrypt");
+const stripe = require("stripe")(
+  "sk_test_51ORywXSGSYXlOuXjmEXnfwICawAhfAi5SVINBy7erevWFi8gSnfVxq7KkKr7QoyeXUZi0RCn1SQ2WLjQbm1KlClL005FM2WgFC"
+);
 
 const userModel = require("../../models/userModel");
 const courseModel = require("../../models/courseModel");
 const { imageUpload } = require("../../utils/uploadImage");
-const hash = require('../../utils/toHash');
+const hash = require("../../utils/toHash");
 
 const getUser = async (req, res) => {
   try {
@@ -65,26 +67,27 @@ const checkPassword = async (req, res) => {
     }
 
     res.status(200).json({ message: "The Password is Correct" });
-
   } catch (error) {
     console.log(error);
   }
 };
 
-const changePassword = async (req, res)=>{
+const changePassword = async (req, res) => {
   try {
-    const {password, userId} = req.body;
+    const { password, userId } = req.body;
     const hashedPassword = await hash(password);
-    await userModel.findByIdAndUpdate(userId,{$set: {password: hashedPassword}});
-    res.status(200).json({message: "Password updated"});
+    await userModel.findByIdAndUpdate(userId, {
+      $set: { password: hashedPassword },
+    });
+    res.status(200).json({ message: "Password updated" });
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 const getAllCourses = async (req, res) => {
   try {
-    const courses = await courseModel.find();
+    const courses = await courseModel.find().populate("category");
     res.status(200).json({ courses });
   } catch (error) {
     console.log(error);
@@ -99,7 +102,7 @@ const getCourse = async (req, res) => {
       .findOne({ _id: courseId })
       .populate("category")
       .populate({
-        path: "chapters"
+        path: "chapters",
       });
     res.status(200).json({ course });
   } catch (error) {
@@ -107,14 +110,13 @@ const getCourse = async (req, res) => {
   }
 };
 
-const handleMakePayment = async (req, res)=>{
+const handleMakePayment = async (req, res) => {
   try {
     const userId = req.userId;
-    const {courseId} = req.body;
-    
+    const { courseId } = req.body;
+
     const course = await courseModel.findById(courseId);
     console.log(typeof course.price);
-
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -135,24 +137,22 @@ const handleMakePayment = async (req, res)=>{
       success_url: `http://localhost:3000/successPayment?session_id={CHECKOUT_SESSION_ID}&courseId=${course._id}&userId=${userId}`,
       cancel_url: "http://localhost:5173/course",
     });
-    
-    res.status(200).json({id: session.id})
+
+    res.status(200).json({ id: session.id });
   } catch (error) {
     console.log(error);
   }
-}
+};
 
-const getMyCourse = async (req, res)=>{
+const getMyCourse = async (req, res) => {
   try {
     const userId = req.userId;
-    const courses = await courseModel.find({users: userId})
-    res.status(200).json({courses})
+    const courses = await courseModel.find({ users: userId });
+    res.status(200).json({ courses });
   } catch (error) {
     console.log(error);
   }
-}
-
-
+};
 
 module.exports = {
   getUser,
@@ -163,5 +163,5 @@ module.exports = {
   checkPassword,
   changePassword,
   handleMakePayment,
-  getMyCourse
+  getMyCourse,
 };

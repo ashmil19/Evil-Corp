@@ -15,7 +15,7 @@ import Footer from '../../components/footer/Footer'
 
 function Home() {
     const axiosPrivate = useAxiosPrivate()
-    const [courses, setCourses] = useState(null);
+    const [courses, setCourses] = useState([]);
 
     useEffect(() => {
         axiosPrivate.get("/user/course")
@@ -80,14 +80,14 @@ function Home() {
                 <div className='w-4/5 md:w-1/3'>Your domain control panel is designed for ease-of-use and allows for all aspects of your domains.</div>
             </div>
             <div className='flex flex-col md:flex-row gap-5'>
-                <CourseComponent />
-                <CourseComponent />
-                <CourseComponent />
+                <CourseComponent course={courses && courses[0]} />
+                <CourseComponent course={courses && courses[0]} />
+                <CourseComponent course={courses && courses[0]} />
             </div>
             <div className='flex flex-col md:flex-row gap-5'>
-                <CourseComponent />
-                <CourseComponent />
-                <CourseComponent />
+                <CourseComponent course={courses && courses[0]} />
+                <CourseComponent course={courses && courses[0]} />
+                <CourseComponent course={courses && courses[0]} />
             </div>
         </div>
     <Footer />
