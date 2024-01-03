@@ -1,6 +1,9 @@
 const bcrypt = require("bcrypt");
+// const stripe = require("stripe")(
+//   "sk_test_51ORywXSGSYXlOuXjmEXnfwICawAhfAi5SVINBy7erevWFi8gSnfVxq7KkKr7QoyeXUZi0RCn1SQ2WLjQbm1KlClL005FM2WgFC"
+// );
 const stripe = require("stripe")(
-  "sk_test_51ORywXSGSYXlOuXjmEXnfwICawAhfAi5SVINBy7erevWFi8gSnfVxq7KkKr7QoyeXUZi0RCn1SQ2WLjQbm1KlClL005FM2WgFC"
+  "sk_test_51OISQWSBQLVhDmRfvicXDGw4m7LT3mOeF3DvnEufBcDN6v0z1STvNhlj4IkBgPHE8lDyByVzsPsv6Y8LAjVub57C00d6Xd8CEy"
 );
 
 const userModel = require("../../models/userModel");
@@ -87,8 +90,45 @@ const changePassword = async (req, res) => {
 
 const getAllCourses = async (req, res) => {
   try {
-    const courses = await courseModel.find().populate("category");
-    res.status(200).json({ courses });
+    const ITEMS_PER_PAGE = 6;
+    let page = +req.query.page || 1;
+    // const search = req.query.search || "";
+    // const search = req.query.search !== 'undefined' ? req.query.search : "";
+    let search = "";
+    if(req.query.search !== 'undefined'){
+      search = req.query.search
+      page = 1;
+    }
+
+    const query = {
+      title: {$regex: new RegExp(`^${search}`, "i")}
+    }
+
+    const allCourses = await courseModel.find(query).populate("category");
+
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const lastIndex = page * ITEMS_PER_PAGE;
+
+    const results = {};
+    results.totalCourse = allCourses.length;
+    results.pageCount = Math.ceil(allCourses.length / ITEMS_PER_PAGE);
+
+    if (lastIndex < allCourses.length) {
+      results.next = {
+        page: page + 1,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.prev = {
+        page: page - 1,
+      };
+    }
+
+    results.page = page-1;
+    results.courses = allCourses.slice(startIndex, lastIndex);
+
+    res.status(200).json({ results });
   } catch (error) {
     console.log(error);
   }
@@ -147,8 +187,51 @@ const handleMakePayment = async (req, res) => {
 const getMyCourse = async (req, res) => {
   try {
     const userId = req.userId;
-    const courses = await courseModel.find({ users: userId });
-    res.status(200).json({ courses });
+    // const courses = await courseModel
+    //   .find({ users: userId })
+    //   .populate("category");
+
+      const ITEMS_PER_PAGE = 6;
+      let page = +req.query.page || 1;
+      // const search = req.query.search || "";
+      // const search = req.query.search !== 'undefined' ? req.query.search : "";
+      let search = "";
+      if(req.query.search !== 'undefined'){
+        search = req.query.search
+        page = 1;
+      }
+  
+      const query = {
+        users: userId,
+        title: {$regex: new RegExp(`^${search}`, "i")}
+      }
+  
+      const allCourses = await courseModel.find(query).populate("category");
+  
+      const startIndex = (page - 1) * ITEMS_PER_PAGE;
+      const lastIndex = page * ITEMS_PER_PAGE;
+  
+      const results = {};
+      results.totalCourse = allCourses.length;
+      results.pageCount = Math.ceil(allCourses.length / ITEMS_PER_PAGE);
+  
+      if (lastIndex < allCourses.length) {
+        results.next = {
+          page: page + 1,
+        };
+      }
+  
+      if (startIndex > 0) {
+        results.prev = {
+          page: page - 1,
+        };
+      }
+  
+      results.page = page-1;
+      results.courses = allCourses.slice(startIndex, lastIndex);
+  
+      res.status(200).json({ results });
+
   } catch (error) {
     console.log(error);
   }

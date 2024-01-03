@@ -4,7 +4,7 @@ import 'hover.css/css/hover-min.css';
 import cyberSecurity from '../../asset/cyberSecurity.jpg' 
 
 function CourseComponent({className , course, onclick}) {
-    console.log(course);
+    // console.log(course);
     return (
         <div className={className ? className : 'h-64 w-full md:w-2/4 cursor-pointer hvr-grow shadow-lg'} onClick={onclick}>
             <div className='h-2/3 bg-cover bg-center' style={{backgroundImage: `url(${course?.coverImage ? course.coverImage.url : cyberSecurity})`}}></div>

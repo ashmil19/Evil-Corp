@@ -228,8 +228,7 @@ const UserProfile = () => {
                 </div>
                 <div className='flex justify-between'>
                   <Link to="/user/myCourse"><p className='font-semibold'>My-Courses</p></Link>
-                  <p className='font-semibold'>My-Blogs</p>
-                  {/* <span>My-Blogs</span> */}
+                  <Link to="/user/myblog"><p className='font-semibold'>My-Blogs</p></Link>
                 </div>
               </div>
             </div>

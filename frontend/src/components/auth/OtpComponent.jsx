@@ -77,7 +77,7 @@ const OtpComponent = ({path, email}) => {
                 <div className=' font-medium text-center w-full'>Time Remaining: <span className='text-red-500'>{countdownTime}</span></div>
                 <div className='w-full flex justify-center items-center gap-2'>
                     <Button size='sm' onClick={handleOtpVerify}>Verify</Button>
-                    <Button size='sm' onClick={handleOtpResend} >Resend OTP</Button>
+                    <Button size='sm' disabled={countdownTime !== 0 ? true : false} onClick={handleOtpResend} >Resend OTP</Button>
                 </div>
             </div>
             <Toaster />

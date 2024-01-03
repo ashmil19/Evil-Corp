@@ -1,0 +1,405 @@
+import { useState, Fragment, useEffect } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { Input, Textarea } from '@material-tailwind/react'
+import Dropzone from 'react-dropzone'
+import { Toaster } from 'react-hot-toast';
+import { Oval } from 'react-loader-spinner'
+import { MdDelete } from "react-icons/md";
+
+import Navbar from '../../components/navbars/navbar'
+import ToastHelper from '../../helper/ToastHelper';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate'
+
+const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0e6b47b83af64e0c9.jpg';
+
+const MyBlog = () => {
+    const axiosPrivate = useAxiosPrivate()
+    const toastHelper = new ToastHelper()
+    const [isOpen, setIsOpen] = useState(false)
+    const [coverImage, setCoverImage] = useState(null);
+    const [values, setValues] = useState({
+        title: "",
+        description: "",
+    })
+
+    const [isEditOpen, setIsEditOpen] = useState(false)
+    const [editCoverImage, setEditCoverImage] = useState(null);
+    const [isImageOpen, setIsImageOpen] = useState(false)
+    const [editValues, setEditValues] = useState({
+        title: "",
+        description: "",
+    })
+
+    const [fetch, setFetch] = useState(false);
+    const [blogs, setBlogs] = useState(null);
+
+    const [blogId, setBlogId] = useState(null);
+    // const [title ,setTitle] = useState(null);
+    // const [description ,setDescription] = useState(null);
+
+    function closeModal() {
+        setCoverImage(null)
+        setIsOpen(false)
+    }
+
+    function openModal() {
+        setIsOpen(true)
+    }
+
+    function closeEditModal() {
+        setIsEditOpen(false)
+    }
+
+    function openEditModal(id, title, description) {
+        setBlogId(id)
+        setEditValues({ title, description })
+        setIsEditOpen(true)
+    }
+
+    function closeImageModal() {
+        setEditCoverImage(null)
+        setIsImageOpen(false)
+    }
+
+    function openImageModal(id) {
+        setBlogId(id)
+        setIsImageOpen(true)
+    }
+
+    const handleDrop = (acceptedFiles) => {
+        const file = acceptedFiles[0];
+
+        if (file && file.type.startsWith('image/')) {
+            setCoverImage(acceptedFiles[0])
+        } else {
+            toastHelper.showToast('Please upload a valid image file.');
+        }
+    };
+
+    const handleEditImageDrop = (acceptedFiles) => {
+        const file = acceptedFiles[0];
+
+        if (file && file.type.startsWith('image/')) {
+            setEditCoverImage(acceptedFiles[0])
+        } else {
+            toastHelper.showToast('Please upload a valid image file.');
+        }
+    };
+
+    const handleChanges = (e) => {
+        setValues({ ...values, [e.target.name]: e.target.value.trim() })
+    }
+
+    const handleEditChanges = (e) => {
+        setEditValues({ ...editValues, [e.target.name]: e.target.value.trim() })
+    }
+
+    const handleCreateBlog = () => {
+        if (values.title === "" || values.description === "" || !coverImage) {
+            toastHelper.showToast("Fill the Form")
+            return
+        }
+
+        const postData = { ...values, coverImage: coverImage }
+        console.log(postData);
+        axiosPrivate.post("/user/myBlog", postData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+            .then((res) => {
+                console.log(res);
+                setFetch(true)
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+
+        closeModal()
+    }
+
+    const handleEditBlog = () => {
+        if (editValues.title === "" || editValues.description === "") {
+            toastHelper.showToast("Fill the Form")
+            return
+        }
+
+        const putData = { ...editValues }
+        console.log(putData);
+
+        axiosPrivate.put(`/user/myBlog/${blogId}`, putData)
+            .then((res) => {
+                console.log(res);
+                setFetch(true)
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+
+        closeEditModal()
+    }
+
+    const handleChangeBlogImage = () => {
+        if (!editCoverImage) {
+            toastHelper.showToast("Select a image")
+            return
+        }
+
+        console.log(editCoverImage);
+        axiosPrivate.put(`/user/myBlogImage/${blogId}`,{image: editCoverImage},{
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        .then((res)=>{
+            console.log(res);
+            setFetch(true)
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+
+        closeImageModal()
+    }
+
+    const handleBlogDelete = (id) =>{
+        axiosPrivate.delete(`/user/myBlog/${id}`)
+        .then((res)=>{
+            setFetch(true)
+            console.log(res);
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+
+    const fetchMyBlogs = () => {
+        axiosPrivate.get("/user/myBlog")
+            .then((res) => {
+                console.log(res);
+                setBlogs(res.data.myBlogs)
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+
+    useEffect(() => {
+        fetchMyBlogs();
+        setFetch(false)
+    }, [fetch]);
+
+    return (
+        <>
+            <div className='w-screen h-screen overflow-x-hidden'>
+                <Navbar />
+                <div className="w-full h-full p-5 flex flex-col gap-5 bg-gray-300">
+
+                    {blogs && blogs.map((blog) => (
+                        <div className="w-full h-24 rounded-lg shadow-lg bg-white flex gap-5 cursor-pointer">
+                            <img src={blog?.coverImage?.url} className='w-1/6 h-full object-fit rounded-l-lg hover:bg-black hover:opacity-80' alt="pic" onClick={()=>openImageModal(blog?._id)} />
+                            <div className='w-full h-full font-bold flex justify-center items-center' onClick={() => openEditModal(blog?._id, blog?.title, blog?.description)}>{blog?.title}</div>
+                            <div className='bg-gray-500 flex justify-center items-center rounded-r-lg' ><MdDelete onClick={()=> handleBlogDelete(blog?._id)} /></div>
+                        </div>
+                    ))}
+
+                    <div className="w-full h-24 rounded-lg shadow-lg bg-white flex gap-5 cursor-pointer" onClick={openModal}>
+                        <div className='w-full h-full font-extrabold text-lg flex justify-center items-center'>Add Blog</div>
+                    </div>
+                </div>
+                <Toaster />
+            </div>
+
+
+            {/* create blog modal */}
+            <Transition appear show={isOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black/25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    <Dialog.Title
+                                        as="h3"
+                                        className="text-lg font-medium leading-6 text-gray-900"
+                                    >
+                                        Create Blog
+                                    </Dialog.Title>
+                                    <div className="mt-2 flex flex-col gap-3">
+                                        <Input label="Title" name='title' onChange={handleChanges} />
+                                        <Textarea label="Description" name='description' onChange={handleChanges} />
+                                        <Dropzone onDrop={handleDrop}>
+                                            {({ getRootProps, getInputProps }) => (
+                                                <section>
+                                                    <div className='w-full h-40 border-2 border-gray-400 border-dashed flex items-center justify-center cursor-pointer' {...getRootProps()}>
+                                                        <input {...getInputProps()} />
+                                                        <div className='flex flex-col h-full justify-center'>
+
+                                                            {coverImage ? <div className='h-1/3 flex items-center justify-center'>{coverImage.name}</div>
+                                                                : <p>Drag 'n' drop some files here, or click to select files</p>}
+                                                            {coverImage && <img className='w-full h-2/3 object-center pb-4' src={URL.createObjectURL(coverImage)}></img>}
+
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            )}
+                                        </Dropzone>
+                                    </div>
+
+                                    <div className="mt-4 flex justify-center">
+                                        <button
+                                            type="button"
+                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                            onClick={handleCreateBlog}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
+
+            {/* Change image modal */}
+            < Transition appear show={isImageOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeImageModal}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black/25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    <Dialog.Title
+                                        as="h3"
+                                        className="text-lg font-medium leading-6 text-gray-900"
+                                    >
+                                        Image Upload
+                                    </Dialog.Title>
+                                    <div className="mt-2 flex flex-col gap-3">
+                                        <Dropzone accept={['image/*']} multiple={false} onDrop={handleEditImageDrop}>
+                                            {({ getRootProps, getInputProps }) => (
+                                                <section>
+                                                    <div className='w-full h-40 border-2 border-gray-400 border-dashed outline-none flex items-center justify-center cursor-pointer' {...getRootProps()}>
+                                                        <input {...getInputProps()} />
+                                                        <div className='flex flex-col h-full justify-center'>
+
+                                                            {editCoverImage ? <div className='h-1/3 flex items-center justify-center'>{editCoverImage.name}</div>
+                                                                : <p>Drag 'n' drop image here, or click to select image</p>}
+                                                            {editCoverImage && <img className='w-full h-2/3 object-center pb-4' src={URL.createObjectURL(editCoverImage)}></img>}
+
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            )}
+                                        </Dropzone>
+                                    </div>
+
+                                    <div className="mt-4 flex justify-center">
+                                        <button
+                                            type="button"
+                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                            onClick={handleChangeBlogImage}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </ Transition>
+
+            {/* Edit Blog modal */}
+            <Transition appear show={isEditOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeEditModal}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className={`fixed inset-0 bg-black/25`} />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    <Dialog.Title
+                                        as="h3"
+                                        className="text-lg font-medium leading-6 text-gray-900"
+                                    >
+                                        Edit Course
+                                    </Dialog.Title>
+                                    <div className="mt-2 flex flex-col gap-3">
+                                        <Input label="Title" name='title' value={editValues.title} onChange={handleEditChanges} />
+                                        <Textarea label="Description" name='description' value={editValues.description} onChange={handleEditChanges} />
+                                    </div>
+
+                                    <div className="mt-4 flex justify-center">
+                                        <button
+                                            type="button"
+                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                            onClick={handleEditBlog}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition >
+        </>
+    )
+}
+
+export default MyBlog

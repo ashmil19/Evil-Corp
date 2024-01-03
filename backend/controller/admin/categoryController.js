@@ -6,7 +6,7 @@ const createCategory = async (req, res) => {
     const { name } = req.body;
     const image = req.files.image;
 
-    const existedCategory = await categoryModel.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
+    const existedCategory = await categoryModel.findOne({ name: { $regex: new RegExp(`^${name}`, "i") } });
 
     if (existedCategory) {
       res.status(409).json({ message: "Category already existed" });

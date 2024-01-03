@@ -115,11 +115,13 @@ const ChapterDetails = () => {
       .then((res) => {
         console.log(res.data.chapter);
         setChapter(res.data.chapter);
-        setFetch(false);
+        
       })
       .catch((err) => {
         console.log(err);
       })
+
+      return ()=> setFetch(false);
   }, [message, fetch]);
 
   const handleChapterValuesChanges = (e) => {
@@ -134,7 +136,7 @@ const ChapterDetails = () => {
           <div className='max-h-[150px] px-2'>
             <div className='capitalize text-center text-3xl md:text-4xl font-semibold flex justify-center break-all'>{chapter && chapter.title}</div>
           </div>
-          <video width="640" height="360" controls>
+          <video width="640" height="360" controls key={chapter?.video?.url}>
             {chapter?.video?.url && <source src={chapter.video.url} type="video/mp4" />}
             Your browser does not support the video tag.
           </video>

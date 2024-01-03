@@ -102,7 +102,8 @@ const UploadCourse = () => {
         .catch((err)=>{
             console.log(err);
         })
-
+        
+        return ()=> setMessage('')
     }, [message]);
 
 
@@ -111,7 +112,7 @@ const UploadCourse = () => {
             <div className='w-screen h-screen+50 md:h-screen overflow-x-hidden'>
                 <TeacherNavbar />
 
-                <div className='w-full h-full bg-dashboard-bg flex flex-col gap-8'>
+                <div className='w-full h-auto bg-dashboard-bg flex flex-col gap-8'>
                     <div className='w-full h-20 bg-dashboard-bg flex justify-center items-center'>
                         <div className='flex '>
                             <div className='w-14 h-10 rounded-l-md bg-black flex justify-center items-center'>

@@ -5,6 +5,9 @@ import UserProfile from '../pages/user/UserProfile'
 import Course from '../pages/user/Course'
 import CourseDetails from '../pages/user/CourseDetails'
 import MyCourses from '../pages/user/MyCourses'
+import MyBlog from '../pages/user/MyBlog'
+import Blog from '../pages/user/Blog'
+import BlogDetails from '../pages/user/BlogDetails'
 
 function User() {
   return (
@@ -14,6 +17,9 @@ function User() {
       <Route path="/course" element={<Course />} />
       <Route path="/courseDetails" element={<CourseDetails />} />
       <Route path="/myCourse" element={<MyCourses />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blogDetails" element={<BlogDetails />} />
+      <Route path="/myblog" element={<MyBlog />} />
     </Routes>
   )
 }
