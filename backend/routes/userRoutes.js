@@ -20,5 +20,8 @@ router.put("/myBlogImage/:id", blogController.changeBlogImage)
 router.get("/blogs", blogController.getAllBlogs)
 router.get("/blog/:id", blogController.getBlog)
 router.post("/blogLike", blogController.handleLike)
+router.post("/blogReport", blogController.handleReport)
+router.post("/blogComment", blogController.handleComment)
+router.post("/courseReview", userController.handleReview)
 
 module.exports = router;

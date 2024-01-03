@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
+
 const { imageUpload } = require("../../utils/uploadImage");
 const blogModel = require("../../models/blogModel")
-const mongoose = require('mongoose');
+const blogCommentModel = require("../../models/blogComment")
 
 
 const addBlog = async (req, res)=>{
@@ -88,7 +90,7 @@ const deleteBlog = async (req, res)=>{
 
 const getAllBlogs = async (req, res)=>{
     try {
-        const blogs = await blogModel.find().populate("user");
+        const blogs = await blogModel.find({isAccess: true}).populate("user");
         res.status(200).json({blogs});
     } catch (error) {
         console.log(error);
@@ -100,14 +102,27 @@ const getBlog = async (req, res)=>{
         const userId = req.userId;
         const blogId = req.params.id;
         const user = new mongoose.Types.ObjectId(userId);
-        let blog = await blogModel.findById(blogId)
-        const liked = !!(await blogModel.findOne({_id: blogId, likes: userId}))
+        let blog = await blogModel.findOne({_id:blogId, isAccess: true}).populate({
+            path: "comments",
+            populate: {
+                path: "user"
+            },
+            options: {
+                sort: {createdAt: -1}
+            }
+        })
 
-        console.log(liked);
+        if(!blog){
+            res.status(200).json({blog});
+            return
+        }
+
+        const liked = !!(await blogModel.findOne({_id: blogId, likes: userId}))
+        const reported = !!(await blogModel.findOne({_id: blogId, reports: userId}))
         
         const likes = blog.likes.length;
-        const {_doc: {...rest}, likesCount = likes, isLiked = liked} = blog
-        blog = {...rest,likesCount, isLiked}
+        const {_doc: {...rest}, likesCount = likes, isLiked = liked, isReported = reported} = blog
+        blog = {...rest,likesCount, isLiked, isReported}
 
 
         res.status(200).json({blog});
@@ -147,6 +162,49 @@ const handleLike = async (req, res)=>{
     }
 }
 
+const handleReport = async (req, res)=>{
+    try {
+        const userId = req.userId;
+        const blogId = req.body.blogId;
+        const user = new mongoose.Types.ObjectId(userId);
+        const minimumReports = 10
+
+        const updatedBlog = await blogModel.findByIdAndUpdate(blogId,{$push: {reports: user}},{ new: true })
+
+        // const reportsCount = updatedBlog.reports.length
+        const reportsCount = 12
+        const LikesCount = updatedBlog.likes.length
+
+        if(reportsCount > Math.floor(LikesCount/2) && reportsCount > minimumReports){
+            updatedBlog.isAccess = false;
+            await updatedBlog.save()
+        }
+
+        res.status(200).json({message: "Blog Reported"})
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const handleComment = async (req, res)=>{
+    try {
+        const userId = req.userId;
+        const user = new mongoose.Types.ObjectId(userId);
+        const {blogId, comment} = req.body
+
+        const newComment = blogCommentModel({
+            user,
+            content: comment,
+        })
+
+        const newAddedComment = await newComment.save();
+        await blogModel.findByIdAndUpdate(blogId,{$push: {comments: newAddedComment._id}})
+        res.status(200).json({message: "comment added"});
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 module.exports = {
     addBlog,
@@ -156,5 +214,7 @@ module.exports = {
     changeBlogImage,
     getAllBlogs,
     getBlog,
-    handleLike
+    handleLike,
+    handleReport,
+    handleComment,
 }

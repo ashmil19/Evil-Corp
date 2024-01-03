@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
 // const stripe = require("stripe")(
 //   "sk_test_51ORywXSGSYXlOuXjmEXnfwICawAhfAi5SVINBy7erevWFi8gSnfVxq7KkKr7QoyeXUZi0RCn1SQ2WLjQbm1KlClL005FM2WgFC"
 // );
@@ -8,6 +9,7 @@ const stripe = require("stripe")(
 
 const userModel = require("../../models/userModel");
 const courseModel = require("../../models/courseModel");
+const courseReviewModel = require("../../models/courseReviewModel");
 const { imageUpload } = require("../../utils/uploadImage");
 const hash = require("../../utils/toHash");
 
@@ -143,7 +145,13 @@ const getCourse = async (req, res) => {
       .populate("category")
       .populate({
         path: "chapters",
-      });
+      })
+      .populate({
+        path: "reviews",
+        populate: {
+          path: "user"
+        }
+      })
     res.status(200).json({ course });
   } catch (error) {
     console.log(error);
@@ -237,6 +245,24 @@ const getMyCourse = async (req, res) => {
   }
 };
 
+const handleReview = async (req, res)=>{
+  try {
+    const {rating, review, courseId, userId} = req.body;
+    const user = new mongoose.Types.ObjectId(userId);
+    const newReview = courseReviewModel({
+      rating,
+      review,
+      user
+    })
+
+    const newAddedReview = await newReview.save();
+    await courseModel.findByIdAndUpdate(courseId,{$push: {reviews: newAddedReview._id}})
+    res.status(200).json({message: "review added"});
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   getUser,
   uploadProfileImage,
@@ -247,4 +273,5 @@ module.exports = {
   changePassword,
   handleMakePayment,
   getMyCourse,
+  handleReview,
 };

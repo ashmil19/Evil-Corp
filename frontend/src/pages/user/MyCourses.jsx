@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FaSearch } from 'react-icons/fa'
 import ReactPaginate from 'react-paginate';
+import { useNavigate } from 'react-router-dom'
 
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import CourseComponent from '../../components/user/CourseComponent';
@@ -8,6 +9,7 @@ import Navbar from '../../components/navbars/navbar';
 import courseBanner from '../../asset/courseBanner.jpeg'
 
 const MyCourses = () => {
+    const navigate = useNavigate()
     const axiosPrivate = useAxiosPrivate()
     const [courses, setCourses] = useState(null);
     const [pageCount, setPageCount] = useState(1)
@@ -82,7 +84,7 @@ const MyCourses = () => {
                 </div>
                 <div className='flex gap-4 p-5'>
                     {courses?.length > 0 ? courses.map((course) => {
-                        return <CourseComponent course={course} className="h-64 w-full md:w-56 cursor-pointer hvr-grow shadow-lg" />
+                        return <CourseComponent course={course} className="h-64 w-full md:w-56 cursor-pointer hvr-grow shadow-lg" onclick={() => navigate("/user/courseDetails", { state: { courseId: course._id } })} />
                     }) : <div className='w-full flex justify-center items-center text-red-500'>Not found</div>}
                 </div>
 

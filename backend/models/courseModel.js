@@ -45,6 +45,12 @@ const courseSchema = new schema({
       ref: "chapter",
     },
   ],
+  reviews: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "courseReview",
+    },
+  ],
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
     ref:'user',
