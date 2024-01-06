@@ -8,6 +8,7 @@ import MyCourses from '../pages/user/MyCourses'
 import MyBlog from '../pages/user/MyBlog'
 import Blog from '../pages/user/Blog'
 import BlogDetails from '../pages/user/BlogDetails'
+import ChapterDetails from '../pages/user/ChapterDetails'
 
 function User() {
   return (
@@ -16,6 +17,7 @@ function User() {
       <Route path="/profile" element={<UserProfile />} />
       <Route path="/course" element={<Course />} />
       <Route path="/courseDetails" element={<CourseDetails />} />
+      <Route path="/chapterDetails" element={<ChapterDetails />} />
       <Route path="/myCourse" element={<MyCourses />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blogDetails" element={<BlogDetails />} />

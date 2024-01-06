@@ -1,37 +1,37 @@
 const mongoose = require("mongoose");
 
 const payment_schema = new mongoose.Schema({
-  strip_id:{
-    type:String,
-    required:true
-  },
-  user_id:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref:'users',
+  strip_id: {
+    type: String,
     required: true,
   },
-  teacher_id:{
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'users',
+    ref: "users",
     required: true,
   },
-  course_id:{
+  teacher_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'course',
+    ref: "users",
     required: true,
   },
-  amount:{
-    type:Number,
-    required:true
+  course_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "course",
+    required: true,
   },
-  isTeacherPay:{
-    type:Boolean,
-    default:false
+  amount: {
+    type: Number,
+    required: true,
   },
-  date:{
-    type:Date,
-    default:Date.now()
-  }
+  isTeacherPay: {
+    type: Boolean,
+    default: false,
+  },
+  date: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 module.exports = mongoose.model("payments", payment_schema);

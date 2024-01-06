@@ -36,14 +36,13 @@ const sendPassword = async (user) => {
     };
 
     console.log("before", result.password);
-    await sendMail(option)
+    await sendMail(option);
     return result.hashPassword;
   } catch (error) {
     console.log(error);
   }
 };
 
-
 module.exports = {
-  sendPassword
-}
+  sendPassword,
+};

@@ -5,6 +5,7 @@ import { Rating, Typography } from "@mui/material"
 import { Button, Textarea } from '@material-tailwind/react';
 import { useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom'
 
 import Navbar from '../../components/navbars/navbar'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
@@ -16,6 +17,7 @@ const CourseDetails = () => {
   const axiosPrivate = useAxiosPrivate()
   const toastHelper = new ToastHelper()
   const location = useLocation();
+  const navigate = useNavigate();
   const courseId = location.state && location.state.courseId;
 
   const [reviews, setReviews] = useState(null)
@@ -98,7 +100,11 @@ const CourseDetails = () => {
           <div className='w-full md:w-1/2 h-full p-5 flex flex-col gap-5'>
             <div className='text-2xl font-bold'>{course.title}:</div>
             <div>
-              <img src={course && course.coverImage?.url} alt="thumbnail" className='' />
+              {/* <img src={course && course.coverImage?.url} alt="thumbnail" className='' /> */}
+              <video width="700" height="360" className='rounded-t-lg' controls key={course?.demoVideo?.url}>
+                {<source src={course?.demoVideo?.url} type="video/mp4" />}
+                Your browser does not support the video tag.
+              </video>
             </div>
             <div>
               <span className="font-bold text-lg">Description: </span>
@@ -124,6 +130,7 @@ const CourseDetails = () => {
                 id="dropdownDefaultButton"
                 className="text-gray-600 bg-gray-300 hover:text-gray-600 transition-colors duration-300 hover:bg-gray-200 focus:ring-2 focus:outline-none focus:ring-gray-400 font-semibold rounded-lg text-xl w-5/6 overflow-hidden px-2 py-2.5 text-center inline-flex items-center justify-center"
                 type="button"
+                onClick={()=> navigate("/user/chapterDetails", { state: { id: chapter._id } })}
               >
                 {chapter.title}
               </button>
@@ -152,17 +159,17 @@ const CourseDetails = () => {
 
         <div className="w-full p-5 flex flex-col gap-2">
           <div className='font-bold text-lg'>Reviews({reviews?.length})</div>
-          {reviews && reviews.map((review)=>(
+          {reviews && reviews.map((review) => (
             <div key={review._id} className='w-full h-20 bg-blue-gray-200 rounded-lg p-2 flex flex-col'>
-            <div className='text-verySmall font-medium'>{review?.user?._id === authState.userId ? "You" :review?.user?.fullname}</div>
-            <Rating
-              size='small'
-              name="rating"
-              value={review?.rating}
-              readOnly
-            />
-            <div className='text-verySmall-1'>{review?.review}</div>
-          </div>
+              <div className='text-verySmall font-medium'>{review?.user?._id === authState.userId ? "You" : review?.user?.fullname}</div>
+              <Rating
+                size='small'
+                name="rating"
+                value={review?.rating}
+                readOnly
+              />
+              <div className='text-verySmall-1'>{review?.review}</div>
+            </div>
           ))}
         </div>
       </div>

@@ -17,4 +17,4 @@ const blogCommentSchema = new schema({
   },
 });
 
-module.exports = mongoose.model("blogComment",blogCommentSchema)
+module.exports = mongoose.model("blogComment", blogCommentSchema);

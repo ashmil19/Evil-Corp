@@ -51,7 +51,7 @@ const userSchema = new schema({
   isGoogle: {
     type: Boolean,
     default: false,
-  }
+  },
 });
 
 module.exports = mongoose.model("user", userSchema);

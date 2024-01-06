@@ -4,6 +4,7 @@ import { Button } from '@material-tailwind/react'
 import { FaUpload } from 'react-icons/fa'
 import { GoGrabber } from "react-icons/go";
 import { RiDeleteBin7Fill } from "react-icons/ri";
+import { Oval } from 'react-loader-spinner'
 import Dropzone from 'react-dropzone'
 import { Dialog, Transition } from '@headlessui/react'
 import { Input, Textarea, Select, Option } from '@material-tailwind/react'
@@ -24,7 +25,9 @@ import TeacherNavbar from '../../components/navbars/TeacherNavbar'
 import ToastHelper from '../../helper/ToastHelper'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import SortableItem from '../../components/teacher/SortableItem';
+
 const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0e6b47b83af64e0c9.jpg';
+const dummyVideo = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 
 const CourseDetails = () => {
@@ -35,15 +38,19 @@ const CourseDetails = () => {
 
   const toastHelper = new ToastHelper()
 
+  const [fetch, setFetch] = useState(false)
   const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false)
   const [isImageOpen, setIsImageOpen] = useState(false)
+  const [isVideoOpen, setIsVideoOpen] = useState(false)
   const [isChapterOpen, setIsChapterOpen] = useState(false)
 
   const [selectedCategory, setSelectedCategory] = useState('');
   const [coverImage, setCoverImage] = useState(null);
 
+  const [demoVideo, setDemoVideo] = useState(null);
   const [chapterVideo, setChapterVideo] = useState(null);
   const [chapterValues, setChapterValues] = useState({
     title: ""
@@ -71,6 +78,14 @@ const CourseDetails = () => {
     })
     setSelectedCategory(course.category._id)
     setIsOpen(true)
+  }
+
+  function closeVideoModal() {
+    setIsVideoOpen(false)
+  }
+
+  function openVideoModal() {
+    setIsVideoOpen(true)
   }
 
   function closeImageModal() {
@@ -112,6 +127,17 @@ const CourseDetails = () => {
   //   }
   // };
 
+  const handleDemoVideoDrop = (acceptedFiles) => {
+    const file = acceptedFiles[0];
+
+    if (file && file.type.startsWith('video/')) {
+      console.log(file);
+      setDemoVideo(acceptedFiles[0])
+    } else {
+      toastHelper.showToast('Please upload a valid video file.');
+    }
+  };
+
   const handleChapterVideoDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
 
@@ -134,7 +160,7 @@ const CourseDetails = () => {
   };
 
   const handleUploadChapter = () => {
-    if (chapterValues === null || !chapterVideo) {
+    if (chapterValues.title === "" || !chapterVideo) {
       toastHelper.showToast("Fill the form")
       return
     }
@@ -212,6 +238,30 @@ const CourseDetails = () => {
     closeImageModal()
   }
 
+  const handleChangeDemoVideo = () =>{
+    if(!demoVideo){
+      toastHelper.showToast("please fill the form")
+      return
+    }
+
+    setLoading(true)
+
+    axiosPrivate.put(`/teacher/courseDemoVideo/${courseId}`,{demoVideo},{
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    .then((res)=>{
+      console.log(res);
+      setFetch(true)
+      setLoading(false)
+    })
+    .catch((err)=>{
+      console.log(err);
+      setLoading(false)
+    })
+    closeVideoModal()
+    
+  }
+
   const handleDragEnd = (event) => {
     const {active, over} = event;
     const activeId = active.id._id
@@ -268,21 +318,51 @@ const CourseDetails = () => {
         console.log(err);
       })
 
-  }, [message]);
+      setFetch(false)
+
+  }, [message, fetch]);
 
   return (
     <>
       <div className='h-auto overflow-hidden'>
         <TeacherNavbar />
+
+        {loading && <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <Oval
+            visible={true}
+            height="80"
+            width="80"
+            color="#4fa94d"
+            ariaLabel="oval-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+          />
+        </div>}
+
         <div className='w-full h-auto py-5 px-5 md:px-10 bg-dashboard-bg flex flex-col gap-5 '>
           <div className='w-full h-auto flex flex-col md:flex-row  gap-5'>
-            <div className='w-full md:w-1/2 h-auto flex flex-col gap-5 '>
-              <div className='w-full h-96 '>
-                <div className='w-full h-5/6 bg-cover bg-center rounded-t-lg' style={{ backgroundImage: `url(${getBackgroundImage()})` }}></div>
-                <div className='w-full h-1/6 bg-gray-600 rounded-b-lg flex justify-center items-center'>
-                  <Button className='rounded-full bg-custom-bg-color' onClick={openImageModal} >Change</Button>
+            <div className='w-full md:w-1/2 h-auto flex flex-col gap-5'>
+              <div className='w-full flex flex-col gap-4'>
+
+                <div className='w-full'>
+                    <video width="700" height="360" className='rounded-t-lg' controls key={course?.demoVideo?.url}>
+                      {<source src={course?.demoVideo?.url} type="video/mp4" />}
+                      Your browser does not support the video tag.
+                    </video>
+                  <div className='w-full h-12 bg-gray-600 rounded-b-lg flex justify-center items-center'>
+                    <Button size='sm' className='rounded-full bg-custom-bg-color' onClick={openVideoModal} >Change</Button>
+                  </div>
                 </div>
+                <div className='w-full h-80'>
+                  <div className='w-full h-5/6 bg-cover bg-center rounded-t-lg' style={{ backgroundImage: `url(${getBackgroundImage()})` }}></div>
+                  <div className='w-full h-1/6 bg-gray-600 rounded-b-lg flex justify-center items-center'>
+                    <Button className='rounded-full bg-custom-bg-color' onClick={openImageModal} >Change</Button>
+                  </div>
+                </div>
+
               </div>
+              
+
               <div className='w-full h-96 bg-teacher-card-bg text-white rounded-lg p-8 flex flex-col justify-evenly gap-2'>
 
                 <div className=''>
@@ -432,6 +512,72 @@ const CourseDetails = () => {
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       onClick={handleChangeCourseImage}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </ Transition>
+
+      {/* change video modal */}
+      < Transition appear show={isVideoOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closeVideoModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Video Upload
+                  </Dialog.Title>
+                  <div className="mt-2 flex flex-col gap-3">
+                  <Dropzone accept={['video/*']} multiple={false} onDrop={handleDemoVideoDrop}>
+                      {({ getRootProps, getInputProps }) => (
+                        <section>
+                          <div className='w-full h-40 border-2 border-gray-400 border-dashed flex items-center justify-center cursor-pointer' {...getRootProps()}>
+                            <input {...getInputProps()} />
+                            <div className='flex flex-col h-full justify-center'>
+
+                              {demoVideo ? <div className='h-1/3 flex items-center justify-center'>{demoVideo.name}</div>
+                                : <p>Drag 'n' drop some video here, or click to select video</p>}
+                            </div>
+                          </div>
+                        </section>
+                      )}
+                    </Dropzone>
+                  </div>
+
+                  <div className="mt-4 flex justify-center">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={handleChangeDemoVideo}
                     >
                       Submit
                     </button>

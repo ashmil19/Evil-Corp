@@ -1,8 +1,7 @@
 const Jobs = {
-    videoUpload : 'VideoUpload'
-}
+  videoUpload: "VideoUpload",
+};
 
-
-module.export ={
-    Jobs
-}
+module.export = {
+  Jobs,
+};

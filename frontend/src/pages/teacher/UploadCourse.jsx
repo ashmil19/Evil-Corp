@@ -5,6 +5,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Input, Textarea, Select, Option } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast';
 import Dropzone from 'react-dropzone'
+import { Oval } from 'react-loader-spinner'
 
 import TeacherNavbar from '../../components/navbars/TeacherNavbar'
 import TeacherCourseCard from '../../components/teacher/TeacherCourseCard'
@@ -15,9 +16,12 @@ const UploadCourse = () => {
     const axiosPrivate = useAxiosPrivate()
     const toastHelper = new ToastHelper()
     const navigate = useNavigate()
+
+    const [loading, setLoading] = useState(false);
     const [courses, setCourses] = useState(null)
     const [isOpen, setIsOpen] = useState(false)
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [demoVideo, setDemoVideo] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
     const [categories, setCategories] = useState(null);
     const [message, setMessage] = useState(null)
@@ -47,6 +51,17 @@ const UploadCourse = () => {
         }
     };
 
+    const handleDemoVideoDrop = (acceptedFiles) => {
+        const file = acceptedFiles[0];
+    
+        if (file && file.type.startsWith('video/')) {
+          console.log(file);
+          setDemoVideo(acceptedFiles[0])
+        } else {
+          toastHelper.showToast('Please upload a valid video file.');
+        }
+      };
+
 
     const handleChanges = (e) => {
         setValues({ ...values, [e.target.name]: e.target.value.trim() })
@@ -54,7 +69,7 @@ const UploadCourse = () => {
 
 
     const handleCreateCourse = () => {
-        if (selectedCategory === "" || values.title === "" || values.description === "" || values.price === "" || !coverImage) {
+        if (selectedCategory === "" || values.title === "" || values.description === "" || values.price === "" || !coverImage || !demoVideo) {
             toastHelper.showToast("Fill the Form")
             return
         }
@@ -64,18 +79,22 @@ const UploadCourse = () => {
             return
         }
 
-        const postData = { ...values, category: selectedCategory, coverImage: coverImage }
+        const postData = { ...values, category: selectedCategory, coverImage: coverImage, demoVideo }
         console.log(postData);
+
+        setLoading(true)
 
         axiosPrivate.post("/teacher/course", postData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
             .then((res) => {
                 setMessage(res.data.message)
-                toastHelper.showToast(message)
+                setLoading(false)
+                // toastHelper.showToast(message)
                 console.log(res);
             })
             .catch((err) => {
+                setLoading(false)
                 toastHelper.showToast("some went wrong")
                 console.log(res);
             })
@@ -111,6 +130,18 @@ const UploadCourse = () => {
         <>
             <div className='w-screen h-screen+50 md:h-screen overflow-x-hidden'>
                 <TeacherNavbar />
+
+                {loading && <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <Oval
+                        visible={true}
+                        height="80"
+                        width="80"
+                        color="#4fa94d"
+                        ariaLabel="oval-loading"
+                        wrapperStyle={{}}
+                        wrapperClass=""
+                    />
+                </div>}
 
                 <div className='w-full h-auto bg-dashboard-bg flex flex-col gap-8'>
                     <div className='w-full h-20 bg-dashboard-bg flex justify-center items-center'>
@@ -191,6 +222,20 @@ const UploadCourse = () => {
                                                                 : <p>Drag 'n' drop some files here, or click to select files</p>}
                                                             {coverImage && <img className='w-full h-2/3 object-center pb-4' src={URL.createObjectURL(coverImage)}></img>}
 
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            )}
+                                        </Dropzone>
+                                        <Dropzone accept={['video/*']} multiple={false} onDrop={handleDemoVideoDrop}>
+                                            {({ getRootProps, getInputProps }) => (
+                                                <section>
+                                                    <div className='w-full h-40 border-2 border-gray-400 border-dashed flex items-center justify-center cursor-pointer' {...getRootProps()}>
+                                                        <input {...getInputProps()} />
+                                                        <div className='flex flex-col h-full justify-center'>
+
+                                                            {demoVideo ? <div className='h-1/3 flex items-center justify-center'>{demoVideo.name}</div>
+                                                                : <p>Drag 'n' drop some video here, or click to select video</p>}
                                                         </div>
                                                     </div>
                                                 </section>

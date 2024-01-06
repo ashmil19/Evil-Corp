@@ -9,7 +9,7 @@ const courseSchema = new schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "category"
+    ref: "category",
   },
   description: {
     type: String,
@@ -20,6 +20,20 @@ const courseSchema = new schema({
     required: true,
   },
   coverImage: {
+    public_id: {
+      type: String,
+      required: function () {
+        return this.url != null;
+      },
+    },
+    url: {
+      type: String,
+      required: function () {
+        return this.public_id != null;
+      },
+    },
+  },
+  demoVideo: {
     public_id: {
       type: String,
       required: function () {
@@ -53,7 +67,7 @@ const courseSchema = new schema({
   ],
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'user',
+    ref: "user",
     required: true,
   },
   isPublished: {

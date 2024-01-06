@@ -29,9 +29,9 @@ const blogSchema = new schema({
     ref: "user",
     required: true,
   },
-  createdAt:{
-    type:Date,
-    default:Date.now()
+  createdAt: {
+    type: Date,
+    default: Date.now(),
   },
   likes: [
     {
@@ -54,8 +54,7 @@ const blogSchema = new schema({
   isAccess: {
     type: Boolean,
     default: true,
-  }
+  },
 });
 
-
-module.exports = mongoose.model("blog",blogSchema)
+module.exports = mongoose.model("blog", blogSchema);

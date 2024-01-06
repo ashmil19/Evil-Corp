@@ -15,13 +15,12 @@ const Course = () => {
   const [courses, setCourses] = useState(null);
   const [pageCount, setPageCount] = useState(1)
   const [searchQuery, setSearchQuery] = useState('');
-  // const [currentPage, setCurrentPage] = useState(0)
   const currentPage = useRef()
 
   useEffect(() => {
     getAllCourse()
 
-    return ()=> setSearchQuery("")
+    return () => setSearchQuery("")
   }, []);
 
   const getAllCourse = (search) => {
@@ -31,7 +30,6 @@ const Course = () => {
         console.log(res.data.results);
         setCourses(res?.data?.results?.courses)
         setPageCount(res?.data?.results?.pageCount)
-        // setCurrentPage(res?.data?.results?.page)
         currentPage.current = res?.data?.results?.page
       })
       .catch((err) => {
@@ -42,8 +40,6 @@ const Course = () => {
   const handlePageClick = (e) => {
     currentPage.current = e.selected + 1;
     getAllCourse()
-    // console.log(e.selected+1, typeof e.selected);
-    // setCurrentPage(e.selected+1)
   }
 
   const debounce = (func, delay) => {
@@ -88,9 +84,11 @@ const Course = () => {
           </div>
         </div>
         <div className='flex flex-col md:flex-row flex-wrap justify-center gap-4 px-5'>
-          {courses && courses.map((course) => {
+          {courses && courses.length !== 0 ? courses.map((course) => {
             return <CourseComponent key={course._id} course={course} className="h-64 w-full md:w-56 cursor-pointer hvr-grow shadow-lg" onclick={() => navigate("/user/courseDetails", { state: { courseId: course._id } })} />
-          })}
+          }) : <div className='h-40 w-full flex justify-center items-center'>
+            <div className='text-black text-4xl capitalize font-bold text-center'>not found anything<span className='text-red-500'>!</span></div>
+          </div>}
         </div>
 
         <div className='w-full flex justify-center py-10'>

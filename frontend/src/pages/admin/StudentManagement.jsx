@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react'
+import React, { useEffect, useState, Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
 import AdminNavbar from '../../components/navbars/AdminNavbar'
@@ -10,16 +10,21 @@ import ToastHelper from '../../helper/ToastHelper'
 
 const StudentManagement = () => {
   const axiosPrivate = useAxiosPrivate();
-  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [itemsPerPage, setItemsPerPage] = useState(5)
-  const [currentPage, setCurrentPage] = useState(0);
+  // const [currentPage, setCurrentPage] = useState(0);
   const [isOpen, setIsOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState({
     id: null,
     isAccess: null,
   });
+
+
+  const [fetch, setFetch] = useState(false)  
+  const [pageCount, setPageCount] = useState(1)
+  const currentPage = useRef()
 
   function closeModal() {
     setIsOpen(false)
@@ -33,57 +38,18 @@ const StudentManagement = () => {
 
 
 
-  const handleSearch = (value) => {
-    console.log(value);
-    setSearchInput(value);
+  // const handleSearch = (value) => {
+    
+  // };
 
-    // Perform the search logic
-    const filteredData = users.filter((user) => {
-      const fullname = (user.fullname || '').toLowerCase();
-      const email = (user.email || '').toLowerCase();
-
-      return (
-        fullname.includes(value.toLowerCase()) ||
-        email.includes(value.toLowerCase())
-      );
-    });
-
-    setFilteredUsers(filteredData);
-  };
-
-
-  useEffect(() => {
-    axiosPrivate.get("/admin/students")
+  const fetchStudents = (search) =>{
+    axiosPrivate.get(`/admin/students?page=${currentPage.current}&search=${search}`)
       .then((res) => {
-        console.log(res.data.students);
-        setUsers(res.data.students)
+        console.log(res.data.results.students);
+        setUsers(res?.data?.results.students)
+        setPageCount(res?.data?.results?.pageCount)
         setFilteredUsers(res.data.students)
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-  }, [setUsers, setFilteredUsers]);
-
-  const handlePageChange = (selectedPage) => {
-    setCurrentPage(selectedPage.selected);
-  };
-
-
-  const handleItemsPerPageChange = (e) => {
-    const selectedItemsPerPage = parseInt(e.target.value, 10);
-    setItemsPerPage(selectedItemsPerPage);
-    setCurrentPage(0);
-  };
-
-
-  const accessChange = () => {
-    axiosPrivate.patch(`/admin/updateAccess/${currentUser.id}`, { isAccess: currentUser.isAccess })
-      .then((res) => {
-        console.log(res.data.updatedUser);
-        closeModal()
-        setFilteredUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user._id === res.data.updatedUser._id ? { ...user, isAccess: res.data.updatedUser.isAccess } : user))
+        currentPage.current = res?.data?.results?.page
       })
       .catch((err) => {
         console.log(err);
@@ -91,8 +57,49 @@ const StudentManagement = () => {
   }
 
 
-  const offset = currentPage * itemsPerPage;
-  const paginatedData = filteredUsers.slice(offset, offset + itemsPerPage);
+  useEffect(() => {
+    fetchStudents()
+    setFetch(false)
+    return ()=> setSearchQuery("")
+  }, [fetch]);
+
+  // const handlePageChange = (selectedPage) => {
+  //   setCurrentPage(selectedPage.selected);
+  // };
+
+  const handlePageClick = (e) => {
+    currentPage.current = e.selected + 1;
+    fetchStudents()
+}
+
+
+  // const handleItemsPerPageChange = (e) => {
+  //   const selectedItemsPerPage = parseInt(e.target.value, 10);
+  //   setItemsPerPage(selectedItemsPerPage);
+  //   setCurrentPage(0);
+  // };
+
+
+  const accessChange = () => {
+    axiosPrivate.patch(`/admin/updateAccess/${currentUser.id}`, { isAccess: currentUser.isAccess })
+      .then((res) => {
+        console.log(res.data.updatedUser);
+        setFetch(true)
+        closeModal()
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
+
+  const handleInputChange = (event) => {
+    setSearchQuery(event.target.value)
+    fetchStudents(event?.target?.value)
+  }
+
+
+  // const offset = currentPage * itemsPerPage;
+  // const paginatedData = filteredUsers.slice(offset, offset + itemsPerPage);
 
 
   return (
@@ -109,17 +116,17 @@ const StudentManagement = () => {
                   type="text"
                   placeholder="Search..."
                   className="p-2 border rounded-md w-full md:w-64"
-                  value={searchInput}
-                  onChange={(e) => handleSearch(e.target.value)}
+                  value={searchQuery}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <table className="min-w-full divide-y divide-gray-200 mx-auto overflow-x-scroll">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Sl No
-                    </th>
+                    </th> */}
                     <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Img
                     </th>
@@ -144,11 +151,11 @@ const StudentManagement = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {paginatedData.map((user, index) => (
+                  {users && users.map((user, index) => (
                     <tr key={user._id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                      {/* <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="text-sm text-gray-900">{index + 1 + currentPage * itemsPerPage}</div>
-                      </td>
+                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <img src={user.profileImage ? user.profileImage.url : ""} alt=" " className="h-8 w-8 rounded-full" />
                       </td>
@@ -186,7 +193,7 @@ const StudentManagement = () => {
                   ))}
                 </tbody>
               </table>
-              <div className=''>
+              {/* <div className=''>
                 <div className='flex justify-end mt-7 '>
                   <label className="mr-2 bg-gray-800 rounded-full px-6 p-2 text-white">Items per Page<span></span></label>
                   <select onChange={handleItemsPerPageChange} value={itemsPerPage} className='bg-gray-800   rounded-md  text-white'>
@@ -197,22 +204,32 @@ const StudentManagement = () => {
                 </div>
 
 
-              </div>
-              <div className='flex-column-center'>
-                <ReactPaginate
-                  pageCount={Math.ceil(filteredUsers.length / itemsPerPage)}
-                  pageRangeDisplayed={5}
-                  marginPagesDisplayed={2}
-                  onPageChange={handlePageChange}
-                  containerClassName="pagination-container"
-                  activeClassName="active"
-                  breakLabel={'...'}
-                  breakClassName={'break-me'}
-                  previousLabel={<span className="pagination-arrow">&lt;</span>}
-                  nextLabel={<span className="pagination-arrow">&gt;</span>}
-                  pageLinkClassName='pagination-page'
-                />
-              </div>
+              </div> */}
+              <div className='w-full flex justify-center py-10'>
+                    <ReactPaginate
+                        nextLabel=">"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={2}
+                        marginPagesDisplayed={0}
+                        pageCount={pageCount}
+                        // initialPage={currentPage.current}
+                        forcePage={currentPage.current}
+                        previousLabel="<"
+                        pageClassName="inline-block mx-1 page-item rounded "
+                        pageLinkClassName="border p-2 page-link"
+                        previousClassName="inline-block mx-1 page-item font-bold"
+                        previousLinkClassName="border p-2 page-link "
+                        nextClassName="inline-block mx-1 page-item font-bold"
+                        nextLinkClassName="border p-2 page-link"
+                        breakLabel="..."
+                        breakClassName="page-item inline-flex"
+                        breakLinkClassName="page-link "
+                        containerClassName="pagination "
+                        activeClassName="active bg-red-500"
+                        renderOnZeroPageCount={null}
+                    />
+
+                </div>
 
             </div>
           </div>

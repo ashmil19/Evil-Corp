@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 // const stripe = require("stripe")(
 //   "sk_test_51ORywXSGSYXlOuXjmEXnfwICawAhfAi5SVINBy7erevWFi8gSnfVxq7KkKr7QoyeXUZi0RCn1SQ2WLjQbm1KlClL005FM2WgFC"
 // );
@@ -12,6 +12,7 @@ const courseModel = require("../../models/courseModel");
 const courseReviewModel = require("../../models/courseReviewModel");
 const { imageUpload } = require("../../utils/uploadImage");
 const hash = require("../../utils/toHash");
+const chapterModel = require("../../models/chapterModel");
 
 const getUser = async (req, res) => {
   try {
@@ -27,8 +28,6 @@ const editUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { fullname } = req.body;
-    console.log(id);
-    console.log(fullname);
     const existedUser = await userModel.findById(id);
     if (!existedUser) {
       res.status(400).json({ message: "user not found" });
@@ -97,14 +96,14 @@ const getAllCourses = async (req, res) => {
     // const search = req.query.search || "";
     // const search = req.query.search !== 'undefined' ? req.query.search : "";
     let search = "";
-    if(req.query.search !== 'undefined'){
-      search = req.query.search
+    if (req.query.search !== "undefined") {
+      search = req.query.search;
       page = 1;
     }
 
     const query = {
-      title: {$regex: new RegExp(`^${search}`, "i")}
-    }
+      title: { $regex: new RegExp(`^${search}`, "i") },
+    };
 
     const allCourses = await courseModel.find(query).populate("category");
 
@@ -127,7 +126,7 @@ const getAllCourses = async (req, res) => {
       };
     }
 
-    results.page = page-1;
+    results.page = page - 1;
     results.courses = allCourses.slice(startIndex, lastIndex);
 
     res.status(200).json({ results });
@@ -138,7 +137,6 @@ const getAllCourses = async (req, res) => {
 
 const getCourse = async (req, res) => {
   try {
-    console.log(req.params);
     const courseId = req.params.id;
     const course = await courseModel
       .findOne({ _id: courseId })
@@ -149,10 +147,20 @@ const getCourse = async (req, res) => {
       .populate({
         path: "reviews",
         populate: {
-          path: "user"
-        }
-      })
+          path: "user",
+        },
+      });
     res.status(200).json({ course });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getChapter = async (req, res) => {
+  try {
+    const chapterId = req.params.id;
+    const chapter = await chapterModel.findById(chapterId);
+    res.status(200).json({ chapter });
   } catch (error) {
     console.log(error);
   }
@@ -199,69 +207,70 @@ const getMyCourse = async (req, res) => {
     //   .find({ users: userId })
     //   .populate("category");
 
-      const ITEMS_PER_PAGE = 6;
-      let page = +req.query.page || 1;
-      // const search = req.query.search || "";
-      // const search = req.query.search !== 'undefined' ? req.query.search : "";
-      let search = "";
-      if(req.query.search !== 'undefined'){
-        search = req.query.search
-        page = 1;
-      }
-  
-      const query = {
-        users: userId,
-        title: {$regex: new RegExp(`^${search}`, "i")}
-      }
-  
-      const allCourses = await courseModel.find(query).populate("category");
-  
-      const startIndex = (page - 1) * ITEMS_PER_PAGE;
-      const lastIndex = page * ITEMS_PER_PAGE;
-  
-      const results = {};
-      results.totalCourse = allCourses.length;
-      results.pageCount = Math.ceil(allCourses.length / ITEMS_PER_PAGE);
-  
-      if (lastIndex < allCourses.length) {
-        results.next = {
-          page: page + 1,
-        };
-      }
-  
-      if (startIndex > 0) {
-        results.prev = {
-          page: page - 1,
-        };
-      }
-  
-      results.page = page-1;
-      results.courses = allCourses.slice(startIndex, lastIndex);
-  
-      res.status(200).json({ results });
+    const ITEMS_PER_PAGE = 6;
+    let page = +req.query.page || 1;
+    // const search = req.query.search || "";
+    // const search = req.query.search !== 'undefined' ? req.query.search : "";
+    let search = "";
+    if (req.query.search !== "undefined") {
+      search = req.query.search;
+      page = 1;
+    }
 
+    const query = {
+      users: userId,
+      title: { $regex: new RegExp(`^${search}`, "i") },
+    };
+
+    const allCourses = await courseModel.find(query).populate("category");
+
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const lastIndex = page * ITEMS_PER_PAGE;
+
+    const results = {};
+    results.totalCourse = allCourses.length;
+    results.pageCount = Math.ceil(allCourses.length / ITEMS_PER_PAGE);
+
+    if (lastIndex < allCourses.length) {
+      results.next = {
+        page: page + 1,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.prev = {
+        page: page - 1,
+      };
+    }
+
+    results.page = page - 1;
+    results.courses = allCourses.slice(startIndex, lastIndex);
+
+    res.status(200).json({ results });
   } catch (error) {
     console.log(error);
   }
 };
 
-const handleReview = async (req, res)=>{
+const handleReview = async (req, res) => {
   try {
-    const {rating, review, courseId, userId} = req.body;
+    const { rating, review, courseId, userId } = req.body;
     const user = new mongoose.Types.ObjectId(userId);
     const newReview = courseReviewModel({
       rating,
       review,
-      user
-    })
+      user,
+    });
 
     const newAddedReview = await newReview.save();
-    await courseModel.findByIdAndUpdate(courseId,{$push: {reviews: newAddedReview._id}})
-    res.status(200).json({message: "review added"});
+    await courseModel.findByIdAndUpdate(courseId, {
+      $push: { reviews: newAddedReview._id },
+    });
+    res.status(200).json({ message: "review added" });
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 module.exports = {
   getUser,
@@ -274,4 +283,5 @@ module.exports = {
   handleMakePayment,
   getMyCourse,
   handleReview,
+  getChapter,
 };

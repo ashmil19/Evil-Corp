@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react'
 import Dropzone from 'react-dropzone'
 import { Toaster } from 'react-hot-toast'
+import { Oval } from 'react-loader-spinner'
 
 import TeacherNavbar from '../../components/navbars/TeacherNavbar'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
@@ -18,6 +19,7 @@ const ChapterDetails = () => {
   const courseId = location.state && location.state.courseId;
   const toastHelper = new ToastHelper()
 
+  const [loading, setLoading] = useState(false)
   const [fetch, setFetch] = useState(false)
   const [message, setMessage] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -66,29 +68,35 @@ const ChapterDetails = () => {
       return
     }
 
+    setLoading(true)
+
    axiosPrivate.patch(`/teacher/chapterVideo/${chapterId}`,{chapterVideo},{
     headers: { 'Content-Type': 'multipart/form-data' }
-  })
-  .then((res)=>{
-    console.log(res.data?.message);  
-    toastHelper.showToast(res.data?.message)
-    setFetch(true);
+    })
+    .then((res)=>{
+      console.log(res.data?.message);  
+      // toastHelper.showToast(res.data?.message)
+      setLoading(false)
+      setFetch(true);
+    })
+    .catch((err)=>{
+      console.log(err);
+      setLoading(false)
+      // toastHelper.showToast(err?.response?.data?.message)
+    })
+
+    
     closeChapterModal()
-  })
-  .catch((err)=>{
-    console.log(err);
-    // toastHelper.showToast(err?.response?.data?.message)
-  })
 
   }
 
   const handleEditChapter = () =>{
-    if(chapterValues.index == chapter.index && chapterValues.title == chapter.title){
+    if(chapterValues.title == chapter.title){
       toastHelper.showToast("values not changed")
       return
     }
 
-    if(chapterValues.index == "" || chapterValues.title == ""){
+    if(chapterValues.title == ""){
       toastHelper.showToast("Fill the form")
       return
     }
@@ -98,7 +106,7 @@ const ChapterDetails = () => {
     .then((res)=>{
       setMessage(res.data?.message)
       console.log(res.data?.message);  
-      toastHelper.showToast(res.data?.message)
+      // toastHelper.showToast(res.data?.message)
       setFetch(true)
     })
     .catch((err)=>{
@@ -125,13 +133,26 @@ const ChapterDetails = () => {
   }, [message, fetch]);
 
   const handleChapterValuesChanges = (e) => {
-    setChapterValues({ ...chapterValues, [e.target.name]: e.target.value.trim() })
+    setChapterValues({ ...chapterValues, [e.target.name]: e.target.value })
   }
 
   return (
     <>
       <div className='w-screen h-screen overflow-hidden'>
         <TeacherNavbar />
+
+        {loading && <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <Oval
+            visible={true}
+            height="80"
+            width="80"
+            color="#4fa94d"
+            ariaLabel="oval-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+          />
+        </div>}
+
         <div className='w-full h-full px-4 pt-5 bg-white flex flex-col justify-start items-center gap-5'>
           <div className='max-h-[150px] px-2'>
             <div className='capitalize text-center text-3xl md:text-4xl font-semibold flex justify-center break-all'>{chapter && chapter.title}</div>
