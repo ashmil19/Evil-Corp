@@ -5,6 +5,7 @@ import TeacherProfile from '../pages/teacher/TeacherProfile'
 import UploadCourse from '../pages/teacher/UploadCourse'
 import CourseDetails from '../pages/teacher/CourseDetails'
 import ChapterDetails from '../pages/teacher/ChapterDetails'
+import TeacherChat from '../pages/teacher/TeacherChat'
 
 function Teacher() {
   return (
@@ -14,6 +15,7 @@ function Teacher() {
         <Route path='/uploadCourse' element={<UploadCourse />}/>
         <Route path='/courseDetails' element={<CourseDetails />}/>
         <Route path='/chapterDetails' element={<ChapterDetails />}/>
+        <Route path='/chat' element={<TeacherChat />}/>
     </Routes>
   )
 }

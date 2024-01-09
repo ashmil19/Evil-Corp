@@ -2,6 +2,7 @@ const router = require("express").Router();
 
 const userController = require("../controller/user/userController");
 const blogController = require("../controller/user/blogController");
+// const chatController = require("../controller/common/chatController");
 
 router.get("/profile", userController.getUser);
 router.patch("/profile/:id", userController.editUser);
@@ -24,5 +25,11 @@ router.post("/blogLike", blogController.handleLike);
 router.post("/blogReport", blogController.handleReport);
 router.post("/blogComment", blogController.handleComment);
 router.post("/courseReview", userController.handleReview);
+
+// router.post("/chat", chatController.accessChat);
+// router.get("/chats", chatController.fetchChats);
+// router.get("/teachers", chatController.getAllTeachers);
+// router.post("/message", chatController.sendMessage);
+// router.get("/message/:id", chatController.allMessages);
 
 module.exports = router;

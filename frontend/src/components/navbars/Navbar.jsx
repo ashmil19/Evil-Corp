@@ -41,6 +41,7 @@ function Navbar({onClick, text}) {
                   <Link to='/user'><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Home</p></Link>
                   <Link to="/user/course"><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Course</p></Link>
                   <p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>About Us</p>
+                  <Link to="/user/chat"><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Chat</p></Link>
                   <Link to="/user/blog"><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Blog</p></Link>
                   <Link to="/user/profile"><p className='text-white text-medium cursor-pointer py-1 hvr-underline-from-left'>Profile</p></Link>
                 </div>

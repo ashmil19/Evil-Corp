@@ -1,12 +1,13 @@
 require("dotenv").config();
 const express = require("express");
+const { createServer } = require('node:http');
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
+const { Server } = require('socket.io');
 
 const mongodb = require("./config/mongo");
 const connectCloudinary = require("./config/cloudinary");
-// const connectS3Bucket = require("./config/s3Bucket");
 const verifyJWT = require("./middleware/verifyJWT");
 const userMiddleware = require("./middleware/userMiddleware")
 const adminMiddleware = require("./middleware/adminMiddleware")
@@ -15,14 +16,28 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+const configureSocket = require("./config/socket")
 
 const app = express();
+const server = createServer(app)
+const io = new Server(server,{
+  transports: ["websocket", "polling"],
+  cors: {
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
 
 const corsOptions = {
   origin: ["http://localhost:5173"],
   credentials: true,
   origin: true,
 };
+
+configureSocket(io);
 
 app.use(cookieParser());
 app.use(cors(corsOptions));
@@ -47,7 +62,8 @@ app.use(verifyJWT);
 app.use("/user", userMiddleware, userRoutes);
 app.use("/teacher", teacherMiddleware, teacherRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);
+app.use("/chat", chatRoutes);
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   console.log(`http://localhost:${process.env.PORT}`);
 });

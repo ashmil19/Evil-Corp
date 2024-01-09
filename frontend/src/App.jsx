@@ -17,6 +17,7 @@ import Blog from "./pages/user/Blog"
 import MyBlog from "./pages/user/MyBlog"
 import BlogDetails from "./pages/user/BlogDetails"
 import ChapterDetails from "./pages/user/ChapterDetails"
+import UserChat from "./pages/user/UserChat"
 
 const ROLES = {
   'User' : 2000,
@@ -31,7 +32,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />} >
 
-            {/* <Route path="/" element={<ChapterDetails />} /> */}
+            {/* <Route path="/" element={<UserChat />} /> */}
             
             <Route element={<CheckAuth />}>
               <Route path="/signup" element={<Registration />} />

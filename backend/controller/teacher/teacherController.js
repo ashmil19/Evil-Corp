@@ -1,12 +1,13 @@
 require("dotenv").config();
-const { Queue } = require("bullmq");
+const { Queue, tryCatch } = require("bullmq");
 
 const teacherModel = require("../../models/userModel");
-const { imageUpload } = require("../../utils/uploadImage");
 const courseModel = require("../../models/courseModel");
 const categoryModel = require("../../models/categoryModel");
-const { uploadVideo } = require("../../utils/videoUpload");
 const chapterModel = require("../../models/chapterModel");
+const chatModel = require("../../models/ChatModel");
+const { imageUpload } = require("../../utils/uploadImage");
+const { uploadVideo } = require("../../utils/videoUpload");
 const { Jobs } = require("../../utils/jobs");
 
 const redisOptions = {
@@ -283,6 +284,8 @@ const changeChapterIndex = async (req, res) => {
     console.log(error);
   }
 };
+
+
 
 module.exports = {
   getTeacher,
