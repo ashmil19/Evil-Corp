@@ -20,8 +20,9 @@ const CourseDetails = () => {
   const navigate = useNavigate();
   const courseId = location.state && location.state.courseId;
 
-  const [reviews, setReviews] = useState(null)
-  const [fetch, setFetch] = useState(false)
+  const [isEdit, setIsEdit] = useState(false);
+  const [reviews, setReviews] = useState(null);
+  const [fetch, setFetch] = useState(false);
   const [chapter, setChapter] = useState([]);
   const [course, setCourse] = useState([]);
   const [values, setValues] = useState({
@@ -130,7 +131,7 @@ const CourseDetails = () => {
                 id="dropdownDefaultButton"
                 className="text-gray-600 bg-gray-300 hover:text-gray-600 transition-colors duration-300 hover:bg-gray-200 focus:ring-2 focus:outline-none focus:ring-gray-400 font-semibold rounded-lg text-xl w-5/6 overflow-hidden px-2 py-2.5 text-center inline-flex items-center justify-center"
                 type="button"
-                onClick={()=> navigate("/user/chapterDetails", { state: { id: chapter._id } })}
+                onClick={() => navigate("/user/chapterDetails", { state: { id: chapter._id } })}
               >
                 {chapter.title}
               </button>
@@ -145,6 +146,7 @@ const CourseDetails = () => {
             <Rating
               name="rating"
               value={values.rating}
+              precision={0.5}
               onChange={(event, newValue) => setValues({ ...values, rating: newValue })}
             />
           </div>
@@ -166,6 +168,7 @@ const CourseDetails = () => {
                 size='small'
                 name="rating"
                 value={review?.rating}
+                precision={0.5}
                 readOnly
               />
               <div className='text-verySmall-1'>{review?.review}</div>

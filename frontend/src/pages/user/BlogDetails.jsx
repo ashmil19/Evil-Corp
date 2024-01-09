@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Textarea } from '@material-tailwind/react';
 import { Toaster } from 'react-hot-toast';
 import { useSelector} from 'react-redux';
+import TimeAgo from 'react-timeago'
 
 import Navbar from '../../components/navbars/navbar'
 import ToastHelper from '../../helper/ToastHelper';
@@ -47,14 +48,14 @@ const BlogDetails = () => {
     }
 
     const handleCommentSubmit = () =>{
-        if(comment === ""){
+        if(comment.trim() === ""){
             toastHelper.showToast("please enter any comment")
             return
         }
 
         const postData = {
             blogId,
-            comment,
+            comment: comment.trim(),
         }
 
         axiosPrivate.post("/user/blogComment",postData)
@@ -110,14 +111,18 @@ const BlogDetails = () => {
                 <div className="w-full h-34 p-5 flex flex-col gap-3">
                     <div className='font-extrabold text-lg'>Comments({allComments?.length})</div>
                     <div>
-                      <Textarea label="Comment" name='comment' value={comment} onChange={(e)=> setComment(e.target.value.trim())} />
+                      <Textarea label="Comment" name='comment' value={comment} onChange={(e)=> setComment(e.target.value)} />
                        <Button size='sm' onClick={handleCommentSubmit}>Submit</Button>
                     </div>
                     <div className='py-2 flex flex-col gap-2'>
                         {allComments && allComments.map((oneComment)=>(
                             <div className="w-full h-14 shadow-md bg-gray-300 p-2">
-                                <div className=" h-2/6 text-verySmall">{authState.userId == oneComment.user._id ? "You" : oneComment.user.fullname}</div>
-                                <div className=" h-4/6 flex items-center font-medium text-sm">{oneComment.content}</div>
+                                <div className='flex gap-2 h-2/6'>
+                                    <div className="flex items-center text-verySmall font-bold">{authState.userId == oneComment.user._id ? "You" : oneComment.user.fullname}</div>
+                                    {/* <div className='flex items-center text-veryVerySmall'>1 hour ago</div> */}
+                                    <TimeAgo className="flex items-center text-veryVerySmall" date={oneComment.createdAt} />
+                                </div>
+                                <div className=" h-4/6 flex items-center font-normal text-verySmall-1">{oneComment.content}</div>
                             </div>
                         ))}
                     </div>

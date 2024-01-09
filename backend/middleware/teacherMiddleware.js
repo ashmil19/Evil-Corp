@@ -7,9 +7,8 @@ const ROLES = {
 };
 
 const verifyUserRole = async (req, res, next) => {
+  if (req.role != ROLES.Teacher) return res.status(401).json({ role: true });
   const teacherData = await teacherModel.findById(req.userId);
-  // console.log("asdfa", teacherData);
-  if (teacherData.role != ROLES.Teacher) return res.status(401).json({ role: true });
   if (!teacherData.isAccess) return res.status(401).json({ access: true });
   next();
 };

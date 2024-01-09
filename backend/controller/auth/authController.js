@@ -109,13 +109,13 @@ const handleLogin = async (req, res) => {
     }
 
     const accessToken = jwt.sign(
-      { userId: userData._id },
+      { userId: userData._id, role: userData.role },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
 
     const refreshToken = jwt.sign(
-      { userId: userData._id },
+      { userId: userData._id, role: userData.role },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "7d" }
     );
@@ -159,15 +159,15 @@ const handleGoogleLogin = async (req, res) => {
       const newUserData = await newUser.save();
 
       const accessToken = jwt.sign(
-        { userId: newUserData._id },
+        { userId: newUserData._id, role: newUserData.role },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "30s" }
+        { expiresIn: "1d" }
       );
 
       const refreshToken = jwt.sign(
-        { userId: newUserData._id },
+        { userId: newUserData._id, role: newUserData.role },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "1d" }
+        { expiresIn: "7d" }
       );
 
       newUserData.refreshToken = refreshToken;
@@ -193,15 +193,15 @@ const handleGoogleLogin = async (req, res) => {
     }
 
     const accessToken = jwt.sign(
-      { userId: existedUser._id },
+      { userId: existedUser._id, role: existedUser.role },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "30s" }
+      { expiresIn: "1d" }
     );
 
     const refreshToken = jwt.sign(
-      { userId: existedUser._id },
+      { userId: existedUser._id, role: existedUser.role },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "7d" }
     );
 
     existedUser.refreshToken = refreshToken;
@@ -285,9 +285,9 @@ const handleRefreshToken = async (req, res) => {
         if (err || !userData._id.equals(decoded.userId))
           return res.sendStatus(403);
         const accessToken = jwt.sign(
-          { userId: decoded.userId },
+          { userId: decoded.userId, role: decoded.role },
           process.env.ACCESS_TOKEN_SECRET,
-          { expiresIn: "30s" }
+          { expiresIn: "1d" }
         );
         res.json({ accessToken });
       }

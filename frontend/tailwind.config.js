@@ -29,6 +29,7 @@ export default withMT({
         'screen+50': '150vh'
       },
       fontSize: {
+        'veryVerySmall': '0.500rem',
         'verySmall': '0.625rem',
         'verySmall-1': '0.725rem',
         'veryLarge': '2.5rem'
