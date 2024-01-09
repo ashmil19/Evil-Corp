@@ -25,6 +25,7 @@ router.post("/blogLike", blogController.handleLike);
 router.post("/blogReport", blogController.handleReport);
 router.post("/blogComment", blogController.handleComment);
 router.post("/courseReview", userController.handleReview);
+router.put("/courseReview/:id", userController.handleEditReview);
 
 // router.post("/chat", chatController.accessChat);
 // router.get("/chats", chatController.fetchChats);

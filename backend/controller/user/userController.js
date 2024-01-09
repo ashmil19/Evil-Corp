@@ -272,6 +272,19 @@ const handleReview = async (req, res) => {
   }
 };
 
+
+const handleEditReview = async (req, res)=>{
+  try {
+    const reviewId = req.params.id;
+    const {rating, review} = req.body;
+
+    await courseReviewModel.findByIdAndUpdate(reviewId,{review, rating})
+    res.status(200).json({message: "review updated"});
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   getUser,
   uploadProfileImage,
@@ -283,5 +296,6 @@ module.exports = {
   handleMakePayment,
   getMyCourse,
   handleReview,
+  handleEditReview,
   getChapter,
 };
