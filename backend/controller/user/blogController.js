@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { imageUpload } = require("../../utils/uploadImage");
 const blogModel = require("../../models/blogModel");
 const blogCommentModel = require("../../models/blogComment");
+const reportModel = require("../../models/reportModel");
 
 const addBlog = async (req, res) => {
   try {
@@ -147,18 +148,16 @@ const getBlog = async (req, res) => {
         options: {
           sort: { createdAt: -1 },
         },
-      });
+      })
+      .populate("reports");
 
     if (!blog) {
-      res.status(200).json({ blog });
+      res.status(404).json({ message: "blog not found" });
       return;
     }
 
     const liked = !!(await blogModel.findOne({ _id: blogId, likes: userId }));
-    const reported = !!(await blogModel.findOne({
-      _id: blogId,
-      reports: userId,
-    }));
+    const reported = !!(await reportModel.findOne({blog: blogId,user}));
 
     const likes = blog.likes.length;
     const {
@@ -208,29 +207,49 @@ const handleLike = async (req, res) => {
 const handleReport = async (req, res) => {
   try {
     const userId = req.userId;
-    const blogId = req.body.blogId;
+    const {blogId, reason} = req.body;
     const user = new mongoose.Types.ObjectId(userId);
-    const minimumReports = 10;
+    const blog = new mongoose.Types.ObjectId(blogId);
+    // const minimumReports = 10;
 
-    const updatedBlog = await blogModel.findByIdAndUpdate(
-      blogId,
-      { $push: { reports: user } },
-      { new: true }
-    );
+    const BlogReport = new reportModel({
+      blog,
+      user,
+      reason,
+    })
 
-    const reportsCount = updatedBlog.reports.length;
-    // const reportsCount = 12
-    const LikesCount = updatedBlog.likes.length;
+    const createdBlogReport = await BlogReport.save();
 
-    if (
-      reportsCount > Math.floor(LikesCount / 2) &&
-      reportsCount > minimumReports
-    ) {
-      updatedBlog.isAccess = false;
-      await updatedBlog.save();
+    const existedBlog = await blogModel.findById(blog);
+
+    if(!existedBlog){
+      return res.status(404).json({message: "blog not found"});
     }
 
+    existedBlog.reports.push(createdBlogReport._id)
+    await existedBlog.save()
+
     res.status(200).json({ message: "Blog Reported" });
+
+    // const updatedBlog = await blogModel.findByIdAndUpdate(
+    //   blogId,
+    //   { $push: { reports: user } },
+    //   { new: true }
+    // );
+
+    // const reportsCount = updatedBlog.reports.length;
+    // // const reportsCount = 12
+    // const LikesCount = updatedBlog.likes.length;
+
+    // if (
+    //   reportsCount > Math.floor(LikesCount / 2) &&
+    //   reportsCount > minimumReports
+    // ) {
+    //   updatedBlog.isAccess = false;
+    //   await updatedBlog.save();
+    // }
+
+    // res.status(200).json({ message: "Blog Reported" });
   } catch (error) {
     console.log(error);
   }

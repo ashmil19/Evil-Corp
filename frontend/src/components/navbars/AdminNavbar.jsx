@@ -42,6 +42,7 @@ const AdminNavbar = () => {
                   <Link to="/admin/students"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Students</p></Link>
                   <Link to="/admin/teachers"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Teachers</p></Link>
                   <Link to="/admin/category"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Category</p></Link>
+                  <Link to="/admin/blogReport"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Blog Report</p></Link>
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>All Courses</p>
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Transactions</p>
                 </div>

@@ -1,3 +1,4 @@
+const blogModel = require("../../models/blogModel");
 const userModel = require("../../models/userModel");
 
 const getStudents = async (req, res) => {
@@ -6,7 +7,6 @@ const getStudents = async (req, res) => {
     let page = +req.query.page || 1;
     let search = "";
     if (req.query.search !== "undefined") {
-      console.log("jai");
       search = req.query.search;
       page = 1;
     }
@@ -16,9 +16,7 @@ const getStudents = async (req, res) => {
       fullname: { $regex: new RegExp(`^${search}`, "i") },
     };
 
-
     const Allstudents = await userModel.find(query);
-    console.log(Allstudents);
 
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const lastIndex = page * ITEMS_PER_PAGE;
@@ -52,7 +50,6 @@ const updateAccess = async (req, res) => {
   try {
     const id = req.params.id;
     const { isAccess } = req.body;
-    console.log(typeof isAccess);
     const updatedUser = await userModel.findByIdAndUpdate(
       id,
       { $set: { isAccess: !isAccess } },
@@ -64,7 +61,69 @@ const updateAccess = async (req, res) => {
   }
 };
 
+const getReportedBlogs = async (req, res) => {
+  try {
+    const blogs = await blogModel.find().populate("user", "-password");
+    const blogData = await blogModel.aggregate([
+      {
+        $match: {
+          $expr: {
+            $gte: [{$size: "$reports"},10]
+          }
+        }
+      },
+      {
+        $lookup:{
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      {
+        $addFields: {
+          user: {
+            $mergeObjects: [
+              {$arrayElemAt: ["$userDetails",0]},
+              {_id: "$user"}
+            ]
+          }
+        }
+      },
+      {
+        $unset: "userDetails",
+      }
+    ])
+
+    res.status(200).json({ blogs: blogData });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const changeBlogStatus = async (req, res) => {
+  try {
+    const blogId = req.params.id;
+    const { isAccess } = req.body;
+
+    const existedBlog = await blogModel.findById(blogId);
+
+    if (!existedBlog) {
+      return res.status(404).json({ message: "blog not found" });
+    }
+
+    existedBlog.isAccess = !isAccess;
+    await existedBlog.save();
+
+    res.status(200).json({ message: "blog status updated" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getStudents,
   updateAccess,
+  getReportedBlogs,
+  changeBlogStatus,
 };

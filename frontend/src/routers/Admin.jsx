@@ -4,6 +4,7 @@ import AdminHome from '../pages/admin/AdminHome'
 import StudentManagement from '../pages/admin/StudentManagement'
 import TeacherManagement from '../pages/admin/TeacherManagement'
 import CategoryManagement from '../pages/admin/CategoryManagement'
+import BlogReportManagement from '../pages/admin/BlogReportManagement'
 
 function Admin() {
   return (
@@ -12,6 +13,7 @@ function Admin() {
         <Route path='/students' element={<StudentManagement />} />
         <Route path='/teachers' element={<TeacherManagement />} />
         <Route path='/category' element={<CategoryManagement />} />
+        <Route path='/blogReport' element={<BlogReportManagement />} />
     </Routes>
   )
 }

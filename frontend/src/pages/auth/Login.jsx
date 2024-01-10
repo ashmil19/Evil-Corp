@@ -1,15 +1,16 @@
-import  { useState, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import { Input, Button } from "@material-tailwind/react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import {Toaster} from 'react-hot-toast';
-import {useNavigate} from 'react-router-dom'
+import { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { Dialog, Transition } from '@headlessui/react'
+import { GridLoader } from 'react-spinners'
 
 import Navbar from '../../components/navbars/navbar'
 import LoginImage from '../../asset/login.svg'
 import axios from '../../helper/axios'
-import { setCredentials } from  '../../features/authSlice'
+import { setCredentials } from '../../features/authSlice'
 import ToastHelper from '../../helper/ToastHelper';
 import GoogleLoginComponent from '../../components/auth/GoogleLoginComponent';
 
@@ -19,6 +20,7 @@ function Login() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [passwordType, setPasswordType] = useState(true);
+  const [isLoading, setIsLoading] = useState(false)
 
   const [values, setValues] = useState({
     email: "",
@@ -31,66 +33,67 @@ function Login() {
 
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  
+
     return emailRegex.test(email);
   }
 
-  const handleSubmit = ()=>{
-    const {email, password} = values
+  const handleSubmit = () => {
+    const { email, password } = values
 
-    if(email === "" || password === ""){
+    if (email === "" || password === "") {
       toastHelper.showToast("fill the form")
       return
     }
 
-    if (!isValidEmail(email)){
+    if (!isValidEmail(email)) {
       toastHelper.showToast("email not in correct form")
       return
     }
+    
+    setIsLoading(true)
 
-    console.log(values);
-
-    axios.post('/login',values,{
+    axios.post('/login', values, {
       withCredentials: true,
       credentials: 'include'
     })
-    .then((res)=>{
-      const userCredentials = {
-        user: res.data.fullname,
-        userId: res.data.userId,
-        accessToken: res.data.accessToken,
-        role: res.data.role
-      }
-      dispatch(setCredentials(userCredentials))
-      res.data.role === 3000 ? navigate('/teacher') : navigate('/')
-    })
-    .catch((err)=>{
-      toastHelper.showToast(err?.response?.data?.message)
-      console.log(err);
-    })
+      .then((res) => {
+        const userCredentials = {
+          user: res.data.fullname,
+          userId: res.data.userId,
+          accessToken: res.data.accessToken,
+          role: res.data.role
+        }
+        dispatch(setCredentials(userCredentials))
+        res.data.role === 3000 ? navigate('/teacher') : navigate('/')
+      })
+      .catch((err) => {
+        setIsLoading(false)
+        toastHelper.showToast(err?.response?.data?.message)
+        console.log(err);
+      })
   }
 
-  const handleForgotPassword = () =>{
-    if(mail === ""){
+  const handleForgotPassword = () => {
+    if (mail === "") {
       toastHelper.showToast("fill the form")
       return;
     }
 
-    if (!isValidEmail(mail)){
+    if (!isValidEmail(mail)) {
       toastHelper.showToast("email not in correct form")
       return
     }
 
-    axios.post("/forgotPassword",{email: mail},{
+    axios.post("/forgotPassword", { email: mail }, {
       withCredentials: true,
       credentials: 'include'
     })
-    .then((res)=>{
-      navigate('/forgotpassword',{state: {email: mail}})
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+      .then((res) => {
+        navigate('/forgotpassword', { state: { email: mail } })
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
 
 
@@ -102,14 +105,15 @@ function Login() {
     setIsOpen(false)
   }
 
-  const handleChanges = (e) =>{
-    setValues({...values, [e.target.name]: e.target.value.trim()})
+  const handleChanges = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value.trim() })
   }
 
   return (
-    <>
-    <div className='h-screen w-screen overflow-hidden'>
-        <Navbar text="Sign up" onClick={()=>{navigate("/signup")}}/>
+    <div className={isLoading ? 'h-screen w-screen flex justify-center items-center' : ''}>
+      {isLoading ? <GridLoader /> :
+      <div className='h-screen w-screen overflow-hidden'>
+        <Navbar text="Sign up" onClick={() => { navigate("/signup") }} />
         <div className=' h-full flex flex-col md:flex-row'>
           <div className='md:w-1/2 w-full h-1/3 md:h-full flex items-start md:items-center justify-center'>
             <img className='w-full md:w-2/3 h-full' src={LoginImage} alt="" />
@@ -119,30 +123,30 @@ function Login() {
             <div className='w-3/4 md:w-1/2 flex flex-col gap-6'>
               <Input variant="standard" name='email' label="Email" color='black' className='!text-black' onChange={handleChanges} />
               <Input variant="standard" name='password' label="Password" type={passwordType ? 'password' : 'text'} color='black' className='!text-black' onChange={handleChanges}
-              icon={ passwordType ?
-              <FaEyeSlash onClick={()=> setPasswordType(!passwordType)} />
-              : <FaEye onClick={()=> setPasswordType(!passwordType)} />
-              } />
+                icon={passwordType ?
+                  <FaEyeSlash onClick={() => setPasswordType(!passwordType)} />
+                  : <FaEye onClick={() => setPasswordType(!passwordType)} />
+                } />
               <div className='text-verySmall underline cursor-pointer' onClick={openModal}>Forgot Password ?</div>
             </div>
             <div>
-            <Button variant="filled" onClick={handleSubmit}>Log in</Button>
+              <Button variant="filled" onClick={handleSubmit}>Log in</Button>
             </div>
             <div className='w-full md:w-2/3 flex items-center justify-center md:justify-start gap-2'>
-              <hr className='w-1/3 md:w-1/3 border-t-2 border-gray-500 my-4'/>
+              <hr className='w-1/3 md:w-1/3 border-t-2 border-gray-500 my-4' />
               <span>Or</span>
-              <hr className='w-1/3 border-t-2 border-gray-500 my-4'/>
+              <hr className='w-1/3 border-t-2 border-gray-500 my-4' />
             </div>
             <div className='w-1/2 flex justify-center'>
               <GoogleLoginComponent />
             </div>
           </div>
         </div>
-        <Toaster/>
-    </div>
+        <Toaster />
+      </div>}
 
-    {/* mail modal */}
-    <Transition appear show={isOpen} as={Fragment}>
+      {/* mail modal */}
+      <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <Transition.Child
             as={Fragment}
@@ -175,7 +179,7 @@ function Login() {
                     Forgot Password
                   </Dialog.Title>
                   <div className="mt-2 flex flex-col gap-3">
-                    <Input label="Email" name='email' onChange={(e)=> setMail(e.target.value.trim())} />
+                    <Input label="Email" name='email' onChange={(e) => setMail(e.target.value.trim())} />
                   </div>
 
                   <div className="mt-4 flex justify-center">
@@ -193,7 +197,7 @@ function Login() {
           </div>
         </Dialog>
       </Transition>
-    </>
+    </div>
   )
 }
 

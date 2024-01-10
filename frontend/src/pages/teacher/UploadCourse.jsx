@@ -17,6 +17,7 @@ const UploadCourse = () => {
     const toastHelper = new ToastHelper()
     const navigate = useNavigate()
 
+    const [fetch, setFetch] = useState(false)
     const [loading, setLoading] = useState(false);
     const [courses, setCourses] = useState(null)
     const [isOpen, setIsOpen] = useState(false)
@@ -30,6 +31,22 @@ const UploadCourse = () => {
         description: "",
         price: "",
     })
+    
+    const [isOtherCategory, setIsOtherCategory] = useState(false)
+    const [otherCategory, setOtherCategory] = useState('')
+
+    const handleCategoryChange = (category) =>{
+        console.log("category",category);
+
+        setIsOtherCategory(false)
+        if(category.name === "Other"){
+            setIsOtherCategory(true)
+        }
+
+        setSelectedCategory(category._id)
+
+    }
+
 
 
     function closeModal() {
@@ -39,6 +56,7 @@ const UploadCourse = () => {
 
     function openModal() {
         setIsOpen(true)
+        setIsOtherCategory(false)
     }
 
     const handleDrop = (acceptedFiles) => {
@@ -74,12 +92,19 @@ const UploadCourse = () => {
             return
         }
 
+        if(isOtherCategory){
+            if(otherCategory.trim() === ""){
+                toastHelper.showToast("Fill the Other category")
+                return
+            }
+        }
+
         if (Number(values.price) < 1) {
             toastHelper.showToast('Price Must greater Zero')
             return
         }
 
-        const postData = { ...values, category: selectedCategory, coverImage: coverImage, demoVideo }
+        const postData = { ...values, category: selectedCategory, coverImage: coverImage, demoVideo, otherCategory }
         console.log(postData);
 
         setLoading(true)
@@ -103,6 +128,8 @@ const UploadCourse = () => {
 
     }
 
+    
+
     useEffect(() => {
         axiosPrivate.get("/teacher/course")
         .then((res)=>{
@@ -121,9 +148,11 @@ const UploadCourse = () => {
         .catch((err)=>{
             console.log(err);
         })
+
+        setFetch(false)
         
         return ()=> setMessage('')
-    }, [message]);
+    }, [message, fetch]);
 
 
     return (
@@ -158,7 +187,7 @@ const UploadCourse = () => {
                     </div>
                     <div className='w-full h-auto flex justify-center px-2 py-2 flex-wrap gap-4'>
                         {courses && courses.map((course) => {
-                            return <TeacherCourseCard key={course._id} course={course} onclick={()=>navigate("/teacher/courseDetails",{state: {id: course._id}})} />
+                            return <TeacherCourseCard key={course._id} course={course} setFetch={setFetch} onclick={()=>navigate("/teacher/courseDetails",{state: {id: course._id}})} />
                         })}
                         <div className='h-56 w-64 bg-gray-300 rounded-lg flex justify-center items-center cursor-pointer' onClick={openModal} >
                             <FaPlus className='text-Student-management' size={180} />
@@ -169,6 +198,7 @@ const UploadCourse = () => {
                 <Toaster />
 
             </div>
+
             <Transition appear show={isOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-10" onClose={closeModal}>
                     <Transition.Child
@@ -203,11 +233,12 @@ const UploadCourse = () => {
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col gap-3">
                                         <Input label="Title" name='title' onChange={handleChanges} />
-                                        <Select variant="outlined" label="Category" id="category" name="category" onChange={(e) => setSelectedCategory(e)}>
+                                        <Select variant="outlined" label="Category" id="category" name="category" onChange={(e) => handleCategoryChange(e)}>
                                             {categories && categories.map((category)=>{
-                                                return <Option value={category._id}>{category.name}</Option>
+                                                return <Option value={category}>{category.name}</Option>
                                             })}
                                         </Select>
+                                        {isOtherCategory && <Input label="Other Category" name='otherCategory' onChange={(e)=> setOtherCategory(e.target.value)} />}
                                         <Textarea label="Description" name='description' onChange={handleChanges} />
                                         <Input type='number' label='Price' name='price' onChange={handleChanges} />
                                         {/* <Input type='file' label='Cover Image' name='coverImage' onChange={(e)=> setCoverImage(e.target.files[0])} /> */}

@@ -76,10 +76,31 @@ const uploadCourse = async (req, res) => {
   try {
     const image = req.files?.coverImage;
     const video = req.files?.demoVideo;
-    const { title, category, description } = req.body;
+    const { title, description, otherCategory } = req.body;
+    let { category } = req.body;
     const price = Number(req.body.price);
     const coverImage = await imageUpload(image);
     const demoVideo = await uploadVideo(video);
+
+    console.log(req.body);
+
+    if(otherCategory !== ""){
+      const existedCategory = await categoryModel.findOne({
+        name: { $regex: new RegExp(`^${otherCategory}`, "i") },
+      })
+
+      if(existedCategory){
+        return res.status(400).json({message: "category already existed"})
+      }
+
+      const newCategory = new categoryModel({
+        name: otherCategory
+      })
+
+      const createdNewCategory = await newCategory.save();
+
+      category = createdNewCategory._id;
+    }
 
     const newCourse = courseModel({
       title,
@@ -149,9 +170,30 @@ const changeCourseDemoVideo = async (req, res) => {
   }
 };
 
+const handlePublishCourse = async (req, res)=>{
+  try {
+    const courseId = req.params.courseId
+    const { isPublished } = req.body
+
+    const updatedCourse = await courseModel.findByIdAndUpdate(courseId, {isPublished: !isPublished},{new: true})
+    res.status(200).json({message: "publish updated",updatedCourse})
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 const getAllCourse = async (req, res) => {
   try {
-    const courses = await courseModel.find();
+    const courses = await courseModel.find({isPublished: false});
+    res.status(200).json({ courses });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getAllMyCourse = async (req, res) => {
+  try {
+    const courses = await courseModel.find({isPublished: true});
     res.status(200).json({ courses });
   } catch (error) {
     console.log(error);
@@ -294,6 +336,7 @@ module.exports = {
   uploadCourse,
   editCourse,
   getAllCourse,
+  getAllMyCourse,
   getCourse,
   getAllCategory,
   uploadChapter,
@@ -303,4 +346,5 @@ module.exports = {
   uploadChapterVideo,
   changeChapterIndex,
   changeCourseDemoVideo,
+  handlePublishCourse,
 };

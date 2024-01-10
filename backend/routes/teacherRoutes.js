@@ -8,6 +8,7 @@ router.post("/uploadImage", teacherController.uploadProfileImage);
 router.post("/course", teacherController.uploadCourse);
 router.put("/course/:id", teacherController.editCourse);
 router.get("/course", teacherController.getAllCourse);
+router.get("/myCourse", teacherController.getAllMyCourse);
 router.get("/course/:id", teacherController.getCourse);
 router.put("/courseImage/:id", teacherController.changeCourseImage);
 router.put("/courseDemoVideo/:id", teacherController.changeCourseDemoVideo);
@@ -17,5 +18,6 @@ router.get("/chapter/:id", teacherController.getChapter);
 router.put("/chapter/:id", teacherController.editChapter);
 router.patch("/chapterVideo/:id", teacherController.uploadChapterVideo);
 router.put("/changeIndex/:courseId", teacherController.changeChapterIndex);
+router.patch("/changePublish/:courseId", teacherController.handlePublishCourse);
 
 module.exports = router;

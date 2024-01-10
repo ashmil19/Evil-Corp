@@ -42,7 +42,7 @@ const blogSchema = new schema({
   reports: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "blogReport",
     },
   ],
   comments: [

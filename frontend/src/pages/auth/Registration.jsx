@@ -21,7 +21,7 @@ const toastHelper = new ToastHelper();
 function Registration() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const uiSettingsState = useSelector((state)=> state.uiSettings)
+  const uiSettingsState = useSelector((state) => state.uiSettings)
   const [passwordType, setPasswordType] = useState(true);
   const [rePasswordType, setRePasswordType] = useState(true);
   const [enabled, setEnabled] = useState(false)

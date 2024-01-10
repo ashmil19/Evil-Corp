@@ -18,14 +18,6 @@ function TeacherNavbar() {
     const dispatch = useDispatch() 
     const navigate = useNavigate()
 
-    // const handleLogout = () =>{
-    //     axiosPrivate.get("/teacher/logout")
-    //     .then((response)=>{
-    //       console.log("success");
-    //       dispatch(logOut())
-    //       navigate('/login')
-    //     })
-    //   }
     
 
   return (
@@ -41,8 +33,8 @@ function TeacherNavbar() {
               <div className="hidden md:flex md:justify-between">
                 <div className=" flex items-center justify-between space-x-7">
                 <Link to="/teacher"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Dashboard</p></Link>
-                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Running Class</p>
-                  <Link to="/teacher/uploadCourse"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Upload Class</p></Link>
+                  <Link to="/teacher/uploadCourse"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Upload Course</p></Link>
+                  <Link to="/teacher/publicCourse"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Public Course</p></Link>
                   <Link to="/teacher/chat"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Chat</p></Link>
                   <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Payment</p>
                   <Link to="/teacher/profile"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Profile</p></Link>

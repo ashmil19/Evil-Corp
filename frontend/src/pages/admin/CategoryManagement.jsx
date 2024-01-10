@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useState, useEffect } from 'react'
 import Dropzone from 'react-dropzone'
 import { Dialog, Transition } from '@headlessui/react'
 import { Input, Textarea, Select, Option, Button } from '@material-tailwind/react'
@@ -9,7 +9,6 @@ import AdminNavbar from '../../components/navbars/AdminNavbar'
 import osint from '../../asset/osint.jpg'
 import ToastHelper from '../../helper/ToastHelper'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
-import { useEffect } from 'react';
 
 
 const CategoryManagement = () => {
@@ -220,7 +219,7 @@ const CategoryManagement = () => {
                                                 {index + 1}
                                             </th>
                                             <td className="px-6 py-4">
-                                                <div style={{ backgroundImage: `url(${category ? category.image.url : osint})` }} className='w-8 h-8 bg-cover bg-center'></div>
+                                                <div style={{ backgroundImage: `url(${category ? category?.image?.url : osint})` }} className='w-8 h-8 bg-cover bg-center'></div>
                                             </td>
                                             <td className="px-6 py-4 font-bold">
                                                 {category.name}
