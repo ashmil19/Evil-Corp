@@ -45,20 +45,20 @@ const BlogDetails = () => {
             return
         }
         console.log(reason)
-        const postData =  {
+        const postData = {
             blogId,
             reason
         }
 
-        axiosPrivate.post("/user/blogReport",postData)
-        .then((res)=>{
-            console.log(res);
-            setFetch(true)
-            closeModal()
-        })
-        .catch((err)=>{
-            console.log(err);
-        })
+        axiosPrivate.post("/user/blogReport", postData)
+            .then((res) => {
+                console.log(res);
+                setFetch(true)
+                closeModal()
+            })
+            .catch((err) => {
+                console.log(err);
+            })
     }
 
     const handleCommentSubmit = () => {
@@ -116,10 +116,11 @@ const BlogDetails = () => {
         <>
             <div className='w-screen h-screen overflow-x-hidden'>
                 <Navbar />
-                <div className="w-full h-full">
+                <div className="w-full h-full px-0 md:px-32 py-0 md:py-10">
                     <div className='h-72 w-full bg-center bg-cover flex justify-center items-center' style={{ backgroundImage: `url(${blog?.coverImage?.url})` }}></div>
-                    <div className='w-full p-5 flex flex-col gap-3'>
+                    <div className='w-full p-5 flex flex-col gap-4'>
                         <div className=''>
+                            <div className='text-verySmall-1'>{new Date(blog?.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
                             <div className='font-bold text-3xl'>{blog?.title}</div>
                             <div className='flex justify-between items-center'>
                                 <div className='flex items-center gap-1'>
@@ -130,7 +131,9 @@ const BlogDetails = () => {
                                 {!blog?.isReported && <Button size='sm' onClick={openModal}>Report</Button>}
                             </div>
                         </div>
+                        <div className='font-semibold text-sm'>By {blog?.user?.fullname}</div>
                         <div className='text-sm overflow-hidden break-words leading-7'>{blog?.description}.</div>
+                        <div dangerouslySetInnerHTML={{ __html: blog?.content }} className='text-sm overflow-hidden break-words leading-7'></div>
                     </div>
                     <div className="w-full h-34 p-5 flex flex-col gap-3">
                         <div className='font-extrabold text-lg'>Comments({allComments?.length})</div>
@@ -187,7 +190,7 @@ const BlogDetails = () => {
                                         What is the reason ?
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col gap-3">
-                                        <Textarea label="Reason" name='reason' onChange={(e)=> setReason(e.target.value)} />
+                                        <Textarea label="Reason" name='reason' onChange={(e) => setReason(e.target.value)} />
                                     </div>
 
                                     <div className="mt-4 flex justify-center">

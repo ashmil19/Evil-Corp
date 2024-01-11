@@ -148,22 +148,7 @@ const sendMessage = async (data) => {
     const message = await newMessage.save()
     createdChat.latestMessage = message._id;
     await createdChat.save()
-
-    // if (!content || !chatId) {
-    //   return res.status(400).json({ message: "not provided enough data" });
-    // }
-
-    // const newMessage = messageModel({
-    //   sender: req.userId,
-    //   content,
-    //   chat: chatId,
-    // });
-
-    // const message = await newMessage.save();
-
-    // await ChatModel.findByIdAndUpdate(chatId, { latestMessage: message._id });
-
-    // res.status(200).json({ message: "succefully send message" });
+    
   } catch (error) {
     console.log(error);
   }

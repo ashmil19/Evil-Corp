@@ -29,15 +29,6 @@ const UserChat = () => {
         setClicked(true);
         setRecipientId(id)
         setRecipient(teacher)
-        // axiosPrivate.post("/user/chat",{userId: id})
-        // .then((res)=>{
-        //     console.log(res);
-        //     setAllMessages(res?.data?.allMessages)
-        //     setChatId(res?.data?.isChat?._id)
-        // })
-        // .catch((err)=>{
-        //     console.log(err);
-        // })
     }
 
     

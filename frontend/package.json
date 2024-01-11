@@ -38,7 +38,9 @@
     "react-spinners": "^0.13.8",
     "react-timeago": "^7.2.0",
     "redux-persist": "^6.0.0",
-    "socket.io-client": "^4.7.3"
+    "socket.io-client": "^4.7.3",
+    "suneditor": "^2.45.1",
+    "suneditor-react": "^3.6.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

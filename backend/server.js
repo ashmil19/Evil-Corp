@@ -47,7 +47,7 @@ mongodb();
 connectCloudinary();
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.json({limit: '100mb'}));
 app.use(
   fileUpload({
     useTempFiles: true,

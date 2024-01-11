@@ -10,6 +10,9 @@ const blogSchema = new schema({
     type: String,
     required: true,
   },
+  content: {
+    type: String
+  },
   coverImage: {
     public_id: {
       type: String,

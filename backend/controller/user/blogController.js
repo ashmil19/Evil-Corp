@@ -8,9 +8,9 @@ const reportModel = require("../../models/reportModel");
 const addBlog = async (req, res) => {
   try {
     const userId = req.userId;
-    const { title, description } = req.body;
+    const { title, description, content } = req.body;
     const image = req.files.coverImage;
-g
+
     const coverImage = await imageUpload(image);
     const user = new mongoose.Types.ObjectId(userId);
 
@@ -19,6 +19,7 @@ g
       description,
       coverImage,
       user,
+      content
     });
 
     newBlog.save();
@@ -32,7 +33,7 @@ g
 const editBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
-    const { title, description } = req.body;
+    const { title, description, editContent } = req.body;
 
     const blog = await blogModel.findById(blogId);
 
@@ -43,6 +44,7 @@ const editBlog = async (req, res) => {
 
     blog.title = title;
     blog.description = description;
+    blog.content = editContent;
     await blog.save();
 
     res.status(200).json({ message: "blog is Edited" });
@@ -149,7 +151,8 @@ const getBlog = async (req, res) => {
           sort: { createdAt: -1 },
         },
       })
-      .populate("reports");
+      .populate("reports")
+      .populate("user","-password");
 
     if (!blog) {
       res.status(404).json({ message: "blog not found" });
@@ -176,9 +179,40 @@ const getBlog = async (req, res) => {
 
 const getAllMyBlogs = async (req, res) => {
   try {
+    const ITEMS_PER_PAGE = 3;
+    let page = +req.query.page || 1;
     const userId = req.userId;
-    const myBlogs = await blogModel.find({ user: userId });
-    res.status(200).json({ myBlogs });
+
+    const query = {
+      isAccess: true,
+      user: userId,
+    };
+
+    const myBlogs = await blogModel.find(query);
+
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const lastIndex = page * ITEMS_PER_PAGE;
+
+    const results = {};
+    results.totalBlogs = myBlogs.length;
+    results.pageCount = Math.ceil(myBlogs.length / ITEMS_PER_PAGE);
+
+    if (lastIndex < myBlogs.length) {
+      results.next = {
+        page: page + 1,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.prev = {
+        page: page - 1,
+      };
+    }
+
+    results.page = page - 1;
+    results.myBlogs = myBlogs.slice(startIndex, lastIndex);
+
+    res.status(200).json({ results });
   } catch (error) {
     console.log(error);
   }
