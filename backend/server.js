@@ -39,6 +39,8 @@ const corsOptions = {
 
 configureSocket(io);
 
+
+
 app.use(cookieParser());
 app.use(cors(corsOptions));
 
@@ -55,9 +57,19 @@ app.use(
   })
 );
 
+
+
 app.use("/", authRoutes);
 
 app.use(verifyJWT);
+
+// app.use((req, res, next)=>{
+//   const userId = req.userId;
+//   console.log(req.userId);
+//   const socket = io.sockets.connected[userId];
+//   req.socket = socket;
+//   next();
+// })
 
 app.use("/user", userMiddleware, userRoutes);
 app.use("/teacher", teacherMiddleware, teacherRoutes);

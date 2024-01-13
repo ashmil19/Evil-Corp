@@ -5,7 +5,7 @@ import {Button} from "@material-tailwind/react"
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 
-const socket = io("http://localhost:3000");
+const socket = io(process.env.CHAT_SOCKET_URL);
 
 const ChatUi = ({ recipientId, recipient }) => {
     const axiosPrivate = useAxiosPrivate()
@@ -34,7 +34,7 @@ const ChatUi = ({ recipientId, recipient }) => {
         if (allMessages) {
             setAllMessages(prevMessages => [...prevMessages, newMessage])
         } else {
-            setAllMessages([...allMessages,newMessage])
+            setAllMessages([newMessage])
         }
 
         console.log("d",conversationId);

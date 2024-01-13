@@ -1,5 +1,6 @@
 require("dotenv").config();
-const { Queue, tryCatch } = require("bullmq");
+const { Queue } = require("bullmq");
+const mongoose = require("mongoose");
 
 const teacherModel = require("../../models/userModel");
 const courseModel = require("../../models/courseModel");
@@ -9,6 +10,7 @@ const chatModel = require("../../models/ChatModel");
 const { imageUpload } = require("../../utils/uploadImage");
 const { uploadVideo } = require("../../utils/videoUpload");
 const { Jobs } = require("../../utils/jobs");
+const paymentModel = require("../../models/paymentModel");
 
 const redisOptions = {
   host: process.env.REDIS_HOST,
@@ -24,6 +26,18 @@ const queues = {
 
 // utilities
 const addJobToTestQueue = (job) => queues.testQueue.add(job.type, job);
+// const addJobToTestQueue = (job) => {
+//   return new Promise((resolve, reject) => {
+//     queues.testQueue
+//       .add(job.type, job)
+//       .then((job) => {
+//         job
+//         .on('completed', (result) => console.log(result))
+//         .on('failed', (error) => reject(error));
+//       })
+//       .catch(reject);
+//   });
+// };
 
 const getTeacher = async (req, res) => {
   try {
@@ -84,18 +98,18 @@ const uploadCourse = async (req, res) => {
 
     console.log(req.body);
 
-    if(otherCategory !== ""){
+    if (otherCategory !== "") {
       const existedCategory = await categoryModel.findOne({
         name: { $regex: new RegExp(`^${otherCategory}`, "i") },
-      })
+      });
 
-      if(existedCategory){
-        return res.status(400).json({message: "category already existed"})
+      if (existedCategory) {
+        return res.status(400).json({ message: "category already existed" });
       }
 
       const newCategory = new categoryModel({
-        name: otherCategory
-      })
+        name: otherCategory,
+      });
 
       const createdNewCategory = await newCategory.save();
 
@@ -170,22 +184,62 @@ const changeCourseDemoVideo = async (req, res) => {
   }
 };
 
-const handlePublishCourse = async (req, res)=>{
+const handlePublishCourse = async (req, res) => {
   try {
-    const courseId = req.params.courseId
-    const { isPublished } = req.body
+    const courseId = req.params.courseId;
+    const { isPublished } = req.body;
 
-    const updatedCourse = await courseModel.findByIdAndUpdate(courseId, {isPublished: !isPublished},{new: true})
-    res.status(200).json({message: "publish updated",updatedCourse})
+    const updatedCourse = await courseModel.findByIdAndUpdate(
+      courseId,
+      { isPublished: !isPublished },
+      { new: true }
+    );
+    res.status(200).json({ message: "publish updated", updatedCourse });
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 const getAllCourse = async (req, res) => {
   try {
-    const courses = await courseModel.find({isPublished: false});
-    res.status(200).json({ courses });
+    const ITEMS_PER_PAGE = 7;
+    let page = +req.query.page || 1;
+    let search = "";
+    if (req.query.search !== "undefined") {
+      search = req.query.search;
+      page = 1;
+    }
+
+    const query = {
+      isPublished: false,
+      title: { $regex: new RegExp(`^${search}`, "i") },
+    };
+
+    const allCourses = await courseModel.find(query);
+
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const lastIndex = page * ITEMS_PER_PAGE;
+
+    const results = {};
+    results.totalCourses = allCourses.length;
+    results.pageCount = Math.ceil(allCourses.length / ITEMS_PER_PAGE);
+
+    if (lastIndex < allCourses.length) {
+      results.next = {
+        page: page + 1,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.prev = {
+        page: page - 1,
+      };
+    }
+
+    results.page = page - 1;
+    results.courses = allCourses.slice(startIndex, lastIndex);
+
+    res.status(200).json({ results });
   } catch (error) {
     console.log(error);
   }
@@ -193,8 +247,44 @@ const getAllCourse = async (req, res) => {
 
 const getAllMyCourse = async (req, res) => {
   try {
-    const courses = await courseModel.find({isPublished: true});
-    res.status(200).json({ courses });
+    const ITEMS_PER_PAGE = 8;
+    let page = +req.query.page || 1;
+    let search = "";
+    if (req.query.search !== "undefined") {
+      search = req.query.search;
+      page = 1;
+    }
+
+    const query = {
+      isPublished: true,
+      title: { $regex: new RegExp(`^${search}`, "i") },
+    };
+
+    const allCourses = await courseModel.find(query);
+
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const lastIndex = page * ITEMS_PER_PAGE;
+
+    const results = {};
+    results.totalCourses = allCourses.length;
+    results.pageCount = Math.ceil(allCourses.length / ITEMS_PER_PAGE);
+
+    if (lastIndex < allCourses.length) {
+      results.next = {
+        page: page + 1,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.prev = {
+        page: page - 1,
+      };
+    }
+
+    results.page = page - 1;
+    results.courses = allCourses.slice(startIndex, lastIndex);
+
+    res.status(200).json({ results });
   } catch (error) {
     console.log(error);
   }
@@ -240,7 +330,7 @@ const uploadChapter = async (req, res) => {
     //   $push: { chapters: Chapter._id },
     // });
 
-    await addJobToTestQueue({
+    const result = await addJobToTestQueue({
       type: "VideoUpload",
       data: {
         title,
@@ -248,6 +338,15 @@ const uploadChapter = async (req, res) => {
         courseId,
       },
     });
+
+    // if (result === "success") {
+    //   res.status(200).json({ message: "Queued successfully" });
+    // } else {
+    //   console.error(result);
+    //   res.status(500).json({ message: "Error queuing the job" });
+    // }
+
+    // console.log(result);
 
     res.status(200).json({ message: "Queued" });
   } catch (error) {
@@ -327,7 +426,98 @@ const changeChapterIndex = async (req, res) => {
   }
 };
 
+const getDashboardDetails = async (req, res) => {
+  try {
+    const teacherId = new mongoose.Types.ObjectId(req.userId);
+    const studentData = await courseModel.aggregate([
+      {
+        $match: {
+          teacher: teacherId,
+        },
+      },
+      {
+        $unwind: "$users",
+      },
+      {
+        $group: {
+          _id: "$users",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
 
+    const allCourses = await courseModel.find({ teacher: teacherId });
+    const publicCourses = await courseModel.find({
+      teacher: teacherId,
+      isPublished: true,
+    });
+
+    const paymentData = await paymentModel.aggregate([
+      {
+        $match: {
+          isTeacherPay: true,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    console.log(paymentData);
+
+    const data = {
+      students: studentData?.length,
+      allCourses: allCourses?.length,
+      publicCourses: publicCourses?.length,
+      totalAmount: paymentData[0]?.total,
+    };
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getPayments = async (req, res) => {
+  try {
+    const ITEMS_PER_PAGE = 4;
+    let page = +req.query.page || 1;
+
+    const AllPayments = await paymentModel
+      .find({ isTeacherPay: true })
+      .populate("course_id")
+      .populate("user_id", "-password");
+
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const lastIndex = page * ITEMS_PER_PAGE;
+
+    const results = {};
+    results.totalPayments = AllPayments.length;
+    results.pageCount = Math.ceil(AllPayments.length / ITEMS_PER_PAGE);
+
+    if (lastIndex < AllPayments.length) {
+      results.next = {
+        page: page + 1,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.prev = {
+        page: page - 1,
+      };
+    }
+
+    results.page = page - 1;
+    results.payments = AllPayments.slice(startIndex, lastIndex);
+
+    res.status(200).json({ results });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 module.exports = {
   getTeacher,
@@ -347,4 +537,6 @@ module.exports = {
   changeChapterIndex,
   changeCourseDemoVideo,
   handlePublishCourse,
+  getDashboardDetails,
+  getPayments,
 };

@@ -121,7 +121,7 @@ const TeacherProfile = () => {
     <div className='w-screen h-screen+50 md:h-screen overflow-x-hidden'>
       <TeacherNavbar />
       <div className='w-full h-full bg-gray-300 py-5 px-10 flex flex-col md:flex-row gap-4'>
-        <div className='w-full md:w-3/4 h-full flex flex-col gap-4'>
+        <div className='w-full h-full flex flex-col gap-4'>
           <div className='h-1/2 flex flex-col relative'>
             <div className='bg-profile-card-color h-1/3 rounded-tl-md rounded-tr-md'></div>
             <div className='bg-white h-2/3 rounded-bl-md rounded-br-md'>
@@ -167,7 +167,7 @@ const TeacherProfile = () => {
             </div>
           </div>
         </div>
-        <div className='bg-grey-500 w-full md:w-1/4 h-1/2 flex flex-col gap-2'>
+        {/* <div className='bg-grey-500 w-full md:w-1/4 h-1/2 flex flex-col gap-2'>
           <div className='bg-white rounded-md h-1/4 flex flex-col justify-center pl-5'>
             <div className='text-sm font-semibold capitalize'>Recent uploads</div>
             <div className='text-verySmall'>Thursday, 10th April , 2022</div>
@@ -188,7 +188,7 @@ const TeacherProfile = () => {
               </div>
           </div>
           <div className='bg-profile-card-color bg-opacity-10 hover:bg-opacity-100 rounded-3xl h-1/6 flex justify-center items-center text-sm text-profile-color hover:text-white cursor-pointer'>View More</div>
-        </div>
+        </div> */}
       </div>
     </div>
 

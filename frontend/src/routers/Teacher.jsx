@@ -7,6 +7,7 @@ import CourseDetails from '../pages/teacher/CourseDetails'
 import ChapterDetails from '../pages/teacher/ChapterDetails'
 import TeacherChat from '../pages/teacher/TeacherChat'
 import PublicCourse from '../pages/teacher/PublicCourse'
+import TeacherTransactions from '../pages/teacher/TeacherTransactions'
 
 function Teacher() {
   return (
@@ -18,6 +19,7 @@ function Teacher() {
         <Route path='/courseDetails' element={<CourseDetails />}/>
         <Route path='/chapterDetails' element={<ChapterDetails />}/>
         <Route path='/chat' element={<TeacherChat />}/>
+        <Route path='/transactions' element={<TeacherTransactions />}/>
     </Routes>
   )
 }

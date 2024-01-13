@@ -19,5 +19,7 @@ router.put("/chapter/:id", teacherController.editChapter);
 router.patch("/chapterVideo/:id", teacherController.uploadChapterVideo);
 router.put("/changeIndex/:courseId", teacherController.changeChapterIndex);
 router.patch("/changePublish/:courseId", teacherController.handlePublishCourse);
+router.get("/dashboard", teacherController.getDashboardDetails);
+router.get("/paymentData", teacherController.getPayments);
 
 module.exports = router;

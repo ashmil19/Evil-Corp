@@ -36,7 +36,7 @@ function TeacherNavbar() {
                   <Link to="/teacher/uploadCourse"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Upload Course</p></Link>
                   <Link to="/teacher/publicCourse"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Public Course</p></Link>
                   <Link to="/teacher/chat"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Chat</p></Link>
-                  <p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Payment</p>
+                  <Link to="/teacher/transactions"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Payment</p></Link>
                   <Link to="/teacher/profile"><p className='text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left'>Profile</p></Link>
                 </div>
               </div>

@@ -17,7 +17,7 @@ const courseReviewSchema = new schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
 });
 

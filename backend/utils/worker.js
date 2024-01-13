@@ -23,8 +23,8 @@ const workerHandler = async (job) => {
         await courseModel.findByIdAndUpdate(courseId, {
           $push: { chapters: Chapter._id },
         });
-        console.log("succeess");
-        return;
+        console.log("success");
+        return "success";
       } catch (error) {
         console.log(error);
       }

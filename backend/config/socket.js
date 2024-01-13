@@ -14,6 +14,10 @@ const configureSocket = (io) => {
       sendMessage(data);
     });
 
+    socket.on("videoUpload",(progressData)=>{
+      socket.emit("videoUploadProgress", progressData)
+    })
+
     socket.on("disconnect", () => {
       console.log("disconnect", socket.id);
     });

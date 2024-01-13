@@ -2,7 +2,7 @@ import React from 'react'
 
 const RecentTransactions = () => {
   return (
-    <div classNameName='h-2/5 md:h-2/4 w-full flex flex-col justify-center'>
+    <div className='h-2/5 md:h-2/4 w-full flex flex-col justify-center'>
       <div className='h-1/6 text-2xl text-white'>Recent Transactions</div>
 
           <div className="relative overflow-x-auto">

@@ -70,13 +70,46 @@ const editCategoryName = async (req, res) => {
 
 const getAllCategory = async (req, res) => {
   try {
-    let search = req.query.search || "";
+    const ITEMS_PER_PAGE = 5;
+    let page = +req.query.page || 1;
+    let search = "";
+    if (req.query.search !== "undefined") {
+      search = req.query.search;
+      page = 1;
+    }
+
     const query = {
       $or: [{ name: { $regex: new RegExp(`^${search}`, "i") } }],
     };
 
-    const categories = await categoryModel.find(query);
-    res.status(200).json({ categories });
+    const allCategories = await categoryModel.find(query);
+    
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const lastIndex = page * ITEMS_PER_PAGE;
+
+    const results = {};
+    results.totalCategories = allCategories.length;
+    results.pageCount = Math.ceil(allCategories.length / ITEMS_PER_PAGE);
+
+    
+    if (lastIndex < allCategories.length) {
+      results.next = {
+        page: page + 1,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.prev = {
+        page: page - 1,
+      };
+    }
+
+    results.page = page - 1;
+    results.categories = allCategories.slice(startIndex, lastIndex);
+
+    console.log(results);
+
+    res.status(200).json({ results });
   } catch (error) {
     console.log(error);
   }

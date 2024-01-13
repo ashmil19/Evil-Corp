@@ -4,6 +4,12 @@ import { Button } from '@material-tailwind/react'
 import { FaUpload } from 'react-icons/fa'
 import { GoGrabber } from "react-icons/go";
 import { RiDeleteBin7Fill } from "react-icons/ri";
+import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import io from "socket.io-client";
+
+
 import { Oval } from 'react-loader-spinner'
 import Dropzone from 'react-dropzone'
 import { Dialog, Transition } from '@headlessui/react'
@@ -30,6 +36,8 @@ const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0
 const dummyVideo = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 
+
+
 const CourseDetails = () => {
   const navigate = useNavigate()
   const axiosPrivate = useAxiosPrivate()
@@ -37,6 +45,8 @@ const CourseDetails = () => {
   const courseId = location.state && location.state.id;
 
   const toastHelper = new ToastHelper()
+
+  const [progress, setProgress] = useState(0);
 
   const [fetch, setFetch] = useState(false)
   const [message, setMessage] = useState(null);
@@ -318,7 +328,19 @@ const CourseDetails = () => {
         console.log(err);
       })
 
+      const socket = io("http://localhost:3000");
+
+      socket.on('videoUploadProgress', (data) => {
+        setProgress(data.progress  || 0);
+        console.log(data);
+      });
+  
+
       setFetch(false)
+
+      return () => {
+        socket.disconnect();
+      };
 
   }, [message, fetch]);
 
@@ -384,6 +406,28 @@ const CourseDetails = () => {
                   {chapter && chapter.map((chap) => <SortableItem key={chap._id} id={chap} chapter={chap} />)}
                 </SortableContext>
               </DndContext >
+              <div  className='w-full h-16 px-2  flex justify-center items-center bg-gray-300 rounded-lg'>
+                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                  <CircularProgress variant="determinate" color='success' value={progress} />
+                  <Box
+                    sx={{
+                      top: 0,
+                      left: 0,
+                      bottom: 0,
+                      right: 0,
+                      position: 'absolute',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Typography variant="caption" component="div" color="text.secondary">
+                      {/* {`${Math.round(props.value)}%`} */}{progress}
+                    </Typography>
+                  </Box>
+                </Box>
+
+              </div>
             </div>
           </div>
 
