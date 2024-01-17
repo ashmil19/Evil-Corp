@@ -22,6 +22,7 @@ const configureSocket = require("./config/socket")
 const app = express();
 const server = createServer(app)
 const io = new Server(server,{
+  maxHttpBufferSize: 1e8 ,
   transports: ["websocket", "polling"],
   cors: {
     origin: ["http://localhost:5173"],

@@ -11,6 +11,7 @@ const ChatUi = ({ recipientId, recipient }) => {
   const axiosPrivate = useAxiosPrivate();
   const authState = useSelector((state) => state.auth);
 
+  const scrollRef = useRef();
   const fileInputRef = useRef(null);
   const [conversationId, setConversationId] = useState(null);
   const [allMessages, setAllMessages] = useState(null);
@@ -20,6 +21,14 @@ const ChatUi = ({ recipientId, recipient }) => {
   const handleButtonClick = () => {
     fileInputRef.current.click();
   };
+
+  const scrollToBottom = () => {
+    scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [allMessages]);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -111,7 +120,7 @@ const ChatUi = ({ recipientId, recipient }) => {
       <div className="flex h-full flex-auto flex-shrink-0 flex-col rounded-b-2xl bg-gray-300 p-4">
         <div className="mb-4 flex h-full flex-col overflow-x-auto">
           <div className="flex h-full flex-col">
-            <div className="grid grid-cols-12 gap-y-2">
+            <div className="grid grid-cols-12 gap-y-2" ref={scrollRef}>
               {allMessages &&
                 allMessages.map((message) =>
                   message?.sender?._id === authState?.userId ? (

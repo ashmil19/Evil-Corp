@@ -1,4 +1,16 @@
-* {
-margin: 0;
-padding: 0;
+::-webkit-scrollbar {
+  width: 6px; /* width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #7e7c7c; /* color of the track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333131; /* color of the scrollbar */
+  border-radius: 3px; /* roundness of the scrollbar thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7e7c7c; /* color of the scrollbar thumb on hover */
 }
