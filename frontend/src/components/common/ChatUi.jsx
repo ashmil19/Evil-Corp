@@ -82,7 +82,6 @@ const ChatUi = ({ recipientId, recipient }) => {
     (async () => {
       const data = await axiosPrivate.get(`/chat/message/${recipientId}`);
 
-      console.log(data);
       setConversationId(data?.data?.conversationId);
 
       setAllMessages(data?.data?.messages);

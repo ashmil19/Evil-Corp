@@ -13,6 +13,7 @@ const courseReviewModel = require("../../models/courseReviewModel");
 const { imageUpload } = require("../../utils/uploadImage");
 const hash = require("../../utils/toHash");
 const chapterModel = require("../../models/chapterModel");
+const categoryModel = require("../../models/categoryModel");
 
 const getUser = async (req, res) => {
   try {
@@ -91,10 +92,10 @@ const changePassword = async (req, res) => {
 
 const getAllCourses = async (req, res) => {
   try {
-    const ITEMS_PER_PAGE = 6;
+    const ITEMS_PER_PAGE = 8;
     let page = +req.query.page || 1;
-    // const search = req.query.search || "";
-    // const search = req.query.search !== 'undefined' ? req.query.search : "";
+    const category = req.query.category === "null" ? null : req.query.category;
+    const price = Number(req.query.price);
     let search = "";
     if (req.query.search !== "undefined") {
       search = req.query.search;
@@ -105,7 +106,14 @@ const getAllCourses = async (req, res) => {
       title: { $regex: new RegExp(`^${search}`, "i") },
     };
 
-    const allCourses = await courseModel.find(query).populate("category");
+    if (category) {
+      query.category = category;
+    }
+
+    const allCourses = await courseModel.find(query).populate("category").sort({price: price});
+
+    //get all categories
+    const allCategories = await categoryModel.find();
 
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const lastIndex = page * ITEMS_PER_PAGE;
@@ -128,7 +136,7 @@ const getAllCourses = async (req, res) => {
 
     results.page = page - 1;
     results.courses = allCourses.slice(startIndex, lastIndex);
-
+    results.allCategories = allCategories;
     res.status(200).json({ results });
   } catch (error) {
     console.log(error);
@@ -272,18 +280,17 @@ const handleReview = async (req, res) => {
   }
 };
 
-
-const handleEditReview = async (req, res)=>{
+const handleEditReview = async (req, res) => {
   try {
     const reviewId = req.params.id;
-    const {rating, review} = req.body;
+    const { rating, review } = req.body;
 
-    await courseReviewModel.findByIdAndUpdate(reviewId,{review, rating})
-    res.status(200).json({message: "review updated"});
+    await courseReviewModel.findByIdAndUpdate(reviewId, { review, rating });
+    res.status(200).json({ message: "review updated" });
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 module.exports = {
   getUser,

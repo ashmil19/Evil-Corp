@@ -6,68 +6,69 @@ const userModel = require("../../models/userModel");
 const courseModel = require("../../models/courseModel");
 const messageModel = require("../../models/messageModel");
 const crypto = require("crypto");
+const communityModel = require("../../models/communityModel");
+const communityMessageModel = require("../../models/communityMessageModel");
 
-const accessChat = async (req, res) => {
-  try {
-    const { userId } = req.body;
+// const accessChat = async (req, res) => {
+//   try {
+//     const { userId } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ message: "userId not found" });
-    }
+//     if (!userId) {
+//       return res.status(400).json({ message: "userId not found" });
+//     }
 
-    console.log(userId);
-    console.log(req.userId);
+//     console.log(userId);
+//     console.log(req.userId);
 
-    const isChat = await ChatModel.findOne({
-      $and: [
-        { participants: { $elemMatch: { $eq: req.userId } } },
-        { participants: { $elemMatch: { $eq: userId } } },
-      ],
-    })
-      .populate("participants", "-password")
-      .populate("latestMessage");
+//     const isChat = await ChatModel.findOne({
+//       $and: [
+//         { participants: { $elemMatch: { $eq: req.userId } } },
+//         { participants: { $elemMatch: { $eq: userId } } },
+//       ],
+//     })
+//       .populate("participants", "-password")
+//       .populate("latestMessage");
 
-    if (isChat) {
-      const allMessages = await messageModel
-        .find({ chat: isChat._id })
-        .populate("sender", "fullname _id email");
-      res.status(200).json({ isChat, allMessages });
-    } else {
-      const chatData = new ChatModel({
-        participants: [userId, req.userId],
-      });
+//     if (isChat) {
+//       const allMessages = await messageModel
+//         .find({ chat: isChat._id })
+//         .populate("sender", "fullname _id email");
+//       res.status(200).json({ isChat, allMessages });
+//     } else {
+//       const chatData = new ChatModel({
+//         participants: [userId, req.userId],
+//       });
 
-      const createdChat = await chatData.save();
+//       const createdChat = await chatData.save();
 
-      const fullChat = await ChatModel.findById(createdChat._id).populate(
-        "participants",
-        "-password"
-      );
+//       const fullChat = await ChatModel.findById(createdChat._id).populate(
+//         "participants",
+//         "-password"
+//       );
 
-      res.status(200).json({ fullChat });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
+//       res.status(200).json({ fullChat });
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
-const fetchChats = async (req, res) => {
-  try {
-    const chats = await ChatModel.find({
-      participants: { $elemMatch: { $eq: req.userId } },
-    })
-      .populate("participants", "-password")
-      .populate("latestMessage");
+// const fetchChats = async (req, res) => {
+//   try {
+//     const chats = await ChatModel.find({
+//       participants: { $elemMatch: { $eq: req.userId } },
+//     })
+//       .populate("participants", "-password")
+//       .populate("latestMessage");
 
-    res.status(200).json({ chats });
-  } catch (error) {
-    console.log(error);
-  }
-};
+//     res.status(200).json({ chats });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 const getAllTeachers = async (req, res) => {
   try {
-    console.log(req.userId);
     const user = new mongoose.Types.ObjectId(req.userId);
     const teacherIds = await courseModel.distinct("teacher", { users: user });
 
@@ -111,9 +112,7 @@ function generateUniqueRoomId(senderId, recieverId) {
 
 const sendMessage = async (data) => {
   try {
-    const { content, type, conversationId, recipientId, token, userId } = data;
-    console.log("conversationId", conversationId);
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const { content, type, conversationId, recipientId, userId } = data;
 
     const existingChat = await ChatModel.findOne({ conversationId });
 
@@ -176,11 +175,63 @@ const allMessages = async (req, res) => {
   }
 };
 
+const getCommunities = async (req, res) => {
+  try {
+    const user = new mongoose.Types.ObjectId(req.userId);
+    const communities = await communityModel.find({
+      participants: { $in: [user] },
+    });
+    res.status(200).json({ communities });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getAllCommunityMessages = async (req, res) => {
+  try {
+    const communityId = req.params.id;
+    const existingCommunity = communityModel.findOne({ communityId });
+
+    if (!existingCommunity) {
+      return res.status(200).json({ communityId });
+    }
+
+    const messages = await communityMessageModel
+      .find({
+        community: existingCommunity._id,
+      })
+      .populate("sender", "fullname email _id");
+
+    res.status(200).json({ existingCommunity, messages, communityId });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const sendCommunityMessage = async (data) => {
+  try {
+    const { content, type, communityId, userId } = data;
+    const existingCommunity = await communityModel.findById({ communityId });
+
+    const newMessage = new communityMessageModel({
+      sender: userId,
+      content,
+      type,
+      community: existingCommunity._id,
+    });
+
+    await newMessage.save();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
-  accessChat,
-  fetchChats,
   getAllTeachers,
   sendMessage,
   allMessages,
   listChatStudents,
+  getCommunities,
+  getAllCommunityMessages,
+  sendCommunityMessage,
 };

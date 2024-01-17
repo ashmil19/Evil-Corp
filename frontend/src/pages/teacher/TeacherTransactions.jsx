@@ -102,7 +102,9 @@ const TeacherTransactions = () => {
           </tbody>
         </table>
 
-        <div className="w-full flex justify-center py-5">
+        
+      </div>
+      <div className="w-full flex justify-center py-5">
           <ReactPaginate
             nextLabel=">"
             onPageChange={handlePageClick}
@@ -126,7 +128,6 @@ const TeacherTransactions = () => {
             renderOnZeroPageCount={null}
           />
         </div>
-      </div>
     </div>
   );
 };

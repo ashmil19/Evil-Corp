@@ -9,7 +9,7 @@ import SunEditor from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
 import ReactPaginate from 'react-paginate';
 
-import Navbar from '../../components/navbars/navbar'
+import Navbar from '../../components/navbars/Navbar'
 import ToastHelper from '../../helper/ToastHelper';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 
@@ -234,7 +234,7 @@ const MyBlog = () => {
                     {blogs && blogs.map((blog) => (
                         <div className="w-full h-24 rounded-lg shadow-lg bg-white flex gap-5 cursor-pointer">
                             <img src={blog?.coverImage?.url} className='w-1/6 h-full object-fit rounded-l-lg hover:bg-black hover:opacity-80' alt="pic" onClick={() => openImageModal(blog?._id)} />
-                            <div className='w-full h-full font-bold flex justify-center items-center' onClick={() => openEditModal(blog?._id, blog?.title, blog?.description, blog?.content)}>{blog?.title}</div>
+                            <div className='w-full h-full font-bold flex justify-center items-center truncate' onClick={() => openEditModal(blog?._id, blog?.title, blog?.description, blog?.content)}>{blog?.title}</div>
                             <div className='bg-gray-400 flex justify-center items-center rounded-r-lg px-10' ><MdDelete className='text-2xl' onClick={() => handleBlogDelete(blog?._id)} /></div>
                         </div>
                     ))}

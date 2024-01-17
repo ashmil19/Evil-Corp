@@ -11,6 +11,7 @@ const { imageUpload } = require("../../utils/uploadImage");
 const { uploadVideo } = require("../../utils/videoUpload");
 const { Jobs } = require("../../utils/jobs");
 const paymentModel = require("../../models/paymentModel");
+const communityModel = require("../../models/communityModel");
 
 const redisOptions = {
   host: process.env.REDIS_HOST,
@@ -76,6 +77,7 @@ const uploadProfileImage = async (req, res) => {
 
 const uploadCourse = async (req, res) => {
   try {
+    const user = mongoose.Types.ObjectId(req.userId);
     const image = req.files?.coverImage;
     const video = req.files?.demoVideo;
     const { title, description, otherCategory } = req.body;
@@ -114,7 +116,15 @@ const uploadCourse = async (req, res) => {
       teacher: req.userId,
     });
 
-    await newCourse.save();
+    const newCreatedCourse = await newCourse.save();
+
+    const newCommunity = communityModel({
+      communityId: newCreatedCourse._id,
+      participants: [user],
+    });
+
+    await newCommunity.save();
+
     res.status(200).json({ message: "Course Added" });
   } catch (error) {
     console.log(error);

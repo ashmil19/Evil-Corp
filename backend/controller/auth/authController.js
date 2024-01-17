@@ -9,6 +9,7 @@ const { sendPassword } = require("../../utils/sendPassword");
 const courseModel = require("../../models/courseModel");
 const paymentModel = require("../../models/paymentModel");
 const { findById } = require("../../models/blogModel");
+const communityModel = require("../../models/communityModel");
 
 const createUser = async (req, res) => {
   try {
@@ -350,6 +351,12 @@ const handleSuccessPayment = async (req, res) => {
     });
 
     await payment.save();
+
+    await communityModel.findOneAndUpdate(
+      { communityId: courseId },
+      { $addToSet: { participants: userId } }
+    );
+
     res.redirect("http://localhost:5173/user/myCourse");
   } catch (error) {
     console.log(error);

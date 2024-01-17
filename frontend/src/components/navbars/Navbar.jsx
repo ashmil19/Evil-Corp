@@ -16,15 +16,6 @@ function Navbar({ onClick, text }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // const handleLogout = () =>{
-  //   axiosPrivate.get("/user/logout")
-  //   .then((response)=>{
-  //     console.log("success");
-  //     dispatch(logOut())
-  //     navigate('/login')
-  //   })
-  // }
-
   const allowedRoles = [1000, 2000, 3000];
 
   return (
@@ -51,9 +42,9 @@ function Navbar({ onClick, text }) {
                       Course
                     </p>
                   </Link>
-                  <p className="text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
+                  {/* <p className="text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                     About Us
-                  </p>
+                  </p> */}
                   <Link to="/user/chat">
                     <p className="text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Chat
@@ -153,24 +144,34 @@ function Navbar({ onClick, text }) {
             <div className="md:hidden" id="mobile-menu">
               <div ref={ref} className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
                 <div className=" mb-3 flex flex-col gap-3">
-                  <p className="text-medium cursor-pointer py-1 text-white">
-                    Home
-                  </p>
-                  <p className="text-medium cursor-pointer py-1 text-white">
-                    Course
-                  </p>
-                  <p className="text-medium cursor-pointer py-1 text-white">
-                    About Us
-                  </p>
-                  <p className="text-medium cursor-pointer py-1 text-white">
-                    Blog
-                  </p>
-                  <p className="text-medium cursor-pointer py-1 text-white">
-                    Profile
-                  </p>
+                  <Link to="/user">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Home
+                    </p>
+                  </Link>
+                  <Link to="/user/course">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Course
+                    </p>
+                  </Link>
+                  <Link to="/user/chat">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Chat
+                    </p>
+                  </Link>
+                  <Link to="/user/blog">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Blog
+                    </p>
+                  </Link>
+                  <Link to="/user/profile">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Profile
+                    </p>
+                  </Link>
                 </div>
 
-                <span className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium md:hidden">
+                <span className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium md:hidden" onClick={logout}>
                   Logout
                 </span>
               </div>

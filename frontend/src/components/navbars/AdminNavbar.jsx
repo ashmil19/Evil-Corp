@@ -20,38 +20,38 @@ const AdminNavbar = () => {
     <div>
       <nav className="w-screen bg-custom-bg-color">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="w-full flex items-center justify-between h-16">
-            <div className="w-full flex items-center justify-between">
+          <div className="flex h-16 w-full items-center justify-between">
+            <div className="flex w-full items-center justify-between">
               <div className="flex-shrink-0">
                 <div
-                  className="w-10 h-10"
+                  className="h-10 w-10"
                   style={{ backgroundImage: `url(${myLogo})` }}
                 ></div>
               </div>
               <div className="hidden md:flex md:justify-between">
                 <div className=" flex items-center justify-between space-x-7">
                   <Link to="/admin">
-                    <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
+                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Dashboard
                     </p>
                   </Link>
                   <Link to="/admin/students">
-                    <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
+                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Students
                     </p>
                   </Link>
                   <Link to="/admin/teachers">
-                    <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
+                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Teachers
                     </p>
                   </Link>
                   <Link to="/admin/category">
-                    <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
+                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Category
                     </p>
                   </Link>
                   <Link to="/admin/blogReport">
-                    <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
+                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Blog Report
                     </p>
                   </Link>
@@ -59,7 +59,7 @@ const AdminNavbar = () => {
                     Courses
                   </p> */}
                   <Link to="/admin/transactions">
-                    <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
+                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Transactions
                     </p>
                   </Link>
@@ -67,7 +67,7 @@ const AdminNavbar = () => {
               </div>
               <div>
                 <span
-                  className="hidden md:block bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer  hvr-bounce-to-right"
+                  className="text-custom-btn-color hvr-bounce-to-right hidden cursor-pointer bg-custom-btnColor px-3 py-1 font-medium  md:block"
                   onClick={logout}
                 >
                   Logout
@@ -78,7 +78,7 @@ const AdminNavbar = () => {
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 type="button"
-                className="bg-gray-900 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                className="inline-flex items-center justify-center rounded-md bg-gray-900 p-2 text-gray-400 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                 aria-controls="mobile-menu"
                 aria-expanded="false"
               >
@@ -132,29 +132,44 @@ const AdminNavbar = () => {
         >
           {(ref) => (
             <div className="md:hidden" id="mobile-menu">
-              <div ref={ref} className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <div className=" flex flex-col gap-3 mb-3">
-                  <p className="text-white text-medium cursor-pointer py-1">
-                    Dashboard
-                  </p>
-                  <p className="text-white text-medium cursor-pointer py-1">
-                    Students
-                  </p>
-                  <p className="text-white text-medium cursor-pointer py-1">
-                    Teachers
-                  </p>
-                  <p className="text-white text-medium cursor-pointer py-1">
-                    Category
-                  </p>
-                  <p className="text-white text-medium cursor-pointer py-1">
+              <div ref={ref} className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+                <div className=" mb-3 flex flex-col gap-3">
+                  <Link to="/admin">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Dashboard
+                    </p>
+                  </Link>
+                  <Link to="/admin/students">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Students
+                    </p>
+                  </Link>
+                  <Link to="/admin/teachers">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Teachers
+                    </p>
+                  </Link>
+                  <Link to="/admin/category">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Category
+                    </p>
+                  </Link>
+                  <Link to="/admin/blogReport">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Blog Report
+                    </p>
+                  </Link>
+                  {/* <p className="text-medium cursor-pointer py-1 text-white">
                     All Courses
-                  </p>
-                  <p className="text-white text-medium cursor-pointer py-1">
-                    Transactions
-                  </p>
+                  </p> */}
+                  <Link to="/admin/transactions">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Transactions
+                    </p>
+                  </Link>
                 </div>
 
-                <span className="md:hidden bg-custom-btnColor px-3 py-1 text-custom-btn-color font-medium cursor-pointer">
+                <span className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium md:hidden" onClick={logout}>
                   Logout
                 </span>
               </div>

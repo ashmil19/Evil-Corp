@@ -11,7 +11,7 @@ function ProfileIcon({title="hai", subtitle="hello", Icon}) {
         </div>
         <div className='w-2/3 flex flex-col'>
             <div className='w-full text-verySmall capitalize'>{title}</div>
-            <div className='w-full font-semibold text-verySmall-1'>{subtitle}</div>
+            <div className='w-full font-semibold text-verySmall md:text-verySmall-1'>{subtitle}</div>
         </div>
     </div>
   )
