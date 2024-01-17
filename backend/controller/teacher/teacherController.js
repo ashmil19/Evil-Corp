@@ -26,18 +26,6 @@ const queues = {
 
 // utilities
 const addJobToTestQueue = (job) => queues.testQueue.add(job.type, job);
-// const addJobToTestQueue = (job) => {
-//   return new Promise((resolve, reject) => {
-//     queues.testQueue
-//       .add(job.type, job)
-//       .then((job) => {
-//         job
-//         .on('completed', (result) => console.log(result))
-//         .on('failed', (error) => reject(error));
-//       })
-//       .catch(reject);
-//   });
-// };
 
 const getTeacher = async (req, res) => {
   try {
@@ -330,7 +318,7 @@ const uploadChapter = async (req, res) => {
     //   $push: { chapters: Chapter._id },
     // });
 
-    const result = await addJobToTestQueue({
+    await addJobToTestQueue({
       type: "VideoUpload",
       data: {
         title,
@@ -339,16 +327,7 @@ const uploadChapter = async (req, res) => {
       },
     });
 
-    // if (result === "success") {
-    //   res.status(200).json({ message: "Queued successfully" });
-    // } else {
-    //   console.error(result);
-    //   res.status(500).json({ message: "Error queuing the job" });
-    // }
-
-    // console.log(result);
-
-    res.status(200).json({ message: "Queued" });
+    res.status(200).json({ Queued: true });
   } catch (error) {
     console.log(error);
   }
@@ -455,6 +434,7 @@ const getDashboardDetails = async (req, res) => {
     const paymentData = await paymentModel.aggregate([
       {
         $match: {
+          teacher_id: teacherId,
           isTeacherPay: true,
         },
       },
@@ -465,8 +445,6 @@ const getDashboardDetails = async (req, res) => {
         },
       },
     ]);
-
-    console.log(paymentData);
 
     const data = {
       students: studentData?.length,
@@ -519,6 +497,43 @@ const getPayments = async (req, res) => {
   }
 };
 
+const getGraphData = async (req, res) => {
+  try {
+    const teacherId = new mongoose.Types.ObjectId(req.userId);
+    const paymentData = await paymentModel.aggregate([
+      {
+        $match: {
+          teacher_id: teacherId,
+          isTeacherPay: true,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$date" },
+          },
+          date: { $first: "$date" },
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: "$_id.month",
+          date: 1,
+          totalAmount: 1,
+        },
+      },
+    ]);
+
+    console.log(paymentData);
+
+    res.status(200).json({ paymentData });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getTeacher,
   editTeacher,
@@ -539,4 +554,5 @@ module.exports = {
   handlePublishCourse,
   getDashboardDetails,
   getPayments,
+  getGraphData,
 };

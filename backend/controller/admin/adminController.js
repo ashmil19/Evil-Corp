@@ -2,6 +2,7 @@ const blogModel = require("../../models/blogModel");
 const userModel = require("../../models/userModel");
 const courseModel = require("../../models/courseModel");
 const paymentModel = require("../../models/paymentModel");
+const { sendRejectMail } = require("../../utils/sendRejectMail");
 
 const getStudents = async (req, res) => {
   try {
@@ -63,7 +64,7 @@ const getTeachers = async (req, res) => {
       fullname: { $regex: new RegExp(`^${search}`, "i") },
     };
 
-    const AllTeachers = await userModel.find(query);
+    const AllTeachers = await userModel.find(query).sort({ createdAt: -1 });
 
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const lastIndex = page * ITEMS_PER_PAGE;
@@ -108,9 +109,30 @@ const updateAccess = async (req, res) => {
   }
 };
 
+const handleTeacherApprove = async (req, res) => {
+  try {
+    const { teacherId } = req.body;
+    await userModel.findByIdAndUpdate(teacherId, { $set: { isVerify: true } });
+    res.status(200).json({ message: "Teacher Approved" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleTeacherReject = async (req, res) => {
+  try {
+    const { teacherId } = req.body;
+    const user = await userModel.findById(teacherId);
+    await sendRejectMail({ fullname: user.fullname, email: user.email });
+    await userModel.findByIdAndDelete(teacherId);
+    res.status(200).json({ message: "Teacher is Rejected" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const getReportedBlogs = async (req, res) => {
   try {
-    const blogs = await blogModel.find().populate("user", "-password");
     const blogData = await blogModel.aggregate([
       {
         $match: {
@@ -257,13 +279,66 @@ const handleTeacherPay = async (req, res) => {
   }
 };
 
+const getGraphData = async (req, res) => {
+  try {
+    const student = await userModel.aggregate([
+      { $match: { role: 2000 } },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$createdAt" },
+          },
+          date: { $first: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: "$_id",
+          date: 1,
+          count: 1,
+        },
+      },
+    ]);
+
+    const teacher = await userModel.aggregate([
+      { $match: { role: 3000 } },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$createdAt" },
+          },
+          date: { $first: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: "$_id.month",
+          date: 1,
+          count: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({ student, teacher });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getStudents,
   updateAccess,
+  handleTeacherApprove,
+  handleTeacherReject,
   getReportedBlogs,
   changeBlogStatus,
   getDashboardData,
   getPayments,
   handleTeacherPay,
   getTeachers,
+  getGraphData,
 };

@@ -5,14 +5,18 @@ const { uploadVideo } = require("./videoUpload");
 const chapterModel = require("../models/chapterModel");
 const courseModel = require("../models/courseModel");
 const mongodb = require("../config/mongo");
+var io = require('socket.io-client');
+
 
 mongodb();
+
+var socket = io.connect('http://localhost:3000', {reconnect: true});
+
 
 const workerHandler = async (job) => {
   switch (job.data.type) {
     case "VideoUpload": {
       try {
-        console.log({ ...job.data });
         const { title, chapterVideo, courseId } = job.data.data;
         const video = await uploadVideo(chapterVideo);
         const newChapter = new chapterModel({
@@ -24,12 +28,17 @@ const workerHandler = async (job) => {
           $push: { chapters: Chapter._id },
         });
         console.log("success");
+
+        socket.emit("videoUploadSuccess", {
+          isVideoUploaded: true,
+          courseId
+        });
+        
         return "success";
       } catch (error) {
         console.log(error);
       }
     }
-
   }
 };
 

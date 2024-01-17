@@ -31,7 +31,7 @@ const DashboardCardSection = () => {
   },[]);
 
   return (
-    <div className="h-2/5 md:h-1/4 w-full flex flex-col md:flex-row justify-between gap-5 md:gap-0">
+    <div className="h-2/5 md:h-28 w-full flex flex-col md:flex-row justify-between gap-5 md:gap-0">
       <DashboardCard
         text="Total Student"
         value={data?.students}

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const ChatModel = require("../../models/ChatModel");
 const userModel = require("../../models/userModel");
@@ -84,24 +84,23 @@ const getAllTeachers = async (req, res) => {
   }
 };
 
-const listChatStudents = async (req,res) => {
+const listChatStudents = async (req, res) => {
   try {
     const teacherId = req.userId;
-    const chats = await ChatModel.find({participants: teacherId})
-    
-    let students = []
-    for(const chat of chats){
-      const userId = chat.participants.find(id=> !id.equals(teacherId))
-      const student = await userModel.findById(userId)
-      students.push(student)
+    const chats = await ChatModel.find({ participants: teacherId });
+
+    let students = [];
+    for (const chat of chats) {
+      const userId = chat.participants.find((id) => !id.equals(teacherId));
+      const student = await userModel.findById(userId);
+      students.push(student);
     }
-    
-    res.status(200).json({students})
-    
+
+    res.status(200).json({ students });
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 function generateUniqueRoomId(senderId, recieverId) {
   const sortedIds = [senderId, recieverId].sort();
@@ -112,43 +111,43 @@ function generateUniqueRoomId(senderId, recieverId) {
 
 const sendMessage = async (data) => {
   try {
-    const { textMessage, conversationId, recipientId, token } = data;
-    console.log("conversationId",conversationId);
+    const { content, type, conversationId, recipientId, token, userId } = data;
+    console.log("conversationId", conversationId);
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-    const existingChat = await ChatModel.findOne({conversationId});
+    const existingChat = await ChatModel.findOne({ conversationId });
 
-    if(existingChat){
+    if (existingChat) {
       const newMessage = new messageModel({
-        sender: decodedToken.userId,
-        content: textMessage,
-        chat: existingChat._id
-      })
+        sender: userId,
+        content,
+        type,
+        chat: existingChat._id,
+      });
 
-      const message = await newMessage.save()
+      const message = await newMessage.save();
       existingChat.latestMessage = message._id;
-      await existingChat.save()
+      await existingChat.save();
       return;
     }
 
-
     const newChat = new ChatModel({
       conversationId,
-      participants: [decodedToken.userId, recipientId],
-    })
+      participants: [userId, recipientId],
+    });
 
     const createdChat = await newChat.save();
 
     const newMessage = new messageModel({
-      sender: decodedToken.userId,
-      content: textMessage,
-      chat: createdChat._id
-    })
+      sender: userId,
+      content,
+      type,
+      chat: createdChat._id,
+    });
 
-    const message = await newMessage.save()
+    const message = await newMessage.save();
     createdChat.latestMessage = message._id;
-    await createdChat.save()
-    
+    await createdChat.save();
   } catch (error) {
     console.log(error);
   }
@@ -158,21 +157,23 @@ const allMessages = async (req, res) => {
   try {
     const recipientId = req.params.id;
     const userId = req.userId;
-    
+
     let conversationId = generateUniqueRoomId(userId, recipientId);
 
-    const existingChat = await ChatModel.findOne({conversationId})
+    const existingChat = await ChatModel.findOne({ conversationId });
 
-    if(!existingChat){
-      return res.status(200).json({conversationId})
+    if (!existingChat) {
+      return res.status(200).json({ conversationId });
     }
 
     const messages = await messageModel
       .find({ chat: existingChat._id })
       .populate("sender", "fullname email _id");
 
-    res.status(200).json({existingChat, messages, conversationId});
-  } catch (error) {}
+    res.status(200).json({ existingChat, messages, conversationId });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = {
@@ -181,5 +182,5 @@ module.exports = {
   getAllTeachers,
   sendMessage,
   allMessages,
-  listChatStudents
+  listChatStudents,
 };

@@ -21,5 +21,6 @@ router.put("/changeIndex/:courseId", teacherController.changeChapterIndex);
 router.patch("/changePublish/:courseId", teacherController.handlePublishCourse);
 router.get("/dashboard", teacherController.getDashboardDetails);
 router.get("/paymentData", teacherController.getPayments);
+router.get("/graph", teacherController.getGraphData);
 
 module.exports = router;

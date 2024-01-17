@@ -217,10 +217,10 @@ const CategoryManagement = () => {
             </div>
             <Button onClick={openModal}>Add</Button>
           </div>
-          <div className="h-auto md:h-2/4 w-full flex flex-col justify-center">
-            <div className="relative overflow-x-auto flex justify-center">
+          {/* <div className="h-auto md:h-2/4 w-full flex flex-col justify-center"> */}
+            <div className=" overflow-x-auto flex justify-center">
               {categories.length !== 0 ? (
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+                <table className="min-w-full divide-y text-sm text-left rtl:text-right text-gray-500 ">
                   <thead className="text-xs text-gray-800 uppercase bg-gray-300 ">
                     <tr>
                       <th scope="col" className="px-6 py-3">
@@ -286,7 +286,7 @@ const CategoryManagement = () => {
               ) : (
                 <div className="flex justify-center font-medium text-xl">Not found</div>
               )}
-            </div>
+            {/* </div> */}
           </div>
         </div>
         <div className="w-full flex justify-center py-10">

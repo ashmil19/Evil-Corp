@@ -8,18 +8,20 @@ const configureSocket = (io) => {
       socket.join(conversationId);
     });
 
-    socket.on("sendMessage", (data) => {
+    socket.on("sendMessage", async (data) => {
       console.log(data);
       socket.broadcast.to(data.conversationId).emit("receiveMessage", data);
-      sendMessage(data);
+      await sendMessage(data);
     });
 
-    socket.on("videoUpload",(progressData)=>{
-      socket.emit("videoUploadProgress", progressData)
+
+    socket.on("videoUploadSuccess",(data)=>{
+      console.log("video success",data.isVideoUploaded)
+      socket.broadcast.emit("videoUpload", data)
     })
 
     socket.on("disconnect", () => {
-      console.log("disconnect", socket.id);
+      console.log("disconnect", socket.id)
     });
 
     socket.on("error", (error) => {

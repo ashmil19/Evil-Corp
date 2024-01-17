@@ -8,6 +8,7 @@ const otp = require("../../utils/sendOtp");
 const { sendPassword } = require("../../utils/sendPassword");
 const courseModel = require("../../models/courseModel");
 const paymentModel = require("../../models/paymentModel");
+const { findById } = require("../../models/blogModel");
 
 const createUser = async (req, res) => {
   try {
@@ -28,6 +29,8 @@ const createUser = async (req, res) => {
       password: hashedPassword,
       role: isTeacher ? 3000 : 2000,
     });
+
+    console.log(newUser);
 
     await newUser.save();
     const options = {
@@ -59,7 +62,11 @@ const verifyOtp = async (req, res) => {
       return;
     }
 
-    await userModel.findByIdAndUpdate(id, { $set: { isVerify: true } });
+    const userData = await userModel.findById(id);
+    userData.isVerify = userData.role == 3000 ? false : true;
+    await userData.save();
+
+    // await userModel.findByIdAndUpdate(id, { $set: { isVerify: true } });
     res.status(200).json({ message: "OTP verification success" });
   } catch (error) {
     console.log(error);
@@ -108,6 +115,10 @@ const handleLogin = async (req, res) => {
       return;
     }
 
+    if (userData.role === 3000 && userData.isVerify === false) {
+      return res.status(400).json({ message: "You need verify account" });
+    }
+
     const accessToken = jwt.sign(
       { userId: userData._id, role: userData.role },
       process.env.ACCESS_TOKEN_SECRET,
@@ -125,7 +136,7 @@ const handleLogin = async (req, res) => {
 
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
-      maxAge: (24 * 60 * 60 * 1000) * 7,
+      maxAge: 24 * 60 * 60 * 1000 * 7,
     });
     res.status(200).json({
       role: userData.role,

@@ -1,35 +1,35 @@
-import { useState, Fragment } from 'react'
+import { useState, Fragment } from "react";
 import { Input, Button } from "@material-tailwind/react";
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Toaster } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { Dialog, Transition } from '@headlessui/react'
-import { GridLoader } from 'react-spinners'
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Dialog, Transition } from "@headlessui/react";
+import { GridLoader } from "react-spinners";
+import CircularProgress from "@mui/material/CircularProgress";
 
-import Navbar from '../../components/navbars/navbar'
-import LoginImage from '../../asset/login.svg'
-import axios from '../../helper/axios'
-import { setCredentials } from '../../features/authSlice'
-import ToastHelper from '../../helper/ToastHelper';
-import GoogleLoginComponent from '../../components/auth/GoogleLoginComponent';
+import Navbar from "../../components/navbars/navbar";
+import LoginImage from "../../asset/login.svg";
+import axios from "../../helper/axios";
+import { setCredentials } from "../../features/authSlice";
+import ToastHelper from "../../helper/ToastHelper";
+import GoogleLoginComponent from "../../components/auth/GoogleLoginComponent";
 
 const toastHelper = new ToastHelper();
 
 function Login() {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [passwordType, setPasswordType] = useState(true);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const [values, setValues] = useState({
     email: "",
-    password: ""
-  })
+    password: "",
+  });
 
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
   const [mail, setMail] = useState("");
-
 
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,112 +38,155 @@ function Login() {
   }
 
   const handleSubmit = () => {
-    const { email, password } = values
+    const { email, password } = values;
 
     if (email === "" || password === "") {
-      toastHelper.showToast("fill the form")
-      return
+      toastHelper.showToast("fill the form");
+      return;
     }
 
     if (!isValidEmail(email)) {
-      toastHelper.showToast("email not in correct form")
-      return
+      toastHelper.showToast("email not in correct form");
+      return;
     }
-    
-    setIsLoading(true)
 
-    axios.post('/login', values, {
-      withCredentials: true,
-      credentials: 'include'
-    })
+    setIsLoading(true);
+
+    axios
+      .post("/login", values, {
+        withCredentials: true,
+        credentials: "include",
+      })
       .then((res) => {
         const userCredentials = {
           user: res.data.fullname,
           userId: res.data.userId,
           accessToken: res.data.accessToken,
-          role: res.data.role
-        }
-        dispatch(setCredentials(userCredentials))
-        res.data.role === 3000 ? navigate('/teacher') : navigate('/')
+          role: res.data.role,
+        };
+        dispatch(setCredentials(userCredentials));
+        res.data.role === 3000 ? navigate("/teacher") : navigate("/");
       })
       .catch((err) => {
-        setIsLoading(false)
-        toastHelper.showToast(err?.response?.data?.message)
+        setIsLoading(false);
+        toastHelper.showToast(err?.response?.data?.message);
         console.log(err);
-      })
-  }
+      });
+  };
 
   const handleForgotPassword = () => {
     if (mail === "") {
-      toastHelper.showToast("fill the form")
+      toastHelper.showToast("fill the form");
       return;
     }
 
     if (!isValidEmail(mail)) {
-      toastHelper.showToast("email not in correct form")
-      return
+      toastHelper.showToast("email not in correct form");
+      return;
     }
 
-    axios.post("/forgotPassword", { email: mail }, {
-      withCredentials: true,
-      credentials: 'include'
-    })
+    axios
+      .post(
+        "/forgotPassword",
+        { email: mail },
+        {
+          withCredentials: true,
+          credentials: "include",
+        },
+      )
       .then((res) => {
-        navigate('/forgotpassword', { state: { email: mail } })
+        navigate("/forgotpassword", { state: { email: mail } });
       })
       .catch((err) => {
         console.log(err);
-      })
-  }
-
+      });
+  };
 
   function openModal() {
-    setIsOpen(true)
+    setIsOpen(true);
   }
 
   function closeModal() {
-    setIsOpen(false)
+    setIsOpen(false);
   }
 
   const handleChanges = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value.trim() })
-  }
+    setValues({ ...values, [e.target.name]: e.target.value.trim() });
+  };
 
   return (
-    <div className={isLoading ? 'h-screen w-screen flex justify-center items-center' : ''}>
-      {isLoading ? <GridLoader /> :
-      <div className='h-screen w-screen overflow-hidden'>
-        <Navbar text="Sign up" onClick={() => { navigate("/signup") }} />
-        <div className=' h-full flex flex-col md:flex-row'>
-          <div className='md:w-1/2 w-full h-1/3 md:h-full flex items-start md:items-center justify-center'>
-            <img className='w-full md:w-2/3 h-full' src={LoginImage} alt="" />
+    <>
+        <div className="h-screen w-screen overflow-hidden">
+          <Navbar
+            text="Sign up"
+            onClick={() => {
+              navigate("/signup");
+            }}
+          />
+          <div className=" flex h-full flex-col md:flex-row">
+            <div className="flex h-1/3 w-full items-start justify-center md:h-full md:w-1/2 md:items-center">
+              <img className="h-full w-full md:w-2/3" src={LoginImage} alt="" />
+            </div>
+            <div className="flex w-full flex-col items-center justify-center gap-6 md:w-1/2 md:items-start">
+              <div className="text-2xl">Sign in</div>
+              <div className="flex w-3/4 flex-col gap-6 md:w-1/2">
+                <Input
+                  variant="standard"
+                  name="email"
+                  label="Email"
+                  color="black"
+                  className="!text-black"
+                  onChange={handleChanges}
+                />
+                <Input
+                  variant="standard"
+                  name="password"
+                  label="Password"
+                  type={passwordType ? "password" : "text"}
+                  color="black"
+                  className="!text-black"
+                  onChange={handleChanges}
+                  icon={
+                    passwordType ? (
+                      <FaEyeSlash
+                        onClick={() => setPasswordType(!passwordType)}
+                      />
+                    ) : (
+                      <FaEye onClick={() => setPasswordType(!passwordType)} />
+                    )
+                  }
+                />
+                <div
+                  className="cursor-pointer text-verySmall underline"
+                  onClick={openModal}
+                >
+                  Forgot Password ?
+                </div>
+              </div>
+              <div>
+                {isLoading ? (
+                  <Button className="h-12 flex justify-center items-center" variant="filled">
+                    <CircularProgress size={'2rem'} color="primary" />
+                  </Button>
+                ) : (
+                  <Button className="h-12" variant="filled" onClick={handleSubmit}>
+                    Log in
+                  </Button>
+                )}
+              </div>
+              <div className="flex w-full items-center justify-center gap-2 md:w-2/3 md:justify-start">
+                <hr className="my-4 w-1/3 border-t-2 border-gray-500 md:w-1/3" />
+                <span>Or</span>
+                <hr className="my-4 w-1/3 border-t-2 border-gray-500" />
+              </div>
+              <div className="flex w-1/2 justify-center">
+                <GoogleLoginComponent />
+              </div>
+            </div>
           </div>
-          <div className='md:w-1/2 w-full flex items-center md:items-start justify-center flex-col gap-6'>
-            <div className='text-2xl'>Sign in</div>
-            <div className='w-3/4 md:w-1/2 flex flex-col gap-6'>
-              <Input variant="standard" name='email' label="Email" color='black' className='!text-black' onChange={handleChanges} />
-              <Input variant="standard" name='password' label="Password" type={passwordType ? 'password' : 'text'} color='black' className='!text-black' onChange={handleChanges}
-                icon={passwordType ?
-                  <FaEyeSlash onClick={() => setPasswordType(!passwordType)} />
-                  : <FaEye onClick={() => setPasswordType(!passwordType)} />
-                } />
-              <div className='text-verySmall underline cursor-pointer' onClick={openModal}>Forgot Password ?</div>
-            </div>
-            <div>
-              <Button variant="filled" onClick={handleSubmit}>Log in</Button>
-            </div>
-            <div className='w-full md:w-2/3 flex items-center justify-center md:justify-start gap-2'>
-              <hr className='w-1/3 md:w-1/3 border-t-2 border-gray-500 my-4' />
-              <span>Or</span>
-              <hr className='w-1/3 border-t-2 border-gray-500 my-4' />
-            </div>
-            <div className='w-1/2 flex justify-center'>
-              <GoogleLoginComponent />
-            </div>
-          </div>
+          <Toaster />
         </div>
-        <Toaster />
-      </div>}
+      
 
       {/* mail modal */}
       <Transition appear show={isOpen} as={Fragment}>
@@ -179,7 +222,11 @@ function Login() {
                     Forgot Password
                   </Dialog.Title>
                   <div className="mt-2 flex flex-col gap-3">
-                    <Input label="Email" name='email' onChange={(e) => setMail(e.target.value.trim())} />
+                    <Input
+                      label="Email"
+                      name="email"
+                      onChange={(e) => setMail(e.target.value.trim())}
+                    />
                   </div>
 
                   <div className="mt-4 flex justify-center">
@@ -197,8 +244,8 @@ function Login() {
           </div>
         </Dialog>
       </Transition>
-    </div>
-  )
+    </>
+  );
 }
 
-export default Login
+export default Login;

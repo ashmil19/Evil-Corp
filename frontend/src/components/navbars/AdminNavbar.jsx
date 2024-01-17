@@ -55,9 +55,9 @@ const AdminNavbar = () => {
                       Blog Report
                     </p>
                   </Link>
-                  <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
+                  {/* <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
                     Courses
-                  </p>
+                  </p> */}
                   <Link to="/admin/transactions">
                     <p className="text-white text-md text-medium cursor-pointer py-1 hvr-underline-from-left">
                       Transactions
