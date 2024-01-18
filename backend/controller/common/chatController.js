@@ -190,7 +190,8 @@ const getCommunities = async (req, res) => {
 const getAllCommunityMessages = async (req, res) => {
   try {
     const communityId = req.params.id;
-    const existingCommunity = communityModel.findOne({ communityId });
+    const existingCommunity = await communityModel.findOne({ communityId });
+    console.log(existingCommunity);
 
     if (!existingCommunity) {
       return res.status(200).json({ communityId });
@@ -211,7 +212,8 @@ const getAllCommunityMessages = async (req, res) => {
 const sendCommunityMessage = async (data) => {
   try {
     const { content, type, communityId, userId } = data;
-    const existingCommunity = await communityModel.findById({ communityId });
+    console.log({communityId});
+    const existingCommunity = await communityModel.findOne({ communityId });
 
     const newMessage = new communityMessageModel({
       sender: userId,

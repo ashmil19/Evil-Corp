@@ -77,7 +77,7 @@ const uploadProfileImage = async (req, res) => {
 
 const uploadCourse = async (req, res) => {
   try {
-    const user = mongoose.Types.ObjectId(req.userId);
+    const user = new mongoose.Types.ObjectId(req.userId);
     const image = req.files?.coverImage;
     const video = req.files?.demoVideo;
     const { title, description, otherCategory } = req.body;
@@ -119,6 +119,7 @@ const uploadCourse = async (req, res) => {
     const newCreatedCourse = await newCourse.save();
 
     const newCommunity = communityModel({
+      communityName: newCreatedCourse.title,
       communityId: newCreatedCourse._id,
       participants: [user],
     });
@@ -213,7 +214,7 @@ const getAllCourse = async (req, res) => {
       title: { $regex: new RegExp(`^${search}`, "i") },
     };
 
-    const allCourses = await courseModel.find(query);
+    const allCourses = await courseModel.find(query).sort({createdAt: -1});
 
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const lastIndex = page * ITEMS_PER_PAGE;

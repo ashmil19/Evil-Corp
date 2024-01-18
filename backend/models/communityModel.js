@@ -3,6 +3,10 @@ const schema = mongoose.Schema;
 
 const communitySchema = schema(
   {
+    communityName: {
+      type: String,
+      required: true,
+    },
     communityId: {
       type: String,
       required: true,

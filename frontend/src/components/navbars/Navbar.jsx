@@ -50,6 +50,11 @@ function Navbar({ onClick, text }) {
                       Chat
                     </p>
                   </Link>
+                  <Link to="/user/community">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Community
+                    </p>
+                  </Link>
                   <Link to="/user/blog">
                     <p className="text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Blog
@@ -159,6 +164,11 @@ function Navbar({ onClick, text }) {
                       Chat
                     </p>
                   </Link>
+                  <Link to="/user/community">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Community
+                    </p>
+                  </Link>
                   <Link to="/user/blog">
                     <p className="text-medium cursor-pointer py-1 text-white">
                       Blog
@@ -171,7 +181,10 @@ function Navbar({ onClick, text }) {
                   </Link>
                 </div>
 
-                <span className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium md:hidden" onClick={logout}>
+                <span
+                  className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium md:hidden"
+                  onClick={logout}
+                >
                   Logout
                 </span>
               </div>

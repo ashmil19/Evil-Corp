@@ -28,35 +28,40 @@ function TeacherNavbar() {
                   style={{ backgroundImage: `url(${myLogo})` }}
                 ></div>
               </div>
-              <div className="hidden md:flex md:justify-between">
+              <div className="hidden lg:flex lg:justify-between">
                 <div className=" flex items-center justify-between space-x-7">
                   <Link to="/teacher">
-                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
+                    <p className="text-sm hvr-underline-from-left cursor-pointer py-1 text-white">
                       Dashboard
                     </p>
                   </Link>
                   <Link to="/teacher/uploadCourse">
-                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
+                    <p className="text-sm hvr-underline-from-left cursor-pointer py-1 text-white">
                       Upload Course
                     </p>
                   </Link>
                   <Link to="/teacher/publicCourse">
-                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
+                    <p className="text-sm hvr-underline-from-left cursor-pointer py-1 text-white">
                       Public Course
                     </p>
                   </Link>
                   <Link to="/teacher/chat">
-                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
+                    <p className="text-sm hvr-underline-from-left cursor-pointer py-1 text-white">
                       Chat
                     </p>
                   </Link>
+                  <Link to="/teacher/community">
+                    <p className="text-sm hvr-underline-from-left cursor-pointer py-1 text-white">
+                      Community
+                    </p>
+                  </Link>
                   <Link to="/teacher/transactions">
-                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
+                    <p className="text-sm hvr-underline-from-left cursor-pointer py-1 text-white">
                       Payment
                     </p>
                   </Link>
                   <Link to="/teacher/profile">
-                    <p className="text-md text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
+                    <p className="text-sm hvr-underline-from-left cursor-pointer py-1 text-white">
                       Profile
                     </p>
                   </Link>
@@ -64,14 +69,14 @@ function TeacherNavbar() {
               </div>
               <div>
                 <span
-                  className="text-custom-btn-color hvr-bounce-to-right hidden cursor-pointer bg-custom-btnColor px-3 py-1 font-medium  md:block"
+                  className="text-custom-btn-color hvr-bounce-to-right hidden cursor-pointer bg-custom-btnColor px-3 py-1 font-medium  lg:block"
                   onClick={logout}
                 >
                   Logout
                 </span>
               </div>
             </div>
-            <div className="-mr-2 flex md:hidden">
+            <div className="-mr-2 flex lg:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 type="button"
@@ -128,7 +133,7 @@ function TeacherNavbar() {
           leaveTo="opacity-0 scale-95"
         >
           {(ref) => (
-            <div className="md:hidden" id="mobile-menu">
+            <div className="lg:hidden" id="mobile-menu">
               <div ref={ref} className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
                 <div className=" mb-3 flex flex-col gap-3">
                   <Link to="/teacher">
@@ -151,6 +156,11 @@ function TeacherNavbar() {
                       Chat
                     </p>
                   </Link>
+                  <Link to="/teacher/community">
+                    <p className="text-medium cursor-pointer py-1 text-white">
+                      Community
+                    </p>
+                  </Link>
                   <Link to="/teacher/transactions">
                     <p className="text-medium cursor-pointer py-1 text-white">
                       Payment
@@ -164,7 +174,7 @@ function TeacherNavbar() {
                 </div>
 
                 <span
-                  className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium md:hidden"
+                  className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium lg:hidden"
                   onClick={logout}
                 >
                   Logout

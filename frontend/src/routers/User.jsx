@@ -10,6 +10,7 @@ import Blog from '../pages/user/Blog'
 import BlogDetails from '../pages/user/BlogDetails'
 import ChapterDetails from '../pages/user/ChapterDetails'
 import UserChat from '../pages/user/UserChat'
+import Commnunity from '../pages/user/Commnunity'
 
 function User() {
   return (
@@ -22,6 +23,7 @@ function User() {
       <Route path="/myCourse" element={<MyCourses />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/chat" element={<UserChat />} />
+      <Route path="/community" element={<Commnunity />} />
       <Route path="/blogDetails" element={<BlogDetails />} />
       <Route path="/myblog" element={<MyBlog />} />
     </Routes>
