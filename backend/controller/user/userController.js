@@ -1,11 +1,7 @@
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
-// const stripe = require("stripe")(
-//   "sk_test_51ORywXSGSYXlOuXjmEXnfwICawAhfAi5SVINBy7erevWFi8gSnfVxq7KkKr7QoyeXUZi0RCn1SQ2WLjQbm1KlClL005FM2WgFC"
-// );
-const stripe = require("stripe")(
-  "sk_test_51OISQWSBQLVhDmRfvicXDGw4m7LT3mOeF3DvnEufBcDN6v0z1STvNhlj4IkBgPHE8lDyByVzsPsv6Y8LAjVub57C00d6Xd8CEy"
-);
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const userModel = require("../../models/userModel");
 const courseModel = require("../../models/courseModel");
@@ -21,7 +17,7 @@ const getUser = async (req, res) => {
     const userData = await userModel.findOne({ _id: userId });
     res.status(200).json({ user: userData });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -40,7 +36,7 @@ const editUser = async (req, res) => {
 
     res.status(200).json({ message: "User Details Updated" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -56,7 +52,7 @@ const uploadProfileImage = async (req, res) => {
     await userModel.findByIdAndUpdate(id, { profileImage });
     res.status(200).json({ message: "image uploaded" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -73,7 +69,7 @@ const checkPassword = async (req, res) => {
 
     res.status(200).json({ message: "The Password is Correct" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -86,7 +82,7 @@ const changePassword = async (req, res) => {
     });
     res.status(200).json({ message: "Password updated" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -110,7 +106,10 @@ const getAllCourses = async (req, res) => {
       query.category = category;
     }
 
-    const allCourses = await courseModel.find(query).populate("category").sort({price: price});
+    const allCourses = await courseModel
+      .find(query)
+      .populate("category")
+      .sort({ price: price });
 
     //get all categories
     const allCategories = await categoryModel.find();
@@ -139,7 +138,7 @@ const getAllCourses = async (req, res) => {
     results.allCategories = allCategories;
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -160,7 +159,7 @@ const getCourse = async (req, res) => {
       });
     res.status(200).json({ course });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -170,7 +169,7 @@ const getChapter = async (req, res) => {
     const chapter = await chapterModel.findById(chapterId);
     res.status(200).json({ chapter });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -198,13 +197,13 @@ const handleMakePayment = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:3000/successPayment?session_id={CHECKOUT_SESSION_ID}&courseId=${course._id}&userId=${userId}`,
-      cancel_url: "http://localhost:5173/course",
+      success_url: `${process.env.SERVER_URL}/successPayment?session_id={CHECKOUT_SESSION_ID}&courseId=${course._id}&userId=${userId}`,
+      cancel_url: `${process.env.CLIENT_URL}/course`,
     });
 
     res.status(200).json({ id: session.id });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -256,7 +255,7 @@ const getMyCourse = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -276,7 +275,7 @@ const handleReview = async (req, res) => {
     });
     res.status(200).json({ message: "review added" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -288,7 +287,7 @@ const handleEditReview = async (req, res) => {
     await courseReviewModel.findByIdAndUpdate(reviewId, { review, rating });
     res.status(200).json({ message: "review updated" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 

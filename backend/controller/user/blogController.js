@@ -26,7 +26,7 @@ const addBlog = async (req, res) => {
 
     res.status(200).json({ message: "blog created" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -49,7 +49,7 @@ const editBlog = async (req, res) => {
 
     res.status(200).json({ message: "blog is Edited" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -67,7 +67,7 @@ const changeBlogImage = async (req, res) => {
     console.log("suces");
     res.status(200).json({ message: "image Changed" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -84,7 +84,7 @@ const deleteBlog = async (req, res) => {
     await blogModel.findByIdAndDelete(blogId);
     res.status(200).json({ message: "blog is Deleted" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -131,7 +131,7 @@ const getAllBlogs = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -173,7 +173,7 @@ const getBlog = async (req, res) => {
 
     res.status(200).json({ blog });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -214,7 +214,7 @@ const getAllMyBlogs = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -234,7 +234,7 @@ const handleLike = async (req, res) => {
     await blogModel.findByIdAndUpdate(blogId, { $push: { likes: user } });
     res.status(200).json({ message: "Blog Liked" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -285,7 +285,7 @@ const handleReport = async (req, res) => {
 
     // res.status(200).json({ message: "Blog Reported" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -306,7 +306,7 @@ const handleComment = async (req, res) => {
     });
     res.status(200).json({ message: "comment added" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 

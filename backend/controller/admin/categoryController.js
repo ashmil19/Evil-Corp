@@ -25,7 +25,7 @@ const createCategory = async (req, res) => {
     await newCategory.save();
     res.status(200).json({ message: `${name} category created` });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -43,7 +43,7 @@ const changeCategoryImage = async (req, res) => {
     await categoryModel.findByIdAndUpdate(id, { image: profileImage });
     res.status(200).json({ message: "image uploaded" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -64,7 +64,7 @@ const editCategoryName = async (req, res) => {
     await categoryModel.findByIdAndUpdate(id, { name });
     res.status(200).json({ message: "category name updated" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -111,7 +111,7 @@ const getAllCategory = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 

@@ -27,10 +27,5 @@ router.post("/blogComment", blogController.handleComment);
 router.post("/courseReview", userController.handleReview);
 router.put("/courseReview/:id", userController.handleEditReview);
 
-// router.post("/chat", chatController.accessChat);
-// router.get("/chats", chatController.fetchChats);
-// router.get("/teachers", chatController.getAllTeachers);
-// router.post("/message", chatController.sendMessage);
-// router.get("/message/:id", chatController.allMessages);
 
 module.exports = router;

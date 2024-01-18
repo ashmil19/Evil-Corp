@@ -8,7 +8,6 @@ const otp = require("../../utils/sendOtp");
 const { sendPassword } = require("../../utils/sendPassword");
 const courseModel = require("../../models/courseModel");
 const paymentModel = require("../../models/paymentModel");
-const { findById } = require("../../models/blogModel");
 const communityModel = require("../../models/communityModel");
 
 const createUser = async (req, res) => {
@@ -44,7 +43,7 @@ const createUser = async (req, res) => {
     res.cookie("id", newUser._id, { httpOnly: true });
     res.status(200).json({ message: "Account created successfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -70,7 +69,7 @@ const verifyOtp = async (req, res) => {
     // await userModel.findByIdAndUpdate(id, { $set: { isVerify: true } });
     res.status(200).json({ message: "OTP verification success" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -89,7 +88,7 @@ const resendOtp = async (req, res) => {
     res.cookie("hashOtp", result, options);
     res.status(200).json({ message: "Generate otp successfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -147,7 +146,7 @@ const handleLogin = async (req, res) => {
       message: "your account is verified",
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -231,7 +230,7 @@ const handleGoogleLogin = async (req, res) => {
       message: "your account is verified",
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -255,7 +254,7 @@ const forgotPassword = async (req, res) => {
     res.cookie("id", userData._id, { httpOnly: true });
     res.status(200).json({ message: "Mail send successfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -272,7 +271,7 @@ const changePassword = async (req, res) => {
     );
     res.status(200).json({ message: "Password Changed succefully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -305,7 +304,7 @@ const handleRefreshToken = async (req, res) => {
       }
     );
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -329,7 +328,7 @@ const handleLogout = async (req, res) => {
     res.clearCookie("jwt", { httpOnly: true });
     res.sendStatus(204);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -357,9 +356,9 @@ const handleSuccessPayment = async (req, res) => {
       { $addToSet: { participants: userId } }
     );
 
-    res.redirect("http://localhost:5173/user/myCourse");
+    res.redirect(`${process.env.CLIENT_URL}/user/myCourse`);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 

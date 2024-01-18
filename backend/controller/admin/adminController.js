@@ -45,7 +45,7 @@ const getStudents = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -90,7 +90,7 @@ const getTeachers = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -105,7 +105,7 @@ const updateAccess = async (req, res) => {
     );
     res.status(200).json({ message: "access updated", updatedUser });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -115,7 +115,7 @@ const handleTeacherApprove = async (req, res) => {
     await userModel.findByIdAndUpdate(teacherId, { $set: { isVerify: true } });
     res.status(200).json({ message: "Teacher Approved" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -127,7 +127,7 @@ const handleTeacherReject = async (req, res) => {
     await userModel.findByIdAndDelete(teacherId);
     res.status(200).json({ message: "Teacher is Rejected" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -166,7 +166,7 @@ const getReportedBlogs = async (req, res) => {
 
     res.status(200).json({ blogs: blogData });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -186,7 +186,7 @@ const changeBlogStatus = async (req, res) => {
 
     res.status(200).json({ message: "blog status updated" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -224,7 +224,7 @@ const getPayments = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -251,7 +251,7 @@ const getDashboardData = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -275,7 +275,7 @@ const handleTeacherPay = async (req, res) => {
 
     res.status(200).json({ message: "Payment Success!" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -325,7 +325,7 @@ const getGraphData = async (req, res) => {
 
     res.status(200).json({ student, teacher });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 

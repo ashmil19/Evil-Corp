@@ -34,7 +34,7 @@ const getTeacher = async (req, res) => {
     const teacherData = await teacherModel.findOne({ _id: userId });
     res.status(200).json({ teacher: teacherData });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -53,7 +53,7 @@ const editTeacher = async (req, res) => {
 
     res.status(200).json({ message: "Teacher Details Updated" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -71,7 +71,7 @@ const uploadProfileImage = async (req, res) => {
     await teacherModel.findByIdAndUpdate(id, { profileImage });
     res.status(200).json({ message: "image uploaded" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -128,7 +128,7 @@ const uploadCourse = async (req, res) => {
 
     res.status(200).json({ message: "Course Added" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -149,7 +149,7 @@ const editCourse = async (req, res) => {
 
     res.status(200).json({ message: "Course Details edited" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -166,7 +166,7 @@ const changeCourseImage = async (req, res) => {
     await courseModel.findByIdAndUpdate(courseId, { coverImage });
     res.status(200).json({ message: "image uploaded" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -179,7 +179,7 @@ const changeCourseDemoVideo = async (req, res) => {
     await courseModel.findByIdAndUpdate(courseId, { $set: { demoVideo } });
     res.status(200).json({ message: "Demo video added" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -195,7 +195,7 @@ const handlePublishCourse = async (req, res) => {
     );
     res.status(200).json({ message: "publish updated", updatedCourse });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -240,7 +240,7 @@ const getAllCourse = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -285,7 +285,7 @@ const getAllMyCourse = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -300,7 +300,7 @@ const getCourse = async (req, res) => {
       });
     res.status(200).json({ course });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -309,7 +309,7 @@ const getAllCategory = async (req, res) => {
     const categories = await categoryModel.find();
     res.status(200).json({ categories });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -340,7 +340,7 @@ const uploadChapter = async (req, res) => {
 
     res.status(200).json({ Queued: true });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -357,7 +357,7 @@ const editChapter = async (req, res) => {
 
     res.status(200).json({ message: "Chapter Details edited" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -370,7 +370,7 @@ const uploadChapterVideo = async (req, res) => {
     });
     res.status(200).json({ message: "Chapter video edited" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -380,7 +380,7 @@ const getChapter = async (req, res) => {
     const chapter = await chapterModel.findById(chapterId);
     res.status(200).json({ chapter });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -412,7 +412,7 @@ const changeChapterIndex = async (req, res) => {
 
     res.status(200).json({ message: "Index Changed" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -466,7 +466,7 @@ const getDashboardDetails = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -504,7 +504,7 @@ const getPayments = async (req, res) => {
 
     res.status(200).json({ results });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -541,7 +541,7 @@ const getGraphData = async (req, res) => {
 
     res.status(200).json({ paymentData });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 

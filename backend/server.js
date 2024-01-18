@@ -17,7 +17,10 @@ const userRoutes = require("./routes/userRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const chatRoutes = require("./routes/chatRoutes");
-const configureSocket = require("./config/socket")
+const configureSocket = require("./config/socket");
+const { allowedOrigins } = require("./config/allowedOrigins");
+const { corsOptions } = require("./config/corsOptions");
+const ErrorHandler = require("./middleware/errorHandler");
 
 const app = express();
 const server = createServer(app)
@@ -25,18 +28,18 @@ const io = new Server(server,{
   maxHttpBufferSize: 1e8 ,
   transports: ["websocket", "polling"],
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
 
-const corsOptions = {
-  origin: ["http://localhost:5173"],
-  credentials: true,
-  origin: true,
-};
+// const corsOptions = {
+//   origin: ["http://localhost:5173"],
+//   credentials: true,
+//   origin: true,
+// };
 
 configureSocket(io);
 
@@ -46,7 +49,6 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 mongodb();
-// connectS3Bucket();
 connectCloudinary();
 
 app.use(express.urlencoded({ extended: true }));
@@ -64,18 +66,11 @@ app.use("/", authRoutes);
 
 app.use(verifyJWT);
 
-// app.use((req, res, next)=>{
-//   const userId = req.userId;
-//   console.log(req.userId);
-//   const socket = io.sockets.connected[userId];
-//   req.socket = socket;
-//   next();
-// })
-
 app.use("/user", userMiddleware, userRoutes);
 app.use("/teacher", teacherMiddleware, teacherRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);
 app.use("/chat", chatRoutes);
+app.use(ErrorHandler)
 
 server.listen(process.env.PORT, () => {
   console.log(`http://localhost:${process.env.PORT}`);

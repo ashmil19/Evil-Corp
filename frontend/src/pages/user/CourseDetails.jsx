@@ -57,8 +57,7 @@ const CourseDetails = () => {
   const [isBuy, setIsBuy] = useState(false)
 
   const makePayment = async () => {
-    const stripe = await loadStripe('pk_test_51OISQWSBQLVhDmRfAhLKSBBKcyKeeIUvfUe1urrofu6ZeWJqqY5N6pVwJ7ItTIVpPSm1kAAWuuR5WJmQMfFUCn6800Wi7hSBjG')
-    // const stripe = await loadStripe('pk_test_51ORywXSGSYXlOuXjSdEWVmjRxocXVWRiT3YuSGH4CyaldklV8kVC9c9kt8ClHdtAuKDteTpYaPtunAwCbf8xw4b500btgcGiOT')
+    const stripe = await loadStripe(process.env.STRIPE_PUBLIC_KEY)
 
     try {
       const response = await axiosPrivate.post("/user/buyCourse", { courseId })
