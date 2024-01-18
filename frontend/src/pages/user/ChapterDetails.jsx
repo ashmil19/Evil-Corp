@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
-import Navbar from '../../components/navbars/navbar'
+import Navbar from '../../components/navbars/Navbar'
 
 const ChapterDetails = () => {  
   const axiosPrivate = useAxiosPrivate()

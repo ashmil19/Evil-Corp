@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 
-import Navbar from '../../components/navbars/navbar'
+import Navbar from '../../components/navbars/Navbar'
 import CourseComponent from '../../components/user/CourseComponent'
 import HomeHeading from '../../components/user/HomeHeading'
 import useAxiosPrivate  from '../../hooks/useAxiosPrivate'

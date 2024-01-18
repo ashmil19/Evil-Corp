@@ -3,7 +3,7 @@ import ReactPaginate from 'react-paginate';
 
 import ToastHelper from '../../helper/ToastHelper';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
-import Navbar from '../../components/navbars/navbar'
+import Navbar from '../../components/navbars/Navbar'
 import BlogCard from '../../components/user/BlogCard';
 import { FaSearch } from 'react-icons/fa';
 

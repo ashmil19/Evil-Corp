@@ -8,7 +8,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { GridLoader } from "react-spinners";
 import CircularProgress from "@mui/material/CircularProgress";
 
-import Navbar from "../../components/navbars/navbar";
+import Navbar from "../../components/navbars/Navbar";
 import LoginImage from "../../asset/login.svg";
 import axios from "../../helper/axios";
 import { setCredentials } from "../../features/authSlice";

@@ -10,7 +10,7 @@ import { RiEdit2Fill } from "react-icons/ri";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-import Navbar from '../../components/navbars/navbar'
+import Navbar from '../../components/navbars/Navbar'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import ToastHelper from '../../helper/ToastHelper';
 import { Dialog, Transition } from '@headlessui/react';

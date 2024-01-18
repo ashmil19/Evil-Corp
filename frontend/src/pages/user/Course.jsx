@@ -7,7 +7,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
-import Navbar from "../../components/navbars/navbar";
+import Navbar from "../../components/navbars/Navbar";
 import CourseComponent from "../../components/user/CourseComponent";
 import courseBanner from "../../asset/courseBanner.jpeg";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";

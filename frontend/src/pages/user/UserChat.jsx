@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Navbar from "../../components/navbars/navbar";
+import Navbar from "../../components/navbars/Navbar";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import ChatUi from "../../components/common/ChatUi";
 

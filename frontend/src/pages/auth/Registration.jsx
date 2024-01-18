@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { GridLoader } from 'react-spinners'
 
-import Navbar from '../../components/navbars/navbar'
+import Navbar from '../../components/navbars/Navbar'
 import LoginImage from '../../asset/login.svg'
 import axios from '../../helper/axios'
 import ToastHelper from '../../helper/ToastHelper';

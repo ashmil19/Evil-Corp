@@ -7,7 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import TimeAgo from 'react-timeago'
 
-import Navbar from '../../components/navbars/navbar'
+import Navbar from '../../components/navbars/Navbar'
 import ToastHelper from '../../helper/ToastHelper';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import courseBanner from '../../asset/courseBanner.jpeg'
