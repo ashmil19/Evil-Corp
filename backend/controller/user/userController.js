@@ -99,6 +99,7 @@ const getAllCourses = async (req, res) => {
     }
 
     const query = {
+      isPublished: true,
       title: { $regex: new RegExp(`^${search}`, "i") },
     };
 
