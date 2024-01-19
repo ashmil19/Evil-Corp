@@ -1,7 +1,9 @@
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(
+  "sk_test_51OISQWSBQLVhDmRfvicXDGw4m7LT3mOeF3DvnEufBcDN6v0z1STvNhlj4IkBgPHE8lDyByVzsPsv6Y8LAjVub57C00d6Xd8CEy"
+);
 
 const userModel = require("../../models/userModel");
 const courseModel = require("../../models/courseModel");

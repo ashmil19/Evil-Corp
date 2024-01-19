@@ -49,7 +49,7 @@ const GoogleLoginComponent = () => {
 
   return (
     <>
-    <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={"513898660677-23ikss6784mhlk5io7fsksiejkse6b6t.apps.googleusercontent.com"}>
       <GoogleLogin
      
         onSuccess={handleGoogleLogin}
