@@ -9,8 +9,8 @@ const allowedOrigins = [
   "https://evil-corp.ashmil.shop",
   "wss://evil-corp.ashmil.shop",
   "ws://evil-corp.ashmil.shop",
-]p
+];
 
 module.exports = {
-    allowedOrigins
-}
+  allowedOrigins,
+};
