@@ -3,7 +3,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://www.evilcorp.ashmil.shop",
   "wss://www.evilcorp.ashmil.shop",
-  "evil-corp123.vercel.app"
+  "https://evil-corp123.vercel.app"
 ]
 
 module.exports = {
