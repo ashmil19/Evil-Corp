@@ -4,7 +4,7 @@ const courseModel = require("../../models/courseModel");
 const paymentModel = require("../../models/paymentModel");
 const { sendRejectMail } = require("../../utils/sendRejectMail");
 
-const getStudents = async (req, res) => {
+const getStudents = async (req, res, next) => {
   try {
     const ITEMS_PER_PAGE = 6;
     let page = +req.query.page || 1;
@@ -49,7 +49,7 @@ const getStudents = async (req, res) => {
   }
 };
 
-const getTeachers = async (req, res) => {
+const getTeachers = async (req, res, next) => {
   try {
     const ITEMS_PER_PAGE = 6;
     let page = +req.query.page || 1;
@@ -94,7 +94,7 @@ const getTeachers = async (req, res) => {
   }
 };
 
-const updateAccess = async (req, res) => {
+const updateAccess = async (req, res, next) => {
   try {
     const id = req.params.id;
     const { isAccess } = req.body;
@@ -109,7 +109,7 @@ const updateAccess = async (req, res) => {
   }
 };
 
-const handleTeacherApprove = async (req, res) => {
+const handleTeacherApprove = async (req, res, next) => {
   try {
     const { teacherId } = req.body;
     await userModel.findByIdAndUpdate(teacherId, { $set: { isVerify: true } });
@@ -119,7 +119,7 @@ const handleTeacherApprove = async (req, res) => {
   }
 };
 
-const handleTeacherReject = async (req, res) => {
+const handleTeacherReject = async (req, res, next) => {
   try {
     const { teacherId } = req.body;
     const user = await userModel.findById(teacherId);
@@ -131,7 +131,7 @@ const handleTeacherReject = async (req, res) => {
   }
 };
 
-const getReportedBlogs = async (req, res) => {
+const getReportedBlogs = async (req, res, next) => {
   try {
     const blogData = await blogModel.aggregate([
       {
@@ -170,7 +170,7 @@ const getReportedBlogs = async (req, res) => {
   }
 };
 
-const changeBlogStatus = async (req, res) => {
+const changeBlogStatus = async (req, res, next) => {
   try {
     const blogId = req.params.id;
     const { isAccess } = req.body;
@@ -190,7 +190,7 @@ const changeBlogStatus = async (req, res) => {
   }
 };
 
-const getPayments = async (req, res) => {
+const getPayments = async (req, res, next) => {
   try {
     const ITEMS_PER_PAGE = 4;
     let page = +req.query.page || 1;
@@ -228,7 +228,7 @@ const getPayments = async (req, res) => {
   }
 };
 
-const getDashboardData = async (req, res) => {
+const getDashboardData = async (req, res, next) => {
   try {
     const studentsData = await userModel.find({ role: 2000 });
     const teachersData = await userModel.find({ role: 3000 });
@@ -255,7 +255,7 @@ const getDashboardData = async (req, res) => {
   }
 };
 
-const handleTeacherPay = async (req, res) => {
+const handleTeacherPay = async (req, res, next) => {
   try {
     const { paymentId } = req.body;
     const existPayment = await paymentModel.findById(paymentId);
@@ -279,7 +279,7 @@ const handleTeacherPay = async (req, res) => {
   }
 };
 
-const getGraphData = async (req, res) => {
+const getGraphData = async (req, res, next) => {
   try {
     const student = await userModel.aggregate([
       { $match: { role: 2000 } },

@@ -8,7 +8,7 @@ const crypto = require("crypto");
 const communityModel = require("../../models/communityModel");
 const communityMessageModel = require("../../models/communityMessageModel");
 
-const getAllTeachers = async (req, res) => {
+const getAllTeachers = async (req, res, next) => {
   try {
     const user = new mongoose.Types.ObjectId(req.userId);
     const teacherIds = await courseModel.distinct("teacher", { users: user });
@@ -26,7 +26,7 @@ const getAllTeachers = async (req, res) => {
   }
 };
 
-const listChatStudents = async (req, res) => {
+const listChatStudents = async (req, res, next) => {
   try {
     const teacherId = req.userId;
     const chats = await ChatModel.find({ participants: teacherId });
@@ -93,7 +93,7 @@ const sendMessage = async (data) => {
   }
 };
 
-const allMessages = async (req, res) => {
+const allMessages = async (req, res, next) => {
   try {
     const recipientId = req.params.id;
     const userId = req.userId;
@@ -116,7 +116,7 @@ const allMessages = async (req, res) => {
   }
 };
 
-const getCommunities = async (req, res) => {
+const getCommunities = async (req, res, next) => {
   try {
     const user = new mongoose.Types.ObjectId(req.userId);
     const communities = await communityModel.find({
@@ -128,7 +128,7 @@ const getCommunities = async (req, res) => {
   }
 };
 
-const getAllCommunityMessages = async (req, res) => {
+const getAllCommunityMessages = async (req, res, next) => {
   try {
     const communityId = req.params.id;
     const existingCommunity = await communityModel.findOne({ communityId });

@@ -11,7 +11,7 @@ const hash = require("../../utils/toHash");
 const chapterModel = require("../../models/chapterModel");
 const categoryModel = require("../../models/categoryModel");
 
-const getUser = async (req, res) => {
+const getUser = async (req, res, next) => {
   try {
     const { userId } = req.query;
     const userData = await userModel.findOne({ _id: userId });
@@ -21,7 +21,7 @@ const getUser = async (req, res) => {
   }
 };
 
-const editUser = async (req, res) => {
+const editUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { fullname } = req.body;
@@ -40,7 +40,7 @@ const editUser = async (req, res) => {
   }
 };
 
-const uploadProfileImage = async (req, res) => {
+const uploadProfileImage = async (req, res, next) => {
   try {
     const { id } = req.body;
     const image = req.files?.image;
@@ -56,7 +56,7 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
-const checkPassword = async (req, res) => {
+const checkPassword = async (req, res, next) => {
   try {
     const { password, userId } = req.body;
     const userData = await userModel.findById(userId);
@@ -73,7 +73,7 @@ const checkPassword = async (req, res) => {
   }
 };
 
-const changePassword = async (req, res) => {
+const changePassword = async (req, res, next) => {
   try {
     const { password, userId } = req.body;
     const hashedPassword = await hash(password);
@@ -86,7 +86,7 @@ const changePassword = async (req, res) => {
   }
 };
 
-const getAllCourses = async (req, res) => {
+const getAllCourses = async (req, res, next) => {
   try {
     const ITEMS_PER_PAGE = 8;
     let page = +req.query.page || 1;
@@ -143,7 +143,7 @@ const getAllCourses = async (req, res) => {
   }
 };
 
-const getCourse = async (req, res) => {
+const getCourse = async (req, res, next) => {
   try {
     const courseId = req.params.id;
     const course = await courseModel
@@ -164,7 +164,7 @@ const getCourse = async (req, res) => {
   }
 };
 
-const getChapter = async (req, res) => {
+const getChapter = async (req, res, next) => {
   try {
     const chapterId = req.params.id;
     const chapter = await chapterModel.findById(chapterId);
@@ -174,7 +174,7 @@ const getChapter = async (req, res) => {
   }
 };
 
-const handleMakePayment = async (req, res) => {
+const handleMakePayment = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { courseId } = req.body;
@@ -208,7 +208,7 @@ const handleMakePayment = async (req, res) => {
   }
 };
 
-const getMyCourse = async (req, res) => {
+const getMyCourse = async (req, res, next) => {
   try {
     const userId = req.userId;
     // const courses = await courseModel
@@ -260,7 +260,7 @@ const getMyCourse = async (req, res) => {
   }
 };
 
-const handleReview = async (req, res) => {
+const handleReview = async (req, res, next) => {
   try {
     const { rating, review, courseId, userId } = req.body;
     const user = new mongoose.Types.ObjectId(userId);
@@ -280,7 +280,7 @@ const handleReview = async (req, res) => {
   }
 };
 
-const handleEditReview = async (req, res) => {
+const handleEditReview = async (req, res, next) => {
   try {
     const reviewId = req.params.id;
     const { rating, review } = req.body;

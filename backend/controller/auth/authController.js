@@ -10,7 +10,7 @@ const courseModel = require("../../models/courseModel");
 const paymentModel = require("../../models/paymentModel");
 const communityModel = require("../../models/communityModel");
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   try {
     const { fullname, email, password, isTeacher } = req.body;
     console.log(req.body);
@@ -48,7 +48,7 @@ const createUser = async (req, res) => {
   }
 };
 
-const verifyOtp = async (req, res) => {
+const verifyOtp = async (req, res, next) => {
   try {
     console.log(req.cookies);
     const { hashOtp, id } = req.cookies;
@@ -74,7 +74,7 @@ const verifyOtp = async (req, res) => {
   }
 };
 
-const resendOtp = async (req, res) => {
+const resendOtp = async (req, res, next) => {
   try {
     const userData = await userModel.findById(req.cookies.id);
     console.log(req.cookies);
@@ -94,7 +94,7 @@ const resendOtp = async (req, res) => {
   }
 };
 
-const handleLogin = async (req, res) => {
+const handleLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -152,7 +152,7 @@ const handleLogin = async (req, res) => {
   }
 };
 
-const handleGoogleLogin = async (req, res) => {
+const handleGoogleLogin = async (req, res, next) => {
   try {
     const { email, picture, name } = req.body.payload;
     const existedUser = await userModel.findOne({ email });
@@ -238,7 +238,7 @@ const handleGoogleLogin = async (req, res) => {
   }
 };
 
-const forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     const userData = await userModel.findOne({ email: email });
@@ -263,7 +263,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-const changePassword = async (req, res) => {
+const changePassword = async (req, res, next) => {
   try {
     console.log("hello");
     const { password, email } = req.body;
@@ -280,7 +280,7 @@ const changePassword = async (req, res) => {
   }
 };
 
-const handleRefreshToken = async (req, res) => {
+const handleRefreshToken = async (req, res, next) => {
   try {
     const cookies = req.cookies;
 
@@ -313,7 +313,7 @@ const handleRefreshToken = async (req, res) => {
   }
 };
 
-const handleLogout = async (req, res) => {
+const handleLogout = async (req, res, next) => {
   try {
     const cookies = req.cookies;
 
@@ -337,7 +337,7 @@ const handleLogout = async (req, res) => {
   }
 };
 
-const handleSuccessPayment = async (req, res) => {
+const handleSuccessPayment = async (req, res, next) => {
   try {
     const { userId, courseId, session_id } = req.query;
     const userData = await userModel.findById(userId);

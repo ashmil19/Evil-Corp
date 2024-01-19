@@ -5,7 +5,7 @@ const blogModel = require("../../models/blogModel");
 const blogCommentModel = require("../../models/blogComment");
 const reportModel = require("../../models/reportModel");
 
-const addBlog = async (req, res) => {
+const addBlog = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { title, description } = req.body;
@@ -29,7 +29,7 @@ const addBlog = async (req, res) => {
   }
 };
 
-const editBlog = async (req, res) => {
+const editBlog = async (req, res, next) => {
   try {
     const blogId = req.params.id;
     const { title, description } = req.body;
@@ -51,7 +51,7 @@ const editBlog = async (req, res) => {
   }
 };
 
-const changeBlogImage = async (req, res) => {
+const changeBlogImage = async (req, res, next) => {
   try {
     const blogId = req.params.id;
     const image = req.files?.image;
@@ -69,7 +69,7 @@ const changeBlogImage = async (req, res) => {
   }
 };
 
-const deleteBlog = async (req, res) => {
+const deleteBlog = async (req, res, next) => {
   try {
     const blogId = req.params.id;
     const blog = await blogModel.findById(blogId);
@@ -86,7 +86,7 @@ const deleteBlog = async (req, res) => {
   }
 };
 
-const getAllBlogs = async (req, res) => {
+const getAllBlogs = async (req, res, next) => {
   try {
     const ITEMS_PER_PAGE = 3;
     let page = +req.query.page || 1;
@@ -133,7 +133,7 @@ const getAllBlogs = async (req, res) => {
   }
 };
 
-const getBlog = async (req, res) => {
+const getBlog = async (req, res, next) => {
   try {
     const userId = req.userId;
     const blogId = req.params.id;
@@ -175,7 +175,7 @@ const getBlog = async (req, res) => {
   }
 };
 
-const getAllMyBlogs = async (req, res) => {
+const getAllMyBlogs = async (req, res, next) => {
   try {
     const ITEMS_PER_PAGE = 3;
     let page = +req.query.page || 1;
@@ -216,7 +216,7 @@ const getAllMyBlogs = async (req, res) => {
   }
 };
 
-const handleLike = async (req, res) => {
+const handleLike = async (req, res, next) => {
   try {
     const userId = req.userId;
     const blogId = req.body.blogId;
@@ -236,7 +236,7 @@ const handleLike = async (req, res) => {
   }
 };
 
-const handleReport = async (req, res) => {
+const handleReport = async (req, res, next) => {
   try {
     const userId = req.userId;
     const {blogId, reason} = req.body;
@@ -287,7 +287,7 @@ const handleReport = async (req, res) => {
   }
 };
 
-const handleComment = async (req, res) => {
+const handleComment = async (req, res, next) => {
   try {
     const userId = req.userId;
     const user = new mongoose.Types.ObjectId(userId);

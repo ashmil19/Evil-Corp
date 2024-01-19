@@ -1,7 +1,7 @@
 const categoryModel = require("../../models/categoryModel");
 const { imageUpload } = require("../../utils/uploadImage");
 
-const createCategory = async (req, res) => {
+const createCategory = async (req, res, next) => {
   try {
     const { name } = req.body;
     const image = req.files.image;
@@ -29,7 +29,7 @@ const createCategory = async (req, res) => {
   }
 };
 
-const changeCategoryImage = async (req, res) => {
+const changeCategoryImage = async (req, res, next) => {
   try {
     const { id } = req.body;
     const image = req.files?.image;
@@ -47,7 +47,7 @@ const changeCategoryImage = async (req, res) => {
   }
 };
 
-const editCategoryName = async (req, res) => {
+const editCategoryName = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
@@ -68,7 +68,7 @@ const editCategoryName = async (req, res) => {
   }
 };
 
-const getAllCategory = async (req, res) => {
+const getAllCategory = async (req, res, next) => {
   try {
     const ITEMS_PER_PAGE = 5;
     let page = +req.query.page || 1;
