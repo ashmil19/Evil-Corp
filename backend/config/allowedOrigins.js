@@ -6,8 +6,9 @@ const allowedOrigins = [
   "https://evil-corp123.vercel.app",
   "https://evilcorp123.netlify.app/",
 
-  "https://evil-corp.ashmil.shop/",
-  "wss://evil-corp.ashmil.shop/",
+  "https://evil-corp.ashmil.shop",
+  "wss://evil-corp.ashmil.shop",
+  "ws://evil-corp.ashmil.shop",
 ]
 
 module.exports = {
