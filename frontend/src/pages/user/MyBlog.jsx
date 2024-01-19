@@ -5,8 +5,6 @@ import Dropzone from 'react-dropzone'
 import { Toaster } from 'react-hot-toast';
 import { Oval } from 'react-loader-spinner'
 import { MdDelete } from "react-icons/md";
-import SunEditor from "suneditor-react";
-import "suneditor/dist/css/suneditor.min.css";
 import ReactPaginate from 'react-paginate';
 
 import Navbar from '../../components/navbars/Navbar'
@@ -18,8 +16,6 @@ const profilePic = 'https://akademi.dexignlab.com/react/demo/static/media/8.0ec0
 const MyBlog = () => {
     const axiosPrivate = useAxiosPrivate()
     const toastHelper = new ToastHelper()
-    const editor = useRef()
-    const valuesEditor = useRef()
 
     const [isOpen, setIsOpen] = useState(false)
     const [coverImage, setCoverImage] = useState(null);
@@ -45,23 +41,6 @@ const MyBlog = () => {
     const [pageCount, setPageCount] = useState(1)
     const currentPage = useRef()
 
-
-    const getSunEditorInstance = (sunEditor) => {
-        editor.current = sunEditor;
-    };
-
-    const editValuesgetSunEditorInstance = (sunEditor) => {
-        valuesEditor.current = sunEditor;
-    };
-
-    const setCodeHandle = () => {
-        setContent(editor.current.getContents());
-    };
-
-    const setEditValuesCodeHandle = () => {
-        setEditContent(valuesEditor.current.getContents());
-    };
-
     function closeModal() {
         setCoverImage(null)
         setIsOpen(false)
@@ -75,10 +54,9 @@ const MyBlog = () => {
         setIsEditOpen(false)
     }
 
-    function openEditModal(id, title, description, content) {
+    function openEditModal(id, title, description) {
         setBlogId(id)
         setEditValues({ title, description })
-        setEditContent(content)
         setIsEditOpen(true)
     }
 
@@ -129,7 +107,6 @@ const MyBlog = () => {
 
         const postData = {
             ...values,
-            content,
             coverImage: coverImage
         }
         console.log(postData);
@@ -153,14 +130,13 @@ const MyBlog = () => {
             return
         }
 
-        const putData = { ...editValues,editContent }
+        const putData = { ...editValues }
         console.log(putData);
 
         axiosPrivate.put(`/user/myBlog/${blogId}`, putData)
             .then((res) => {
                 console.log(res);
                 setFetch(true)
-                setEditContent("")
             })
             .catch((err) => {
                 console.log(err);
@@ -234,7 +210,7 @@ const MyBlog = () => {
                     {blogs && blogs.map((blog) => (
                         <div className="w-full h-24 rounded-lg shadow-lg bg-white flex gap-5 cursor-pointer">
                             <img src={blog?.coverImage?.url} className='w-1/6 h-full object-fit rounded-l-lg hover:bg-black hover:opacity-80' alt="pic" onClick={() => openImageModal(blog?._id)} />
-                            <div className='w-full h-full font-bold flex justify-center items-center truncate' onClick={() => openEditModal(blog?._id, blog?.title, blog?.description, blog?.content)}>{blog?.title}</div>
+                            <div className='w-full h-full font-bold flex justify-center items-center truncate' onClick={() => openEditModal(blog?._id, blog?.title, blog?.description)}>{blog?.title}</div>
                             <div className='bg-gray-400 flex justify-center items-center rounded-r-lg px-10' ><MdDelete className='text-2xl' onClick={() => handleBlogDelete(blog?._id)} /></div>
                         </div>
                     ))}
@@ -308,50 +284,6 @@ const MyBlog = () => {
                                     <div className="mt-2 flex flex-col gap-3">
                                         <Input label="Title" name='title' onChange={handleChanges} />
                                         <Textarea label="Description" name='description' onChange={handleChanges} />
-                                        <SunEditor
-                                            getSunEditorInstance={getSunEditorInstance}
-                                            onChange={setCodeHandle}
-                                            setContents={content}
-                                            setOptions={{
-                                                width: "100%", // Full width
-                                                minHeight: "200px", // Or any other minimum height you want
-                                                maxHeight: "70vh", // Set a maximum height to prevent it from expanding too much
-                                                overflowY: "auto",
-                                                buttonList: [
-                                                    ["undo", "redo", "font", "fontSize", "formatBlock"],
-                                                    [
-                                                        "bold",
-                                                        "underline",
-                                                        "italic",
-                                                        "strike",
-                                                        "subscript",
-                                                        "superscript",
-                                                        "removeFormat",
-                                                    ],
-                                                    [
-                                                        "fontColor",
-                                                        "hiliteColor",
-                                                        "outdent",
-                                                        "indent",
-                                                        "align",
-                                                        "horizontalRule",
-                                                        "list",
-                                                        "table",
-                                                    ],
-                                                    [
-                                                        "link",
-                                                        "image",
-                                                        "video",
-                                                        "fullScreen",
-                                                        "showBlocks",
-                                                        "codeView",
-                                                        "preview",
-                                                        "print",
-                                                        "save",
-                                                    ],
-                                                ],
-                                            }}
-                                        />
                                         <Dropzone onDrop={handleDrop}>
                                             {({ getRootProps, getInputProps }) => (
                                                 <section>
@@ -490,50 +422,6 @@ const MyBlog = () => {
                                     <div className="mt-2 flex flex-col gap-3">
                                         <Input label="Title" name='title' value={editValues.title} onChange={handleEditChanges} />
                                         <Textarea label="Description" name='description' value={editValues.description} onChange={handleEditChanges} />
-                                        <SunEditor
-                                            getSunEditorInstance={editValuesgetSunEditorInstance}
-                                            onChange={setEditValuesCodeHandle}
-                                            setContents={editContent}
-                                            setOptions={{
-                                                width: "100%", // Full width
-                                                minHeight: "200px", // Or any other minimum height you want
-                                                maxHeight: "70vh", // Set a maximum height to prevent it from expanding too much
-                                                overflowY: "auto",
-                                                buttonList: [
-                                                    ["undo", "redo", "font", "fontSize", "formatBlock"],
-                                                    [
-                                                        "bold",
-                                                        "underline",
-                                                        "italic",
-                                                        "strike",
-                                                        "subscript",
-                                                        "superscript",
-                                                        "removeFormat",
-                                                    ],
-                                                    [
-                                                        "fontColor",
-                                                        "hiliteColor",
-                                                        "outdent",
-                                                        "indent",
-                                                        "align",
-                                                        "horizontalRule",
-                                                        "list",
-                                                        "table",
-                                                    ],
-                                                    [
-                                                        "link",
-                                                        "image",
-                                                        "video",
-                                                        "fullScreen",
-                                                        "showBlocks",
-                                                        "codeView",
-                                                        "preview",
-                                                        "print",
-                                                        "save",
-                                                    ],
-                                                ],
-                                            }}
-                                        />
                                     </div>
 
                                     <div className="mt-4 flex justify-center">

@@ -8,7 +8,7 @@ const reportModel = require("../../models/reportModel");
 const addBlog = async (req, res) => {
   try {
     const userId = req.userId;
-    const { title, description, content } = req.body;
+    const { title, description } = req.body;
     const image = req.files.coverImage;
 
     const coverImage = await imageUpload(image);
@@ -18,8 +18,7 @@ const addBlog = async (req, res) => {
       title,
       description,
       coverImage,
-      user,
-      content
+      user
     });
 
     newBlog.save();
@@ -33,7 +32,7 @@ const addBlog = async (req, res) => {
 const editBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
-    const { title, description, editContent } = req.body;
+    const { title, description } = req.body;
 
     const blog = await blogModel.findById(blogId);
 
@@ -44,7 +43,6 @@ const editBlog = async (req, res) => {
 
     blog.title = title;
     blog.description = description;
-    blog.content = editContent;
     await blog.save();
 
     res.status(200).json({ message: "blog is Edited" });

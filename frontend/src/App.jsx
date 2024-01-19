@@ -27,7 +27,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />} >
 
-            {/* <Route path="/" element={<UserChat />} /> */}
+            <Route path="/" element={<Home />} />
             
             <Route element={<CheckAuth />}>
               <Route path="/signup" element={<Registration />} />
