@@ -201,7 +201,7 @@ const handleMakePayment = async (req, res, next) => {
       ],
       mode: "payment",
       success_url: `${process.env.SERVER_URL}successPayment?session_id={CHECKOUT_SESSION_ID}&courseId=${course._id}&userId=${userId}`,
-      cancel_url: `${process.env.CLIENT_URL}course`,
+      cancel_url: `${process.env.CLIENT_URL}user/course`,
     });
 
     res.status(200).json({ id: session.id });
