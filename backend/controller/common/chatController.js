@@ -55,6 +55,8 @@ const sendMessage = async (data) => {
   try {
     const { content, type, conversationId, recipientId, userId } = data;
 
+    console.log({data});
+
     const existingChat = await ChatModel.findOne({ conversationId });
 
     if (existingChat) {

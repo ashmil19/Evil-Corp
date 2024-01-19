@@ -16,6 +16,7 @@ const configureSocket = (io) => {
     });
 
     socket.on("sendMessage", async (data) => {
+      console.log("sendm",data);
       socket.broadcast.to(data.conversationId).emit("receiveMessage", data);
       await sendMessage(data);
     });
