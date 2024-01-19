@@ -361,7 +361,7 @@ const handleSuccessPayment = async (req, res, next) => {
       { $addToSet: { participants: userId } }
     );
 
-    res.redirect(`${process.env.CLIENT_URL}/user/myCourse`);
+    res.redirect(`${process.env.CLIENT_URL}user/myCourse`);
   } catch (error) {
     next(error);
   }
