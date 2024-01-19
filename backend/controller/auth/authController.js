@@ -36,6 +36,7 @@ const createUser = async (req, res) => {
     const options = {
       maxAge: 90 * 1000,
       httpOnly: true,
+      secure: true,
     };
 
     const result = await otp.sendOtp({ fullname, email });
@@ -80,6 +81,7 @@ const resendOtp = async (req, res) => {
     const options = {
       maxAge: 90 * 1000,
       httpOnly: true,
+      secure: true,
     };
     const result = await otp.sendOtp({
       fullname: userData.fullname,
@@ -187,6 +189,7 @@ const handleGoogleLogin = async (req, res) => {
       res.cookie("jwt", refreshToken, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
+        secure: true,
       });
       res.status(200).json({
         role: newUserData.role,
@@ -221,6 +224,7 @@ const handleGoogleLogin = async (req, res) => {
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
+      secure: true,
     });
     res.status(200).json({
       role: existedUser.role,
@@ -247,6 +251,7 @@ const forgotPassword = async (req, res) => {
     const options = {
       maxAge: 90 * 1000,
       httpOnly: true,
+      secure: true,
     };
 
     const result = await otp.sendOtp({ fullname: userData.fullname, email });
@@ -325,7 +330,7 @@ const handleLogout = async (req, res) => {
     userData.refreshToken = "";
     await userData.save();
 
-    res.clearCookie("jwt", { httpOnly: true });
+    res.clearCookie("jwt", { httpOnly: true, secure: true, });
     res.sendStatus(204);
   } catch (error) {
     next(error);
