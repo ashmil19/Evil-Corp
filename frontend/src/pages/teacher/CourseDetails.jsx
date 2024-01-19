@@ -30,14 +30,16 @@ import ToastHelper from "../../helper/ToastHelper";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import SortableItem from "../../components/teacher/SortableItem";
 import { handleChapterUpload } from "../../thunks/socketThunks";
-import { startIsProgressLoading } from "../../features/socketSlice";
+import { startIsProgressLoading, stopIsProgressLoading } from "../../features/socketSlice";
 
 const profilePic =
   "https://akademi.dexignlab.com/react/demo/static/media/8.0ec0e6b47b83af64e0c9.jpg";
 const dummyVideo =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
-const socket = io(process.env.CHAT_SOCKET_URL);
+const socket = io("evilcorp.ashmil.shop", {
+  transports: ["websocket", "polling"],
+});
 
 const CourseDetails = () => {
   const socketProgress = useSelector((state) => state.socket);
@@ -366,25 +368,25 @@ const CourseDetails = () => {
   }, [message, fetch, socketProgress]);
 
   useEffect(() => {
-    // socket.on("videoUpload", (data) => {
-    //   console.log("d", data);
-    //   if (data?.isVideoUploaded) {
-    //     setprogressLoading(false);
-    //     dispatch(
-    //       stopIsProgressLoading({ isProgress: false, courseId: courseId }),
-    //     );
-    //     setFetch(true);
-    //   }
-    // });
+    socket.on("videoUpload", (data) => {
+      console.log("d", data);
+      if (data?.isVideoUploaded) {
+        // setprogressLoading(false);
+        dispatch(
+          stopIsProgressLoading({ isProgress: false, courseId: courseId }),
+        );
+        setFetch(true);
+      }
+    });
 
-    const handleChapterUploadSocket = (data) => {
-      dispatch(handleChapterUpload(data));
-    };
+    // const handleChapterUploadSocket = (data) => {
+    //   dispatch(handleChapterUpload(data));
+    // };
 
-    socket.on("videoUpload", handleChapterUploadSocket);
+    // socket.on("videoUpload", handleChapterUploadSocket);
 
     return () => {
-      socket.off("videoUpload", handleChapterUploadSocket);
+      socket.off("videoUpload");
     };
   }, [dispatch]);
 

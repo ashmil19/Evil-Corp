@@ -10,7 +10,7 @@ var io = require('socket.io-client');
 
 mongodb();
 
-var socket = io.connect("evilcorp.ashmil.shop", {reconnect: true});
+var socket = io("evilcorp.ashmil.shop", {reconnect: true});
 
 
 const workerHandler = async (job) => {
