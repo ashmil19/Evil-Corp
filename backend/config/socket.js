@@ -8,10 +8,12 @@ const configureSocket = (io) => {
     console.log("socket connected", socket.id);
 
     socket.on("joinRoom", (conversationId) => {
+      console.log("chat",conversationId);
       socket.join(conversationId);
     });
 
     socket.on("joinCommunity", (communityId) => {
+      console.log("community",communityId);
       socket.join(communityId);
     });
 
@@ -22,6 +24,7 @@ const configureSocket = (io) => {
     });
 
     socket.on("communitySendMessage", async (data) => {
+      console.log("comm",data);
       socket.broadcast
         .to(data.communityId)
         .emit("communityReceiveMessage", data);
