@@ -5,7 +5,9 @@ import { Button } from "@material-tailwind/react";
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
-const socket = io("https://evil-corp.ashmil.shop");
+const socket = io("https://evil-corp.ashmil.shop/",{
+  transports: ["websocket", "polling"],
+});
 
 const CommunityUi = ({ chatId, community }) => {
   const axiosPrivate = useAxiosPrivate();
@@ -85,7 +87,23 @@ const CommunityUi = ({ chatId, community }) => {
   };
 
   useEffect(() => {
-    (async () => {
+    socket.connect();
+
+    socket.on("connect", () => {
+      console.log("Socket connected");
+    });
+    
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+    
+    socket.on("error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
+    socket.emit("joinCommunity", chatId);
+
+    const fetchcommunitymessage = async () => {
       const data = await axiosPrivate.get(`/chat/communityMessages/${chatId}`);
 
       console.log(data);
@@ -94,8 +112,14 @@ const CommunityUi = ({ chatId, community }) => {
 
       setAllMessages(data?.data?.messages);
 
-      socket.emit("joinCommunity", chatId);
-    })();
+      if (socket.connected) {
+        console.log("socket connected");
+      } else {
+        console.log("socket not connected");
+      }
+    };
+
+    fetchcommunitymessage();
 
     return () => {
       socket.off("communityReceiveMessage");
@@ -126,9 +150,11 @@ const CommunityUi = ({ chatId, community }) => {
 
   return (
     <>
-      <div className="rounded-t-2xl bg-red-500 p-4 flex gap-2">
+      <div className="flex gap-2 rounded-t-2xl bg-red-500 p-4">
         <span>{community?.communityName}</span>
-        <span className="text-verySmall flex justify-center items-center">{community?.participants?.length} members</span>
+        <span className="flex items-center justify-center text-verySmall">
+          {community?.participants?.length} members
+        </span>
       </div>
       <div className="flex h-full flex-auto flex-shrink-0 flex-col rounded-b-2xl bg-gray-300 p-4">
         <div className="mb-4 flex h-full flex-col overflow-x-auto">

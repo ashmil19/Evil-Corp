@@ -7,6 +7,7 @@ const allowedOrigins = [
   "https://evilcorp123.netlify.app/",
 
   "https://evil-corp.ashmil.shop/",
+  "wss://evil-corp.ashmil.shop/",
 ]
 
 module.exports = {

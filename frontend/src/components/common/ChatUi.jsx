@@ -5,7 +5,9 @@ import { Button } from "@material-tailwind/react";
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
-const socket = io("https://evil-corp.ashmil.shop");
+const socket = io("https://evil-corp.ashmil.shop/",{
+  transports: ["websocket", "polling"],
+});
 
 const ChatUi = ({ recipientId, recipient }) => {
   const axiosPrivate = useAxiosPrivate();
@@ -79,15 +81,38 @@ const ChatUi = ({ recipientId, recipient }) => {
   };
 
   useEffect(() => {
-    (async () => {
+
+    socket.connect();
+
+    socket.on("connect", () => {
+      console.log("Socket connected");
+    });
+    
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+    
+    socket.on("error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
+    const fetchChatMessage = async () => {
       const data = await axiosPrivate.get(`/chat/message/${recipientId}`);
 
       setConversationId(data?.data?.conversationId);
 
       setAllMessages(data?.data?.messages);
 
+      if(socket.connected){
+        console.log("socket connected");
+      }else{
+        console.log("socket not connected");
+      }
+
       socket.emit("joinRoom", data?.data?.conversationId);
-    })();
+    }
+
+    fetchChatMessage();
 
     console.log("haii");
 
