@@ -5,13 +5,13 @@ const { uploadVideo } = require("./videoUpload");
 const chapterModel = require("../models/chapterModel");
 const courseModel = require("../models/courseModel");
 const mongodb = require("../config/mongo");
-var io = require('socket.io-client');
-
+var io = require("socket.io-client");
 
 mongodb();
 
-var socket = io("evilcorp.ashmil.shop", {reconnect: true});
-
+var socket = io("evilcorp.ashmil.shop", {
+  transports: ["websocket", "polling"],
+});
 
 const workerHandler = async (job) => {
   switch (job.data.type) {
@@ -31,9 +31,9 @@ const workerHandler = async (job) => {
 
         socket.emit("videoUploadSuccess", {
           isVideoUploaded: true,
-          courseId
+          courseId,
         });
-        
+
         return "success";
       } catch (error) {
         console.log(error);
