@@ -5,7 +5,7 @@ import { Button } from "@material-tailwind/react";
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
-const socket = io("https://www.evil-corp.ashmil.shop");
+const socket = io("https://evil-corp.ashmil.shop");
 
 const CommunityUi = ({ chatId, community }) => {
   const axiosPrivate = useAxiosPrivate();
