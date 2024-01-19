@@ -32,7 +32,54 @@ const getTeacher = async (req, res) => {
   try {
     const userId = req.params.id;
     const teacherData = await teacherModel.findOne({ _id: userId });
-    res.status(200).json({ teacher: teacherData });
+    
+    const teacherId = new mongoose.Types.ObjectId(req.userId);
+    const allCourses = await courseModel.find({ teacher: teacherId });
+    const publicCourses = await courseModel.find({
+      teacher: teacherId,
+      isPublished: true,
+    });
+
+    const paymentData = await paymentModel.aggregate([
+      {
+        $match: {
+          teacher_id: teacherId,
+          isTeacherPay: true,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    const studentData = await courseModel.aggregate([
+      {
+        $match: {
+          teacher: teacherId,
+        },
+      },
+      {
+        $unwind: "$users",
+      },
+      {
+        $group: {
+          _id: "$users",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const data = {
+      students: studentData?.length,
+      allCourses: allCourses?.length,
+      publicCourses: publicCourses?.length,
+      totalAmount: paymentData[0]?.total,
+    };
+
+    res.status(200).json({ teacher: teacherData, data });
   } catch (error) {
     next(error);
   }

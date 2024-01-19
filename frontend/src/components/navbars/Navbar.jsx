@@ -32,7 +32,7 @@ function Navbar({ onClick, text }) {
               </div>
               <div className="hidden md:flex md:justify-between">
                 <div className=" flex items-center justify-between space-x-7">
-                  <Link to="/user">
+                  <Link to={authState.userId ? "/user" : "/"}>
                     <p className="text-medium hvr-underline-from-left cursor-pointer py-1 text-white">
                       Home
                     </p>

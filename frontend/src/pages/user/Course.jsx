@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import ReactPaginate from "react-paginate";
@@ -13,14 +14,18 @@ import courseBanner from "../../asset/courseBanner.jpeg";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const Course = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const categoryId = location.state && location.state.categoryId;
+
   const axiosPrivate = useAxiosPrivate();
   const [courses, setCourses] = useState(null);
   const [categories, setCategories] = useState(null);
   const [pageCount, setPageCount] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [price, setPrice] = React.useState(-1);
-  const [category, setCategory] = React.useState(null);
+  const [category, setCategory] = React.useState(categoryId ||  null);
 
   const currentPage = useRef();
 

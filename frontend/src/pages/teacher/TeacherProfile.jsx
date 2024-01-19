@@ -27,6 +27,7 @@ const TeacherProfile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [image, setImage] = useState(null);
   const [teacherData, setTeacherData] = useState({});
+  const [data, setData] = useState(null);
   const [editValues, setEditValues] = useState({
     fullname: authState.user,
   });
@@ -98,7 +99,8 @@ const TeacherProfile = () => {
     const userId = authState.userId;
     axiosPrivate.get(`/teacher/profile/${userId}`).then((res) => {
       setTeacherData(res?.data?.teacher);
-      console.log(res?.data?.teacher);
+      setData(res?.data?.data);
+      console.log(res?.data);
     });
 
     setFetch(false);
@@ -124,7 +126,7 @@ const TeacherProfile = () => {
         <div className="flex h-full w-full flex-col gap-4 bg-gray-300 px-10 py-5 md:flex-row">
           <div className="flex h-full w-full flex-col gap-4">
             <div className="relative flex h-1/2 flex-col rounded-b-md">
-              <div className="h-1/5 md:h-1/3 rounded-tl-md rounded-tr-md bg-profile-card-color"></div>
+              <div className="h-1/5 rounded-tl-md rounded-tr-md bg-profile-card-color md:h-1/3"></div>
               <div className="h-3/5 rounded-bl-md rounded-br-md bg-white md:h-2/3">
                 <div className="flex h-1/4 justify-end gap-4 pr-5">
                   <div className="flex items-center justify-center">
@@ -169,7 +171,7 @@ const TeacherProfile = () => {
               </div>
             </div>
             <div className="h-1/2 rounded-md bg-white">
-              <div className="flex h-2/3 flex-col justify-center gap-2 pl-5">
+              {/* <div className="flex h-2/3 flex-col justify-center gap-2 pl-5">
                 <div className="font-bold">About</div>
                 <div className="w-3/4 text-sm">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -177,10 +179,24 @@ const TeacherProfile = () => {
                   Ut enim ad minim veniam, quis nostrud exercitation ullamco
                   laboris nisi ut aliquip ex ea commodo consequat.
                 </div>
-              </div>
-              <div className="flex h-1/3 flex-col justify-center gap-2 pl-5">
-                <div className="text-lg font-semibold">Expertise:</div>
-                <div className="text-sm">Bug Bounty</div>
+              </div> */}
+              <div className="flex h-full flex-col justify-evenly gap-2 pl-5">
+                <div className="flex gap-3">
+                  <div className="text-base font-semibold text-center">Total Students:</div>
+                  <div className="text-sm self-center">{data?.students || 0}</div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="text-base font-semibold text-center">Total Courses:</div>
+                  <div className="text-sm self-center">{data?.allCourses || 0}</div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="text-base font-semibold text-center">Public Courses:</div>
+                  <div className="text-sm self-center">{data?.publicCourses || 0}</div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="text-base font-semibold text-center">Revenue:</div>
+                  <div className="text-sm self-center">{data?.totalAmount || 0}</div>
+                </div>
               </div>
             </div>
           </div>

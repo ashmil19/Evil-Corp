@@ -64,9 +64,9 @@ const TeacherTransactions = () => {
               <th scope="col" className="px-6 py-3 capitalize">
                 price
               </th>
-              <th scope="col" className="px-6 py-3 capitalize">
+              {/* <th scope="col" className="px-6 py-3 capitalize">
                 Action
-              </th>
+              </th> */}
             </tr>
           </thead>
           <tbody>
@@ -88,7 +88,7 @@ const TeacherTransactions = () => {
                 <td className="px-6 py-4">{payment?.course_id?.title}</td>
                 <td className="px-6 py-4">{payment?.teacher_id?.fullname}</td>
                 <td className="px-6 py-4">{payment?.amount}</td>
-                <td className="px-6 py-4">
+                {/* <td className="px-6 py-4">
                   {payment?.isTeacherPay ? (
                     <Button disabled={true} color="red">
                       Paid
@@ -96,7 +96,7 @@ const TeacherTransactions = () => {
                   ) : (
                     <Button onClick={() => openModal(payment?._id)}>Pay</Button>
                   )}
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

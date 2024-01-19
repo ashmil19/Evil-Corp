@@ -27,9 +27,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />} >
 
-            <Route path="/" element={<Home />} />
             
             <Route element={<CheckAuth />}>
+              <Route path="/" element={<Home />} />
               <Route path="/signup" element={<Registration />} />
               <Route path="/login" element={<Login />} />
               <Route path="/otp" element={<OtpComponent/>} />
