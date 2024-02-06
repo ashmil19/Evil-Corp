@@ -13,6 +13,8 @@ var socket = io("evilcorp.ashmil.shop", {
   transports: ["websocket", "polling"],
 });
 
+console.log({socket})
+
 if(socket.connected){
   console.log("socket is connected");
 }else{
