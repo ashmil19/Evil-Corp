@@ -9,7 +9,7 @@ var io = require("socket.io-client");
 
 mongodb();
 
-var socket = io("evilcorp.ashmil.shop", {
+var socket = io("https://evilcorp.ashmil.shop", {
   transports: ["websocket", "polling"],
 });
 
