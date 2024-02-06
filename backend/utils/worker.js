@@ -19,9 +19,14 @@ if(socket.connected){
   console.log("socket is not connected");
 }
 
+socket.on("error",(error)=>{
+  console.log("socket connection error:",error);
+})
+
 socket.on("connect", ()=>{
   console.log("SOCKET CONNECTED");
 })
+
 
 const workerHandler = async (job) => {
   switch (job.data.type) {
