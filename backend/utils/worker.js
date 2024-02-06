@@ -13,6 +13,16 @@ var socket = io("evilcorp.ashmil.shop", {
   transports: ["websocket", "polling"],
 });
 
+if(socket.connected){
+  console.log("socket is connected");
+}else{
+  console.log("socket is not connected");
+}
+
+socket.on("connect", ()=>{
+  console.log("SOCKET CONNECTED");
+})
+
 const workerHandler = async (job) => {
   switch (job.data.type) {
     case "VideoUpload": {
