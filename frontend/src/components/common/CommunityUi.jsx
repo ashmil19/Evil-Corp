@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { Button } from "@material-tailwind/react";
+import { Toaster } from "react-hot-toast";
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
@@ -37,7 +38,13 @@ const CommunityUi = ({ chatId, community }) => {
   }, [allMessages]);
 
   const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
+    const selectedFile = event.target.files[0];  
+
+    if (!(selectedFile?.type?.startsWith("image/"))) {
+      toastHelper.showToast("Please upload a valid image file.");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setFilePreview({ dataURL: reader.result, type: selectedFile.type });
@@ -271,6 +278,7 @@ const CommunityUi = ({ chatId, community }) => {
           </div>
         </div>
       </div>
+      <Toaster />
     </>
   );
 };

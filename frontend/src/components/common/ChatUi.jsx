@@ -2,14 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { Button } from "@material-tailwind/react";
+import { Toaster } from "react-hot-toast";
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import ToastHelper from "../../helper/ToastHelper";
 
-const socket = io("evilcorp.ashmil.shop",{
+const socket = io("evilcorp.ashmil.shop", {
   transports: ["websocket", "polling"],
 });
 
 const ChatUi = ({ recipientId, recipient }) => {
+  const toastHelper = new ToastHelper();
   const axiosPrivate = useAxiosPrivate();
   const authState = useSelector((state) => state.auth);
 
@@ -25,7 +28,11 @@ const ChatUi = ({ recipientId, recipient }) => {
   };
 
   const scrollToBottom = () => {
-    scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+    scrollRef?.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+      inline: "nearest",
+    });
   };
 
   useEffect(() => {
@@ -34,6 +41,12 @@ const ChatUi = ({ recipientId, recipient }) => {
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
+
+    if (!(selectedFile?.type?.startsWith("image/"))) {
+      toastHelper.showToast("Please upload a valid image file.");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setFilePreview({ dataURL: reader.result, type: selectedFile.type });
@@ -81,17 +94,16 @@ const ChatUi = ({ recipientId, recipient }) => {
   };
 
   useEffect(() => {
-
     socket.connect();
 
     socket.on("connect", () => {
       console.log("Socket connected");
     });
-    
+
     socket.on("disconnect", () => {
       console.log("Socket disconnected");
     });
-    
+
     socket.on("error", (error) => {
       console.error("Socket connection error:", error);
     });
@@ -103,14 +115,14 @@ const ChatUi = ({ recipientId, recipient }) => {
 
       setAllMessages(data?.data?.messages);
 
-      if(socket.connected){
+      if (socket.connected) {
         console.log("socket connected");
-      }else{
+      } else {
         console.log("socket not connected");
       }
 
       socket.emit("joinRoom", data?.data?.conversationId);
-    }
+    };
 
     fetchChatMessage();
 
@@ -153,7 +165,7 @@ const ChatUi = ({ recipientId, recipient }) => {
                         <div className="relative mr-3 rounded-xl bg-indigo-100 px-4 py-2 text-sm shadow">
                           {message?.type === "String" ? (
                             <div>{message.content}</div>
-                            ) : (
+                          ) : (
                             <img src={message.content} alt="Preview" />
                           )}
                         </div>
@@ -165,7 +177,7 @@ const ChatUi = ({ recipientId, recipient }) => {
                         <div className="relative ml-3 rounded-xl bg-white px-4 py-2 text-sm shadow">
                           {message?.type === "String" ? (
                             <div>{message.content}</div>
-                            ) : (
+                          ) : (
                             <img src={message.content} alt="Preview" />
                           )}
                         </div>
@@ -252,6 +264,7 @@ const ChatUi = ({ recipientId, recipient }) => {
           </div>
         </div>
       </div>
+      <Toaster />
     </>
   );
 };
