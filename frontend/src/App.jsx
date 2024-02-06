@@ -13,6 +13,10 @@ import CheckAuth from "./components/features/checkAuth"
 import OtpComponent from "./components/auth/OtpComponent"
 import ForgotPasswordOtp from "./components/auth/ForgotPasswordOtp"
 import NewPassword from "./pages/auth/NewPassword"
+import { stopIsProgressLoading } from "./features/socketSlice"
+import { useEffect } from "react"
+import io from "socket.io-client";
+import { useDispatch } from "react-redux";
 
 const ROLES = {
   'User' : 2000,
@@ -20,7 +24,32 @@ const ROLES = {
   'Admin' : 1000
 }
 
+const socket = io("evilcorp.ashmil.shop", {
+  transports: ["websocket", "polling"],
+});
+
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    socket.on("videoUpload", (data) => {
+      if (data?.isVideoUploaded) {
+        dispatch(
+          stopIsProgressLoading({ isProgress: false, courseId: data?.courseId }),
+        );
+      }
+    });
+
+    // const handleChapterUploadSocket = (data) => {
+    //   dispatch(handleChapterUpload(data));
+    // };
+
+    // socket.on("videoUpload", handleChapterUploadSocket);
+
+    return () => {
+      socket.off("videoUpload");
+    };
+  }, [dispatch]);
 
   return (
     <div className="font-poppins">

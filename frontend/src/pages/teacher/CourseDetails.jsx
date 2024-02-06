@@ -369,9 +369,7 @@ const CourseDetails = () => {
 
   useEffect(() => {
     socket.on("videoUpload", (data) => {
-      console.log("d", data);
       if (data?.isVideoUploaded) {
-        // setprogressLoading(false);
         dispatch(
           stopIsProgressLoading({ isProgress: false, courseId: courseId }),
         );
