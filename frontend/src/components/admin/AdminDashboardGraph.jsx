@@ -36,7 +36,7 @@ const AdminDashboardGraph = () => {
 
   return (
     
-    <div className="h-64 flex flex-col md:flex-row gap-2">
+    <div className="h-2/5 flex flex-col md:flex-row gap-2">
       <div className="w-full md:w-1/2 h-full bg-gray-100 rounded-md flex justify-center items-center">
         <Doughnut
           data={{

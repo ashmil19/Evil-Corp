@@ -32,7 +32,7 @@ const TeacherDashboardGraph = () => {
   }, []);
 
   return (
-    <div className="h-64 flex flex-col md:flex-row gap-2 bg-gray-100 rounded-md">
+    <div className="h-2/5 flex flex-col md:flex-row gap-2 bg-gray-100 rounded-md">
       <div className="w-full  h-full bg-gray-100 rounded-md flex justify-center items-center">
         <Line
           data={{

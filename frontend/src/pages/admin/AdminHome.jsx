@@ -9,7 +9,7 @@ function AdminHome() {
   return (
     <div className="h-screen w-screen overflow-x-hidden">
       <AdminNavbar />
-      <div className="flex h-auto w-full flex-col gap-4  bg-dashboard-bg p-5 md:gap-8 md:p-8 ">
+      <div className="flex h-screen w-full flex-col gap-4  bg-dashboard-bg p-5 md:gap-8 md:p-8 ">
         <DashboardTextContent text="Admin" />
         <AdminDashboardCardSection />
         <AdminDashboardGraph />

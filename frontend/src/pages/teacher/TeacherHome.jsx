@@ -9,7 +9,7 @@ const TeacherHome = () => {
   return (
     <div className='w-screen h-screen+50 md:h-screen overflow-x-hidden'>
       <TeacherNavbar />
-      <div className='w-full h-auto bg-dashboard-bg p-5 md:p-8  flex flex-col gap-4 md:gap-8'>
+      <div className='w-full h-screen  bg-dashboard-bg p-5 md:p-8  flex flex-col gap-4 md:gap-8'>
           <DashboardTextContent text="teacher" />
           <DashboardCardSection />
           <TeacherDashboardGraph />

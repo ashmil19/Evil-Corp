@@ -181,12 +181,27 @@ function Navbar({ onClick, text }) {
                   </Link>
                 </div>
 
-                <span
+
+                {authState?.role?.find((role) =>
+                  allowedRoles?.includes(role),
+                ) ? (
+                  <span
                   className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium md:hidden"
                   onClick={logout}
                 >
                   Logout
                 </span>
+                ) : (
+                  <span
+                    className="text-custom-btn-color cursor-pointer bg-custom-btnColor px-3 py-1 font-medium md:hidden"
+                    onClick={
+                      onClick == undefined ? () => navigate("/login") : onClick
+                    }
+                  >
+                    {text}
+                  </span>
+                )}
+                
               </div>
             </div>
           )}
